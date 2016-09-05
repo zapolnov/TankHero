@@ -5,6 +5,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <map>
+#include <unordered_map>
 #include <limits>
 #include <string>
 #include <cstdlib>
@@ -27,6 +29,69 @@
  #pragma warning(pop)
 #endif
 
+namespace
+{
+    struct XmlMaterial
+    {
+        glm::vec3 ambientColor;
+        glm::vec3 diffuseColor;
+        glm::vec3 specularColor;
+        std::string diffuseMap;
+        std::string normalMap;
+        std::string specularMap;
+        float opacity;
+        float shininess;
+        Mesh::ElementBlendMode blendMode;
+        bool twoSided;
+        bool hasAmbientColor = false;
+        bool hasDiffuseColor = false;
+        bool hasSpecularColor = false;
+        bool hasDiffuseMap = false;
+        bool hasNormalMap = false;
+        bool hasSpecularMap = false;
+        bool hasOpacity = false;
+        bool hasShininess = false;
+        bool hasBlendMode = false;
+        bool hasTwoSided = false;
+        bool visited = false;
+    };
+
+    class StringTable
+    {
+    public:
+        StringTable()
+        {
+            mData.emplace_back(0);
+            mStrings[std::string()] = 0;
+        }
+
+        uint16_t addString(const std::string& text)
+        {
+            auto it = mStrings.find(text);
+            if (it != mStrings.end())
+                return it->second;
+
+            if (mData.size() + text.length() + 1 > 65535) {
+                fprintf(stderr, "string table is too large.\n");
+                exit(1);
+            }
+
+            size_t offset = mData.size();
+            mData.resize(offset + text.length() + 1);
+            std::memcpy(&mData[offset], text.c_str(), text.length() + 1);
+
+            mStrings[text] = uint16_t(offset);
+            return uint16_t(offset);
+        }
+
+        const std::vector<char>& rawBytes() const { return mData; }
+
+    private:
+        std::unordered_map<std::string, uint16_t> mStrings;
+        std::vector<char> mData;
+    };
+}
+
 static const char* gOutputFile = nullptr;
 static const char* gXmlFile = nullptr;
 static std::string gInputDirectory;
@@ -42,10 +107,12 @@ static bool gFlipUVs = true;
 static std::vector<Mesh::Element> gMeshElements;
 static std::unique_ptr<VertexData> gVertexData;
 static std::vector<uint16_t> gIndexData;
+static std::map<std::string, XmlMaterial> gXmlMaterials;
 static glm::vec3 gBoundingBoxMin;
 static glm::vec3 gBoundingBoxMax;
 static glm::vec3 gBoundingSphereCenter;
 static float gBoundingSphereRadius;
+static StringTable gStringTable;
 
 static std::string stripFileName(const std::string& path)
 {
@@ -102,6 +169,133 @@ static bool xmlToBool(const TiXmlElement* element)
     exit(1);
 }
 
+static float xmlToFloat(const TiXmlElement* element, float defValue = 0.0f)
+{
+    float value = defValue;
+
+    const char* str = element->GetText();
+    if (str) {
+        std::stringstream ss(str);
+        ss.imbue(std::locale("C"));
+        ss >> value;
+    }
+
+    return value;
+}
+
+static glm::vec3 xmlToRGB(const TiXmlElement* element)
+{
+    float r = 0.0f;
+    float g = 0.0f;
+    float b = 0.0f;
+
+    {
+        const char* str = element->Attribute("r");
+        if (str) {
+            std::stringstream ss(str);
+            ss.imbue(std::locale("C"));
+            ss >> r;
+        }
+    }
+
+    {
+        const char* str = element->Attribute("g");
+        if (str) {
+            std::stringstream ss(str);
+            ss.imbue(std::locale("C"));
+            ss >> g;
+        }
+    }
+
+    {
+        const char* str = element->Attribute("b");
+        if (str) {
+            std::stringstream ss(str);
+            ss.imbue(std::locale("C"));
+            ss >> b;
+        }
+    }
+
+    return glm::vec3(r, g, b);
+}
+
+static std::string xmlToString(const TiXmlElement* element)
+{
+    const char* text = element->GetText();
+    return (text ? std::string(text) : std::string());
+}
+
+static void readXmlMaterial(const TiXmlElement* element)
+{
+    const char* XML_NAME = "name";
+
+    const char* name = element->Attribute(XML_NAME);
+    if (!name) {
+        fprintf(stderr, "in file \"%s\" at line %d, column %d: missing attribute \"%s\".\n",
+            gXmlFile, element->Row(), element->Column(), XML_NAME);
+        exit(1);
+    }
+
+    auto& r = gXmlMaterials.emplace(name, XmlMaterial{});
+    if (!r.second) {
+        fprintf(stderr, "in file \"%s\" at line %d, column %d: duplicate material \"%s\".\n",
+            gXmlFile, element->Row(), element->Column(), name);
+        exit(1);
+    }
+
+    auto& material = r.first->second;
+    for (const auto* child = element->FirstChildElement(); child; child = child->NextSiblingElement()) {
+        if (child->ValueStr() == "AmbientColor") {
+            material.hasAmbientColor = true;
+            material.ambientColor = xmlToRGB(child);
+        } else if (child->ValueStr() == "DiffuseColor") {
+            material.hasDiffuseColor = true;
+            material.diffuseColor = xmlToRGB(child);
+        } else if (child->ValueStr() == "SpecularColor") {
+            material.hasSpecularColor = true;
+            material.specularColor = xmlToRGB(child);
+        } else if (child->ValueStr() == "DiffuseMap") {
+            material.hasDiffuseMap = true;
+            material.diffuseMap = xmlToString(child);
+        } else if (child->ValueStr() == "NormalMap") {
+            material.hasNormalMap = true;
+            material.normalMap = xmlToString(child);
+        } else if (child->ValueStr() == "SpecularMap") {
+            material.hasSpecularMap = true;
+            material.specularMap = xmlToString(child);
+        } else if (child->ValueStr() == "Opacity") {
+            material.hasOpacity = true;
+            material.opacity = xmlToFloat(child, 1.0f);
+        } else if (child->ValueStr() == "Shininess") {
+            material.hasShininess = true;
+            material.shininess = xmlToFloat(child);
+        } else if (child->ValueStr() == "TwoSided") {
+            material.hasTwoSided = true;
+            material.twoSided = xmlToBool(child);
+        } else if (child->ValueStr() == "BlendMode") {
+            const char* str = child->GetText();
+            if (!std::strcmp(str, "none"))
+                material.blendMode = Mesh::NoBlending;
+            else if (!std::strcmp(str, "default"))
+                material.blendMode = Mesh::DefaultBlending;
+            else if (!std::strcmp(str, "premultiplied"))
+                material.blendMode = Mesh::PremultipliedBlending;
+            else if (!std::strcmp(str, "additive"))
+                material.blendMode = Mesh::AdditiveBlending;
+            else {
+                fprintf(stderr, "in file \"%s\" at line %d, column %d: invalid value \"%s\" for element \"%s\".\n",
+                    gXmlFile, child->Row(), child->Column(), str, child->Value());
+                exit(1);
+            }
+            material.hasBlendMode = true;
+        } else {
+            fprintf(stderr, "unable to parse file \"%s\": at line %d, column %d: unexpected element \"%s\".\n",
+                gXmlFile, child->Row(), child->Column(), child->Value());
+            exit(1);
+        }
+    }
+}
+
 static void readXmlFile()
 {
     const std::string XML_ROOT = "Mesh";
@@ -141,6 +335,8 @@ static void readXmlFile()
             gFixInfacingNormals = xmlToBool(element);
         else if (element->ValueStr() == "FlipUVs")
             gFlipUVs = xmlToBool(element);
+        else if (element->ValueStr() == "Material")
+            readXmlMaterial(element);
         else {
             fprintf(stderr, "unable to parse file \"%s\": at line %d, column %d: unexpected element \"%s\".\n",
                 gXmlFile, element->Row(), element->Column(), element->Value());
@@ -285,6 +481,90 @@ static void readMeshFile()
         element.firstIndex = uint32_t(gIndexData.size());
         element.indexCount = uint32_t(indexCount);
 
+        const aiMaterial* sceneMeshMaterial = scene->mMaterials[sceneMesh->mMaterialIndex];
+        if (sceneMeshMaterial->Get(AI_MATKEY_NAME, materialName) == AI_SUCCESS) {
+            std::string material = std::string(materialName.data, materialName.length);
+
+            aiColor3D ambientColor;
+            if (sceneMeshMaterial->Get(AI_MATKEY_COLOR_AMBIENT, ambientColor) != AI_SUCCESS)
+                element.ambientColor = glm::vec3(0.0f);
+            else
+                element.ambientColor = glm::vec3(ambientColor.r, ambientColor.g, ambientColor.b);
+
+            aiColor3D diffuseColor;
+            if (sceneMeshMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) != AI_SUCCESS)
+                element.diffuseColor = glm::vec3(1.0f);
+            else
+                element.diffuseColor = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
+
+            aiColor3D specularColor;
+            if (sceneMeshMaterial->Get(AI_MATKEY_COLOR_SPECULAR, specularColor) != AI_SUCCESS)
+                element.specularColor = glm::vec3(0.0f);
+            else
+                element.specularColor = glm::vec3(specularColor.r, specularColor.g, specularColor.b);
+
+            float opacity;
+            if (sceneMeshMaterial->Get(AI_MATKEY_OPACITY, opacity) != AI_SUCCESS)
+                element.opacity = 1.0f;
+            else
+                element.opacity = opacity;
+
+            float shininess;
+            if (sceneMeshMaterial->Get(AI_MATKEY_SHININESS, shininess) != AI_SUCCESS)
+                element.shininess = 0.0f;
+            else
+                element.shininess = shininess;
+
+            element.flags = 0;
+            element.blendMode = Mesh::NoBlending;
+
+            int blendFunc;
+            if (sceneMeshMaterial->Get(AI_MATKEY_BLEND_FUNC, blendFunc) == AI_SUCCESS) {
+                switch (blendFunc) {
+                    case aiBlendMode_Default: element.blendMode = Mesh::DefaultBlending; break;
+                    case aiBlendMode_Additive: element.blendMode = Mesh::AdditiveBlending; break;
+                }
+            }
+
+            int twoSided;
+            if (sceneMeshMaterial->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
+                if (twoSided)
+                    element.flags |= Mesh::TwoSided;
+            }
+
+            auto it = gXmlMaterials.find(material);
+            if (it == gXmlMaterials.end())
+                fprintf(stdout, "note: no definition for material \"%s\" in xml file.\n", material.c_str());
+            else {
+                auto& material = it->second;
+                material.visited = true;
+                if (material.hasAmbientColor)
+                    element.ambientColor = material.ambientColor;
+                if (material.hasDiffuseColor)
+                    element.diffuseColor = material.diffuseColor;
+                if (material.hasSpecularColor)
+                    element.specularColor = material.specularColor;
+                if (material.hasOpacity)
+                    element.opacity = material.opacity;
+                if (material.hasShininess)
+                    element.shininess = material.shininess;
+                if (material.hasBlendMode)
+                    element.blendMode = material.blendMode;
+                if (material.hasTwoSided) {
+                    if (material.twoSided)
+                        element.flags |= Mesh::TwoSided;
+                    else
+                        element.flags &= ~Mesh::TwoSided;
+                }
+                if (material.hasDiffuseMap)
+                    element.diffuseMap = gStringTable.addString(material.diffuseMap);
+                if (material.hasNormalMap)
+                    element.normalMap = gStringTable.addString(material.normalMap);
+                if (material.hasSpecularMap)
+                    element.specularMap = gStringTable.addString(material.specularMap);
+            }
+        }
+
         size_t indexBase = vertexDataCurrentEnd;
         vertexDataCurrentEnd += vertexCount;
 
@@ -377,6 +657,11 @@ static void readMeshFile()
         gBoundingSphereCenter = glm::vec3(c[0], c[1], c[2]);
         gBoundingSphereRadius = sphereCalculator.radius();
     }
+
+    for (const auto& material : gXmlMaterials) {
+        if (!material.second.visited)
+            fprintf(stderr, "warning: unused material \"%s\" in xml file.\n", material.first.c_str());
+    }
 }
 
 static void writeMeshFile()
@@ -404,7 +689,7 @@ static void writeMeshFile()
     };
 
     static_assert(sizeof(Mesh::FileHeader) == 14 * sizeof(uint32_t), "sizeof(Mesh::FileHeader)");
-    static_assert(sizeof(Mesh::Element) == 4 * sizeof(uint32_t), "sizeof(Mesh::Element)");
+    static_assert(sizeof(Mesh::Element) == 16 * sizeof(uint32_t), "sizeof(Mesh::Element)");
 
     Mesh::FileHeader header;
     std::memset(&header, 0, sizeof(header));
@@ -415,9 +700,12 @@ static void writeMeshFile()
     header.bboxMax = gBoundingBoxMax;
     header.boundingSphereCenter = gBoundingSphereCenter;
     header.boundingSphereRadius = gBoundingSphereRadius;
+    header.stringTableSize = uint16_t(gStringTable.rawBytes().size());
     header.vertexFormat = uint8_t(gVertexData->format().components());
     header.elementCount = uint8_t(gMeshElements.size());
     write(&header, sizeof(header));
+
+    write(gStringTable.rawBytes().data(), gStringTable.rawBytes().size());
 
     for (const auto& element : gMeshElements)
         write(&element, sizeof(element));
@@ -446,6 +734,7 @@ static void printInfo()
         "==============================================================================\n"
         "%s\n"
         "------------------------------------------------------------------------------\n"
+        "Elements:        %lu\n"
         "Total vertices:  %lu (%.2f KB)\n"
         "Total indices:   %lu (%.2f KB)\n"
         "Total triangles: %lu\n"
@@ -456,6 +745,7 @@ static void printInfo()
         "Sphere radius:   %-10f\n"
         "==============================================================================\n",
         outputFile.c_str(),
+        static_cast<unsigned long>(gMeshElements.size()),
         static_cast<unsigned long>(gVertexData->vertexCount()), float(gVertexData->sizeInBytes()) / 1024.0f,
         static_cast<unsigned long>(gIndexData.size()), float(gIndexData.size() * sizeof(uint16_t)) / 1024.0f,
         static_cast<unsigned long>(gIndexData.size() / 3),

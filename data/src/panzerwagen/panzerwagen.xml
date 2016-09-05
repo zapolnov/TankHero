@@ -1,3 +1,6 @@
 <Mesh>
     <File>panzerwagen_3x3.blend</File>
+    <Material name="Material">
+        <DiffuseMap>texture_panzerwagen.png</DiffuseMap>
+    </Material>
 </Mesh>
