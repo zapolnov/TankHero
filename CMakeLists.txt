@@ -28,13 +28,13 @@ add_mesh(
 # Platform-independent sources
 
 set(source_files
-    src/mesh/Mesh.h
-    src/mesh/VertexData.cpp
-    src/mesh/VertexData.h
-    src/mesh/VertexFormat.cpp
-    src/mesh/VertexFormat.h
-    src/Game.cpp
-    src/Game.h
+    src/engine/mesh/Mesh.h
+    src/engine/mesh/VertexData.cpp
+    src/engine/mesh/VertexData.h
+    src/engine/mesh/VertexFormat.cpp
+    src/engine/mesh/VertexFormat.h
+    src/game/Game.cpp
+    src/game/Game.h
 )
 
 #######################################################################################################################
@@ -50,7 +50,7 @@ if(TRUE)
     find_package(Qt5Gui REQUIRED)
     find_package(Qt5Core REQUIRED)
 
-    qt5_wrap_cpp(moc_files src/platform/qt/MainWindow.h)
+    qt5_wrap_cpp(moc_files src/engine/platform/qt/MainWindow.h)
     foreach(file ${moc_files})
         get_filename_component(name "${file}" NAME_WE)
         if("${name}" MATCHES "^moc_")
@@ -60,9 +60,9 @@ if(TRUE)
 
     list(APPEND source_files
         ${moc_files}
-        src/platform/qt/main.cpp
-        src/platform/qt/MainWindow.cpp
-        src/platform/qt/MainWindow.h
+        src/engine/platform/qt/main.cpp
+        src/engine/platform/qt/MainWindow.cpp
+        src/engine/platform/qt/MainWindow.h
     )
 
     list(APPEND libraries Qt5::Widgets Qt5::Gui Qt5::Core)

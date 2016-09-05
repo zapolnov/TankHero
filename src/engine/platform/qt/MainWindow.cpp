@@ -1,5 +1,5 @@
 #include "MainWindow.h"
-#include "src/Game.h"
+#include "src/game/Game.h"
 #include <QMouseEvent>
 #include <QWheelEvent>
 

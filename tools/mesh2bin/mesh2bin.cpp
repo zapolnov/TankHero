@@ -1,6 +1,6 @@
-#include "src/mesh/Mesh.h"
-#include "src/mesh/VertexFormat.h"
-#include "src/mesh/VertexData.h"
+#include "src/engine/mesh/Mesh.h"
+#include "src/engine/mesh/VertexFormat.h"
+#include "src/engine/mesh/VertexData.h"
 #include <tinyxml.h>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -15,8 +15,8 @@
 #include <vector>
 #include <memory>
 
-#include "src/mesh/VertexFormat.cpp"
-#include "src/mesh/VertexData.cpp"
+#include "src/engine/mesh/VertexFormat.cpp"
+#include "src/engine/mesh/VertexData.cpp"
 
 #ifdef _MSC_VER
  #pragma warning(push, 0)
