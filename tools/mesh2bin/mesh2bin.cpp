@@ -36,7 +36,7 @@ static bool gNormals = true;
 static bool gTangents = true;
 static bool gBitangents = true;
 static bool gTexCoords0 = true;
-static bool gColors = true;
+static bool gColors = false;
 static bool gFixInfacingNormals = true;
 static bool gFlipUVs = true;
 static std::vector<Mesh::Element> gMeshElements;
@@ -89,10 +89,23 @@ static void parseCommandLine(int argc, char** argv)
     }
 }
 
+static bool xmlToBool(const TiXmlElement* element)
+{
+    const char* text = element->GetText();
+    if (text && !std::strcmp(text, "true"))
+        return true;
+    if (text && !std::strcmp(text, "false"))
+        return false;
+
+    fprintf(stderr, "in file \"%s\" at line %d, column %d: invalid value \"%s\" for element \"%s\".\n",
+        gXmlFile, element->Row(), element->Column(), text, element->Value());
+    exit(1);
+}
+
 static void readXmlFile()
 {
-    const std::string XML_ROOT = "mesh";
-    const std::string XML_FILE = "file";
+    const std::string XML_ROOT = "Mesh";
+    const std::string XML_FILE = "File";
 
     TiXmlDocument doc;
     if (!doc.LoadFile(gXmlFile)) {
@@ -112,6 +125,22 @@ static void readXmlFile()
     for (const auto* element = root->FirstChildElement(); element; element = element->NextSiblingElement()) {
         if (element->ValueStr() == XML_FILE)
             meshFile = element->GetText();
+        else if (element->ValueStr() == "IncludePositions")
+            gPositions = xmlToBool(element);
+        else if (element->ValueStr() == "IncludeNormals")
+            gNormals = xmlToBool(element);
+        else if (element->ValueStr() == "IncludeTangents")
+            gTangents = xmlToBool(element);
+        else if (element->ValueStr() == "IncludeBitangents")
+            gBitangents = xmlToBool(element);
+        else if (element->ValueStr() == "IncludeTexCoords0")
+            gTexCoords0 = xmlToBool(element);
+        else if (element->ValueStr() == "IncludeColors")
+            gColors = xmlToBool(element);
+        else if (element->ValueStr() == "FixInfacingNormals")
+            gFixInfacingNormals = xmlToBool(element);
+        else if (element->ValueStr() == "FlipUVs")
+            gFlipUVs = xmlToBool(element);
         else {
             fprintf(stderr, "unable to parse file \"%s\": at line %d, column %d: unexpected element \"%s\".\n",
                 gXmlFile, element->Row(), element->Column(), element->Value());
@@ -339,10 +368,15 @@ static void readMeshFile()
     gBoundingBoxMin = min;
     gBoundingBoxMax = max;
 
-    Seb::Smallest_enclosing_ball<float, glm::vec3> sphereCalculator(3, allPoints);
-    const float* c = sphereCalculator.center_begin();
-    gBoundingSphereCenter = glm::vec3(c[0], c[1], c[2]);
-    gBoundingSphereRadius = sphereCalculator.radius();
+    if (allPoints.empty()) {
+        gBoundingSphereCenter = glm::vec3(0.0f);
+        gBoundingSphereRadius = 0.0f;
+    } else {
+        Seb::Smallest_enclosing_ball<float, glm::vec3> sphereCalculator(3, allPoints);
+        const float* c = sphereCalculator.center_begin();
+        gBoundingSphereCenter = glm::vec3(c[0], c[1], c[2]);
+        gBoundingSphereRadius = sphereCalculator.radius();
+    }
 }
 
 static void writeMeshFile()
