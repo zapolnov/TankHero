@@ -9,8 +9,8 @@
 #include <fstream>
 #include <map>
 #include <string>
-#include <sys/resource.h>
-#include <sys/time.h>
+//#include <sys/resource.h>
+//#include <sys/time.h>
 
 namespace SEB_NAMESPACE {
   
@@ -77,8 +77,8 @@ namespace SEB_NAMESPACE {
     float lapse(const char *name);
     
   private: // private members:
-    typedef std::map<std::string,timeval> Timers;
-    Timers timers;              // a collection of pairs (k,v) where
+    //typedef std::map<std::string,timeval> Timers;
+    //Timers timers;              // a collection of pairs (k,v) where
     // k is the timer name and v is the
     // (started) timer associated with k
   };

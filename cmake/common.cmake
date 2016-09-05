@@ -35,3 +35,38 @@ macro(set_source_groups_with_dir prefix dir)
         source_group("${path}" FILES "${file}")
     endforeach()
 endmacro()
+
+macro(add_mesh)
+    set(options)
+    set(oneValueArgs INPUT OUTPUT)
+    set(multiValueArgs DEPENDS)
+    cmake_parse_arguments(MESH "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    get_filename_component(infile "${MESH_INPUT}" ABSOLUTE)
+    get_filename_component(outfile "${MESH_OUTPUT}" ABSOLUTE)
+
+    set_source_groups_with_dir("Data Files/src" "data/src" "${MESH_INPUT}" ${MESH_DEPENDS})
+    set_source_groups_with_dir("Data Files/bin" "data/bin" "${MESH_OUTPUT}")
+
+    list(APPEND asset_src_files "${MESH_INPUT}" ${MESH_DEPENDS})
+    list(APPEND asset_bin_files "${MESH_OUTPUT}")
+
+    if(TARGET mesh2bin)
+        set_source_files_properties(outfile PROPERTIES GENERATED TRUE)
+        add_custom_command(OUTPUT
+                "${outfile}"
+            COMMAND
+                mesh2bin
+                    "${infile}"
+                    "${outfile}"
+            DEPENDS
+                mesh2bin
+                "${infile}"
+                ${MESH_DEPENDS}
+            MAIN_DEPENDENCY
+                "${infile}"
+            WORKING_DIRECTORY
+                "${CMAKE_BINARY_DIR}"
+        )
+    endif()
+endmacro()

@@ -1,10 +1,7 @@
 
-cmake_minimum_required(VERSION 3.5)
-project(Tools)
-
-include(../cmake/common.cmake)
-
-add_subdirectory(../lib/zlib zlib)
 add_subdirectory(../lib/assimp assimp)
+add_subdirectory(../lib/miniball miniball)
+add_subdirectory(../lib/tinyxml tinyxml)
+add_subdirectory(../lib/zlib zlib)
 
-include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/..")
+add_subdirectory(mesh2bin)

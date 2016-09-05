@@ -10,7 +10,6 @@ add_definitions(-DASSIMP_BUILD_NO_AC_IMPORTER)
 add_definitions(-DASSIMP_BUILD_NO_ASE_IMPORTER)
 add_definitions(-DASSIMP_BUILD_NO_ASSBIN_IMPORTER)
 add_definitions(-DASSIMP_BUILD_NO_B3D_IMPORTER)
-add_definitions(-DASSIMP_BUILD_NO_BLEND_IMPORTER)
 add_definitions(-DASSIMP_BUILD_NO_BVH_IMPORTER)
 add_definitions(-DASSIMP_BUILD_NO_C4D_IMPORTER)
 add_definitions(-DASSIMP_BUILD_NO_COB_IMPORTER)
@@ -65,6 +64,12 @@ set(src
     src/code/BaseImporter.cpp
     src/code/BaseProcess.cpp
     src/code/Bitmap.cpp
+    src/code/BlenderBMesh.cpp
+    src/code/BlenderDNA.cpp
+    src/code/BlenderLoader.cpp
+    src/code/BlenderModifier.cpp
+    src/code/BlenderScene.cpp
+    src/code/BlenderTessellator.cpp
     src/code/CalcTangentsProcess.cpp
     src/code/ColladaLoader.cpp
     src/code/ColladaParser.cpp
