@@ -236,7 +236,7 @@ static void readXmlMaterial(const TiXmlElement* element)
         exit(1);
     }
 
-    auto& r = gXmlMaterials.emplace(name, XmlMaterial{});
+    auto r = gXmlMaterials.emplace(name, XmlMaterial{});
     if (!r.second) {
         fprintf(stderr, "in file \"%s\" at line %d, column %d: duplicate material \"%s\".\n",
             gXmlFile, element->Row(), element->Column(), name);
