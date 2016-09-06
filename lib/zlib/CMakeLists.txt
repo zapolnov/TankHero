@@ -20,7 +20,7 @@ set(src
     src/zlib.h
     src/zutil.c
     src/zutil.h
-)
+    )
 
 source_group("Source Files" FILES ${src})
 

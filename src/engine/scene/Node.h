@@ -8,7 +8,6 @@ class TouchableNode
 {
 public:
     virtual bool recursiveIsChildOf(const std::shared_ptr<TouchableNode>& node) const = 0;
-    virtual bool touchBegin(float x, float y) = 0;
     virtual void touchContinue(float x, float y) = 0;
     virtual void touchEnd(float x, float y) = 0;
     virtual void touchCancel(float x, float y) = 0;
@@ -68,7 +67,7 @@ protected:
     virtual void afterDraw();
     virtual void draw();
 
-    bool touchBegin(float x, float y) override;
+    virtual bool touchBegin(float x, float y);
     void touchContinue(float x, float y) override;
     void touchEnd(float x, float y) override;
     void touchCancel(float x, float y) override;

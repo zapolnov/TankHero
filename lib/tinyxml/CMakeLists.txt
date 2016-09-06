@@ -6,7 +6,7 @@ set(tinyxml_sources
     src/tinyxml.h
     src/tinyxmlerror.cpp
     src/tinyxmlparser.cpp
-)
+    )
 
 source_group("Source Files" FILES ${tinyxml_sources})
 

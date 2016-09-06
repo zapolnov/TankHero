@@ -1,7 +1,7 @@
 
 set(src
     mesh2bin.cpp
-)
+    )
 
 source_group("Source Files" FILES ${src})
 

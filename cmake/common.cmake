@@ -53,20 +53,11 @@ macro(add_mesh)
 
     if(TARGET mesh2bin)
         set_source_files_properties(outfile PROPERTIES GENERATED TRUE)
-        add_custom_command(OUTPUT
-                "${outfile}"
-            COMMAND
-                mesh2bin
-                    "${infile}"
-                    "${outfile}"
-            DEPENDS
-                mesh2bin
-                "${infile}"
-                ${MESH_DEPENDS}
-            MAIN_DEPENDENCY
-                "${infile}"
-            WORKING_DIRECTORY
-                "${CMAKE_BINARY_DIR}"
-        )
+        add_custom_command(OUTPUT "${outfile}"
+            COMMAND mesh2bin "${infile}" "${outfile}"
+            DEPENDS mesh2bin "${infile}" ${MESH_DEPENDS}
+            MAIN_DEPENDENCY "${infile}"
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+            )
     endif()
 endmacro()

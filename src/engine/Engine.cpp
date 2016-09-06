@@ -1,10 +1,10 @@
 #include "Engine.h"
 
-static const std::shared_ptr<Scene> nullScene;
+static const std::shared_ptr<Scene> gNullScene;
 
 Engine::Engine()
 {
-    mRenderer.reset(new Renderer(this));
+    mRenderer.reset(Renderer::create(this));
 }
 
 Engine::~Engine()
@@ -16,7 +16,7 @@ const std::shared_ptr<Scene>& Engine::currentScene() const
 {
     if (!mScenes.empty())
         return mScenes.back();
-    return nullScene;
+    return gNullScene;
 }
 
 void Engine::setScene(const std::shared_ptr<Scene>& scene)

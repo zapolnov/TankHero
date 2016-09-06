@@ -56,7 +56,7 @@ configure_file("src/include/assimp/config.h.in" "${CMAKE_CURRENT_BINARY_DIR}/ass
 set(generated
     "${CMAKE_CURRENT_BINARY_DIR}/revision.h"
     "${CMAKE_CURRENT_BINARY_DIR}/assimp/config.h"
-)
+    )
 
 set(src
     src/code/3DSConverter.cpp
@@ -136,13 +136,13 @@ set(src
     src/code/VertexTriangleAdjacency.cpp
     src/contrib/ConvertUTF/ConvertUTF.c
     src/contrib/irrXML/irrXML.cpp
-    pch.hpp
-)
+    )
 
 set_source_groups_with_dir("Source Files" "src" ${src})
+source_group("Source Files" FILES pch.hpp)
 source_group("Generated Files" FILES ${generated})
 
-add_library(assimp STATIC ${generated} ${src})
+add_library(assimp STATIC ${generated} ${src} pch.hpp)
 target_link_libraries(assimp zlib)
 
 set_target_properties(assimp PROPERTIES
