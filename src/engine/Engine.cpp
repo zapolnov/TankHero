@@ -131,6 +131,6 @@ void Engine::runFrame(int width, int height, float time)
 
     mRenderer->beginFrame(width, height);
     if (scene)
-        scene->runFrame(time);
+        scene->runFrame(mRenderer.get(), time);
     mRenderer->endFrame();
 }

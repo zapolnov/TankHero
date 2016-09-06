@@ -22,8 +22,18 @@ set(engine_sources
     src/engine/mesh/VertexData.h
     src/engine/mesh/VertexFormat.cpp
     src/engine/mesh/VertexFormat.h
+    src/engine/scene/camera/Camera.cpp
+    src/engine/scene/camera/Camera.h
+    src/engine/scene/camera/OrthoCamera.cpp
+    src/engine/scene/camera/OrthoCamera.h
+    src/engine/scene/camera/PerspectiveCamera.cpp
+    src/engine/scene/camera/PerspectiveCamera.h
+    src/engine/scene/Button.cpp
+    src/engine/scene/Button.h
     src/engine/scene/Node.cpp
     src/engine/scene/Node.h
+    src/engine/scene/RootNode.cpp
+    src/engine/scene/RootNode.h
     src/engine/scene/Scene.cpp
     src/engine/scene/Scene.h
     src/engine/utility/StbImage.cpp

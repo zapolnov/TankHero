@@ -155,17 +155,17 @@ void Node::recursiveUpdate(float frameTime)
     }
 }
 
-void Node::recursiveDraw()
+void Node::recursiveDraw(Renderer* renderer)
 {
-    beforeDraw();
-    draw();
+    beforeDraw(renderer);
+    draw(renderer);
 
     for (auto it = mChildren.begin(); it != mChildren.end(); ) {
         auto child = *it++;
-        child->recursiveDraw();
+        child->recursiveDraw(renderer);
     }
 
-    afterDraw();
+    afterDraw(renderer);
 }
 
 void Node::resize(float, float)
@@ -176,15 +176,15 @@ void Node::update(float)
 {
 }
 
-void Node::beforeDraw()
+void Node::beforeDraw(Renderer*)
 {
 }
 
-void Node::afterDraw()
+void Node::afterDraw(Renderer*)
 {
 }
 
-void Node::draw()
+void Node::draw(Renderer*)
 {
 }
 

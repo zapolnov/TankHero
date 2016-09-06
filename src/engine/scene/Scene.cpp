@@ -106,7 +106,7 @@ void Scene::resize(float width, float height)
     }
 }
 
-void Scene::runFrame(float frameTime)
+void Scene::runFrame(Renderer* renderer, float frameTime)
 {
     auto rootNode = mRootNode;
     if (rootNode) {
@@ -116,7 +116,7 @@ void Scene::runFrame(float frameTime)
         }
 
         rootNode->recursiveUpdate(frameTime);
-        rootNode->recursiveDraw();
+        rootNode->recursiveDraw(renderer);
     }
 
     auto hudNode = mHudNode;
@@ -127,6 +127,6 @@ void Scene::runFrame(float frameTime)
         }
 
         hudNode->recursiveUpdate(frameTime);
-        hudNode->recursiveDraw();
+        hudNode->recursiveDraw(renderer);
     }
 }

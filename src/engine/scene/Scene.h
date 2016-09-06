@@ -17,14 +17,14 @@ public:
 
     bool isPartOfScene(const std::shared_ptr<TouchableNode>& node) const;
 
-    bool touchBegin(float x, float y);
-    void touchContinue(float x, float y);
-    void touchEnd(float x, float y);
-    void touchCancel(float x, float y);
+    virtual bool touchBegin(float x, float y);
+    virtual void touchContinue(float x, float y);
+    virtual void touchEnd(float x, float y);
+    virtual void touchCancel(float x, float y);
 
-    void resize(float width, float height);
+    virtual void resize(float width, float height);
 
-    void runFrame(float frameTime);
+    virtual void runFrame(Renderer* renderer, float frameTime);
 
 private:
     std::shared_ptr<Node> mRootNode;

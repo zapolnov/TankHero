@@ -4,6 +4,8 @@
 #include <list>
 #include <memory>
 
+class Renderer;
+
 class TouchableNode
 {
 public:
@@ -56,16 +58,16 @@ public:
     virtual std::shared_ptr<TouchableNode> recursiveTouchBegin(float x, float y);
 
     void recursiveUpdate(float frameTime);
-    void recursiveDraw();
+    void recursiveDraw(Renderer* renderer);
 
     virtual void resize(float width, float height);
 
 protected:
     virtual void update(float frameTime);
 
-    virtual void beforeDraw();
-    virtual void afterDraw();
-    virtual void draw();
+    virtual void beforeDraw(Renderer* renderer);
+    virtual void afterDraw(Renderer* renderer);
+    virtual void draw(Renderer* renderer);
 
     virtual bool touchBegin(float x, float y);
     void touchContinue(float x, float y) override;
