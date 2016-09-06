@@ -17,9 +17,6 @@
 #include <vector>
 #include <memory>
 
-#include "src/engine/mesh/VertexFormat.cpp"
-#include "src/engine/mesh/VertexData.cpp"
-
 #ifdef _MSC_VER
  #pragma warning(push, 0)
  #pragma warning(disable:4996)
