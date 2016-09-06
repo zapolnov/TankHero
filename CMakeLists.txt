@@ -30,7 +30,7 @@ if(TRUE)
     find_package(Qt5Gui REQUIRED)
     find_package(Qt5Core REQUIRED)
 
-    qt5_wrap_cpp(moc_files src/engine/platform/qt/MainWindow.h)
+    qt5_wrap_cpp(moc_files src/engine/platform/qt/OpenGLWidget.h)
     foreach(file ${moc_files})
         get_filename_component(name "${file}" NAME_WE)
         if("${name}" MATCHES "^moc_")
@@ -40,8 +40,8 @@ if(TRUE)
 
     list(APPEND engine_sources
         ${moc_files}
-        src/engine/platform/qt/MainWindow.cpp
-        src/engine/platform/qt/MainWindow.h
+        src/engine/platform/qt/OpenGLWidget.cpp
+        src/engine/platform/qt/OpenGLWidget.h
     )
 
     list(APPEND platform_sources

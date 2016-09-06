@@ -1,29 +1,29 @@
-#include "MainWindow.h"
+#include "OpenGLWidget.h"
 #include "src/game/Game.h"
 #include <QMouseEvent>
 #include <QWheelEvent>
 
 QOpenGLFunctions* gl;
 
-MainWindow::MainWindow()
+OpenGLWidget::OpenGLWidget()
 {
     setUpdateBehavior(NoPartialUpdate);
 
     mTimer = new QTimer(this);
     mTimer->setSingleShot(false);
     mTimer->setInterval(8);
-    connect(mTimer, &QTimer::timeout, this, static_cast<void(MainWindow::*)()>(&MainWindow::update));
+    connect(mTimer, &QTimer::timeout, this, static_cast<void(OpenGLWidget::*)()>(&OpenGLWidget::update));
     mTimer->start();
 }
 
-MainWindow::~MainWindow()
+OpenGLWidget::~OpenGLWidget()
 {
     makeCurrent();
     cleanupGL();
     doneCurrent();
 }
 
-void MainWindow::initializeGL()
+void OpenGLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
     gl = this;
@@ -31,44 +31,44 @@ void MainWindow::initializeGL()
     mGame = new Game;
 }
 
-void MainWindow::cleanupGL()
+void OpenGLWidget::cleanupGL()
 {
     delete mGame;
 }
 
-void MainWindow::resizeGL(int width, int height)
+void OpenGLWidget::resizeGL(int width, int height)
 {
     mWidth = width;
     mHeight = height;
 }
 
-void MainWindow::paintGL()
+void OpenGLWidget::paintGL()
 {
     auto time = mElapsedTimer.restart();
     float frameTime = float(double(time) / 1000.0);
     mGame->runFrame(mWidth, mHeight, frameTime);
 }
 
-void MainWindow::keyPressEvent(QKeyEvent*)
+void OpenGLWidget::keyPressEvent(QKeyEvent*)
 {
 }
 
-void MainWindow::keyReleaseEvent(QKeyEvent*)
+void OpenGLWidget::keyReleaseEvent(QKeyEvent*)
 {
 }
 
-void MainWindow::mousePressEvent(QMouseEvent*)
+void OpenGLWidget::mousePressEvent(QMouseEvent*)
 {
 }
 
-void MainWindow::mouseReleaseEvent(QMouseEvent*)
+void OpenGLWidget::mouseReleaseEvent(QMouseEvent*)
 {
 }
 
-void MainWindow::mouseMoveEvent(QMouseEvent*)
+void OpenGLWidget::mouseMoveEvent(QMouseEvent*)
 {
 }
 
-void MainWindow::wheelEvent(QWheelEvent*)
+void OpenGLWidget::wheelEvent(QWheelEvent*)
 {
 }

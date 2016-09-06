@@ -7,13 +7,13 @@
 
 class Game;
 
-class MainWindow : public QOpenGLWidget, public QOpenGLFunctions
+class OpenGLWidget : public QOpenGLWidget, public QOpenGLFunctions
 {
     Q_OBJECT
 
 public:
-    MainWindow();
-    ~MainWindow();
+    OpenGLWidget();
+    ~OpenGLWidget();
 
 protected:
     void initializeGL() override;
@@ -37,5 +37,5 @@ private:
     int mWidth = 0;
     int mHeight = 0;
 
-    Q_DISABLE_COPY(MainWindow)
+    Q_DISABLE_COPY(OpenGLWidget)
 };

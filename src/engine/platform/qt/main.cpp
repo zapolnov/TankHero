@@ -1,4 +1,4 @@
-#include "MainWindow.h"
+#include "OpenGLWidget.h"
 #include <QSurfaceFormat>
 #include <QApplication>
 
@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 
     QApplication app(argc, argv);
 
-    MainWindow mainWindow;
+    OpenGLWidget mainWindow;
     mainWindow.resize(1024, 768);
     mainWindow.show();
 
