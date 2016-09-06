@@ -17,7 +17,8 @@ set(platform_sources)
 # Engine
 
 set(engine_sources
-    src/engine/mesh/Mesh.h
+    src/engine/mesh/MaterialDesc.h
+    src/engine/mesh/MeshFile.h
     src/engine/mesh/VertexData.cpp
     src/engine/mesh/VertexData.h
     src/engine/mesh/VertexFormat.cpp

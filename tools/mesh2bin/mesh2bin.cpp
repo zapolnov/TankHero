@@ -1,4 +1,4 @@
-#include "src/engine/mesh/Mesh.h"
+#include "src/engine/mesh/MeshFile.h"
 #include "src/engine/mesh/VertexFormat.h"
 #include "src/engine/mesh/VertexData.h"
 #include <tinyxml.h>
@@ -38,7 +38,7 @@ namespace
         std::string specularMap;
         float opacity;
         float shininess;
-        Mesh::ElementBlendMode blendMode;
+        MaterialBlendMode blendMode;
         bool twoSided;
         bool hasAmbientColor = false;
         bool hasDiffuseColor = false;
@@ -101,7 +101,7 @@ static bool gTexCoords0 = true;
 static bool gColors = false;
 static bool gFixInfacingNormals = true;
 static bool gFlipUVs = true;
-static std::vector<Mesh::Element> gMeshElements;
+static std::vector<MeshFile::Element> gMeshElements;
 static std::unique_ptr<VertexData> gVertexData;
 static std::vector<uint16_t> gIndexData;
 static std::map<std::string, XmlMaterial> gXmlMaterials;
@@ -272,13 +272,11 @@ static void readXmlMaterial(const TiXmlElement* element)
         } else if (child->ValueStr() == "BlendMode") {
             const char* str = child->GetText();
             if (!std::strcmp(str, "none"))
-                material.blendMode = Mesh::NoBlending;
+                material.blendMode = MaterialOpaque;
             else if (!std::strcmp(str, "default"))
-                material.blendMode = Mesh::DefaultBlending;
-            else if (!std::strcmp(str, "premultiplied"))
-                material.blendMode = Mesh::PremultipliedBlending;
+                material.blendMode = MaterialTransparent;
             else if (!std::strcmp(str, "additive"))
-                material.blendMode = Mesh::AdditiveBlending;
+                material.blendMode = MaterialAdditive;
             else {
                 fprintf(stderr, "in file \"%s\" at line %d, column %d: invalid value \"%s\" for element \"%s\".\n",
                     gXmlFile, child->Row(), child->Column(), str, child->Value());
@@ -484,49 +482,49 @@ static void readMeshFile()
 
             aiColor3D ambientColor;
             if (sceneMeshMaterial->Get(AI_MATKEY_COLOR_AMBIENT, ambientColor) != AI_SUCCESS)
-                element.ambientColor = glm::vec3(0.0f);
+                element.material.ambientColor = glm::vec3(0.0f);
             else
-                element.ambientColor = glm::vec3(ambientColor.r, ambientColor.g, ambientColor.b);
+                element.material.ambientColor = glm::vec3(ambientColor.r, ambientColor.g, ambientColor.b);
 
             aiColor3D diffuseColor;
             if (sceneMeshMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) != AI_SUCCESS)
-                element.diffuseColor = glm::vec3(1.0f);
+                element.material.diffuseColor = glm::vec3(1.0f);
             else
-                element.diffuseColor = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
+                element.material.diffuseColor = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
 
             aiColor3D specularColor;
             if (sceneMeshMaterial->Get(AI_MATKEY_COLOR_SPECULAR, specularColor) != AI_SUCCESS)
-                element.specularColor = glm::vec3(0.0f);
+                element.material.specularColor = glm::vec3(0.0f);
             else
-                element.specularColor = glm::vec3(specularColor.r, specularColor.g, specularColor.b);
+                element.material.specularColor = glm::vec3(specularColor.r, specularColor.g, specularColor.b);
 
             float opacity;
             if (sceneMeshMaterial->Get(AI_MATKEY_OPACITY, opacity) != AI_SUCCESS)
-                element.opacity = 1.0f;
+                element.material.opacity = 1.0f;
             else
-                element.opacity = opacity;
+                element.material.opacity = opacity;
 
             float shininess;
             if (sceneMeshMaterial->Get(AI_MATKEY_SHININESS, shininess) != AI_SUCCESS)
-                element.shininess = 0.0f;
+                element.material.shininess = 0.0f;
             else
-                element.shininess = shininess;
+                element.material.shininess = shininess;
 
-            element.flags = 0;
-            element.blendMode = Mesh::NoBlending;
+            element.material.flags = 0;
+            element.material.blendMode = MaterialOpaque;
 
             int blendFunc;
             if (sceneMeshMaterial->Get(AI_MATKEY_BLEND_FUNC, blendFunc) == AI_SUCCESS) {
                 switch (blendFunc) {
-                    case aiBlendMode_Default: element.blendMode = Mesh::DefaultBlending; break;
-                    case aiBlendMode_Additive: element.blendMode = Mesh::AdditiveBlending; break;
+                    case aiBlendMode_Default: element.material.blendMode = MaterialTransparent; break;
+                    case aiBlendMode_Additive: element.material.blendMode = MaterialAdditive; break;
                 }
             }
 
             int twoSided;
             if (sceneMeshMaterial->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
                 if (twoSided)
-                    element.flags |= Mesh::TwoSided;
+                    element.material.flags |= MaterialTwoSided;
             }
 
             auto it = gXmlMaterials.find(material);
@@ -536,29 +534,29 @@ static void readMeshFile()
                 auto& material = it->second;
                 material.visited = true;
                 if (material.hasAmbientColor)
-                    element.ambientColor = material.ambientColor;
+                    element.material.ambientColor = material.ambientColor;
                 if (material.hasDiffuseColor)
-                    element.diffuseColor = material.diffuseColor;
+                    element.material.diffuseColor = material.diffuseColor;
                 if (material.hasSpecularColor)
-                    element.specularColor = material.specularColor;
+                    element.material.specularColor = material.specularColor;
                 if (material.hasOpacity)
-                    element.opacity = material.opacity;
+                    element.material.opacity = material.opacity;
                 if (material.hasShininess)
-                    element.shininess = material.shininess;
+                    element.material.shininess = material.shininess;
                 if (material.hasBlendMode)
-                    element.blendMode = material.blendMode;
+                    element.material.blendMode = material.blendMode;
                 if (material.hasTwoSided) {
                     if (material.twoSided)
-                        element.flags |= Mesh::TwoSided;
+                        element.material.flags |= MaterialTwoSided;
                     else
-                        element.flags &= ~Mesh::TwoSided;
+                        element.material.flags &= ~MaterialTwoSided;
                 }
                 if (material.hasDiffuseMap)
-                    element.diffuseMap = gStringTable.addString(material.diffuseMap);
+                    element.material.diffuseMap = gStringTable.addString(material.diffuseMap);
                 if (material.hasNormalMap)
-                    element.normalMap = gStringTable.addString(material.normalMap);
+                    element.material.normalMap = gStringTable.addString(material.normalMap);
                 if (material.hasSpecularMap)
-                    element.specularMap = gStringTable.addString(material.specularMap);
+                    element.material.specularMap = gStringTable.addString(material.specularMap);
             }
         }
 
@@ -685,12 +683,12 @@ static void writeMeshFile()
         }
     };
 
-    static_assert(sizeof(Mesh::FileHeader) == 14 * sizeof(uint32_t), "sizeof(Mesh::FileHeader)");
-    static_assert(sizeof(Mesh::Element) == 16 * sizeof(uint32_t), "sizeof(Mesh::Element)");
+    static_assert(sizeof(MeshFile::Header) == 14 * sizeof(uint32_t), "sizeof(MeshFile::Header)");
+    static_assert(sizeof(MeshFile::Element) == 16 * sizeof(uint32_t), "sizeof(MeshFile::Element)");
 
-    Mesh::FileHeader header;
+    MeshFile::Header header;
     std::memset(&header, 0, sizeof(header));
-    header.magic = Mesh::Magic;
+    header.magic = MeshFile::Magic;
     header.vertexBufferSize = uint32_t(gVertexData->sizeInBytes());
     header.indexBufferSize = uint32_t(gIndexData.size() * sizeof(uint16_t));
     header.bboxMin = gBoundingBoxMin;
