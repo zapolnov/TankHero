@@ -225,7 +225,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #if defined(_DEBUG) || ! defined(NDEBUG)
-#   define ASSIMP_BUILD_DEBUG
+//#   define ASSIMP_BUILD_DEBUG
 #endif
 
     //////////////////////////////////////////////////////////////////////////
