@@ -1,11 +1,13 @@
 #include "OpenGLWidget.h"
-#include "src/game/Game.h"
+#include "src/engine/Engine.h"
+#include <QKeyEvent>
 #include <QMouseEvent>
-#include <QWheelEvent>
 
 QOpenGLFunctions* gl;
 
-OpenGLWidget::OpenGLWidget()
+OpenGLWidget::OpenGLWidget(const std::function<void(Engine*)>& gameInit, QWidget* parent)
+    : QOpenGLWidget(parent)
+    , mGameInit(gameInit)
 {
     setUpdateBehavior(NoPartialUpdate);
 
@@ -27,13 +29,16 @@ void OpenGLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
     gl = this;
+
+    mEngine = new Engine;
+    mGameInit(mEngine);
+
     mElapsedTimer.start();
-    mGame = new Game;
 }
 
 void OpenGLWidget::cleanupGL()
 {
-    delete mGame;
+    delete mEngine;
 }
 
 void OpenGLWidget::resizeGL(int width, int height)
@@ -46,7 +51,7 @@ void OpenGLWidget::paintGL()
 {
     auto time = mElapsedTimer.restart();
     float frameTime = float(double(time) / 1000.0);
-    mGame->runFrame(mWidth, mHeight, frameTime);
+    mEngine->runFrame(mWidth, mHeight, frameTime);
 }
 
 void OpenGLWidget::keyPressEvent(QKeyEvent*)
@@ -57,18 +62,24 @@ void OpenGLWidget::keyReleaseEvent(QKeyEvent*)
 {
 }
 
-void OpenGLWidget::mousePressEvent(QMouseEvent*)
+void OpenGLWidget::mousePressEvent(QMouseEvent* event)
 {
+    if (!mLeftButtonDown && event->button() == Qt::LeftButton) {
+        mLeftButtonDown = true;
+        mEngine->touchBegin(event->pos().x(), event->pos().y());
+    }
 }
 
-void OpenGLWidget::mouseReleaseEvent(QMouseEvent*)
+void OpenGLWidget::mouseReleaseEvent(QMouseEvent* event)
 {
+    if (mLeftButtonDown && event->button() == Qt::LeftButton) {
+        mLeftButtonDown = false;
+        mEngine->touchEnd(event->pos().x(), event->pos().y());
+    }
 }
 
-void OpenGLWidget::mouseMoveEvent(QMouseEvent*)
+void OpenGLWidget::mouseMoveEvent(QMouseEvent* event)
 {
-}
-
-void OpenGLWidget::wheelEvent(QWheelEvent*)
-{
+    if (mLeftButtonDown)
+        mEngine->touchContinue(event->pos().x(), event->pos().y());
 }

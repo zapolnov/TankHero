@@ -1,18 +1,19 @@
 
 #pragma once
+#include <functional>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QTimer>
 #include <QElapsedTimer>
 
-class Game;
+class Engine;
 
 class OpenGLWidget : public QOpenGLWidget, public QOpenGLFunctions
 {
     Q_OBJECT
 
 public:
-    OpenGLWidget();
+    explicit OpenGLWidget(const std::function<void(Engine*)>& gameInit, QWidget* parent = nullptr);
     ~OpenGLWidget();
 
 protected:
@@ -28,14 +29,14 @@ protected:
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
 
-    void wheelEvent(QWheelEvent* event) override;
-
 private:
+    std::function<void(Engine*)> mGameInit;
     QTimer* mTimer;
     QElapsedTimer mElapsedTimer;
-    Game* mGame = nullptr;
+    Engine* mEngine = nullptr;
     int mWidth = 0;
     int mHeight = 0;
+    bool mLeftButtonDown = false;
 
     Q_DISABLE_COPY(OpenGLWidget)
 };

@@ -8,7 +8,7 @@ add_subdirectory(lib/glm)
 
 include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}")
 
-set(libraries)
+set(platform_libraries)
 set(platform_sources)
 
 #######################################################################################################################
@@ -20,6 +20,13 @@ set(engine_sources
     src/engine/mesh/VertexData.h
     src/engine/mesh/VertexFormat.cpp
     src/engine/mesh/VertexFormat.h
+    src/engine/scene/Node.cpp
+    src/engine/scene/Node.h
+    src/engine/scene/Scene.cpp
+    src/engine/scene/Scene.h
+    src/engine/Engine.cpp
+    src/engine/Engine.h
+    src/engine/Game.h
 )
 
 # FIXME
@@ -48,12 +55,46 @@ if(TRUE)
         src/engine/platform/qt/main.cpp
     )
 
-    list(APPEND libraries Qt5::Widgets Qt5::Gui Qt5::Core)
+    list(APPEND platform_libraries Qt5::Widgets Qt5::Gui Qt5::Core)
 endif()
 
-set_source_groups_with_dir("Source Files" "src/engine" ${source_files})
+set_source_groups_with_dir("Source Files" "src/engine" ${engine_sources})
 add_library(engine STATIC ${engine_sources})
-target_link_libraries(engine glm ${libraries})
+target_link_libraries(engine renderer glm ${platform_libraries})
+
+
+#######################################################################################################################
+# Renderer
+
+set(renderer_libraries)
+
+set(renderer_sources
+    src/engine/render/Renderer.cpp
+    src/engine/render/Renderer.h
+)
+
+#FIXME
+if(TRUE)
+    add_definitions(-DRENDERER_GLES2)
+
+    list(APPEND renderer_sources
+        src/engine/render/opengles2/OpenGL.h
+    )
+
+    find_package(OpenGL)
+    if(OPENGL_FOUND)
+        if(OPENGL_INCLUDE_DIR)
+            include_directories("${OPENGL_INCLUDE_DIR}")
+        endif()
+        if(OPENGL_LIBRARIES)
+            list(APPEND renderer_libraries ${OPENGL_LIBRARIES})
+        endif()
+    endif()
+endif()
+
+set_source_groups_with_dir("Source Files" "src/engine/render" ${renderer_sources})
+add_library(renderer STATIC ${renderer_sources})
+target_link_libraries(renderer engine glm ${renderer_libraries})
 
 
 #######################################################################################################################
@@ -74,8 +115,9 @@ add_mesh(
 
 set(source_files
     ${platform_sources}
-    src/game/Game.cpp
-    src/game/Game.h
+    src/game/menu/MainMenuScene.cpp
+    src/game/menu/MainMenuScene.h
+    src/game/main.cpp
 )
 
 set_source_groups_with_dir("Source Files" "src" ${source_files})
