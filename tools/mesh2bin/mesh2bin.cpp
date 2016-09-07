@@ -683,9 +683,6 @@ static void writeMeshFile()
         }
     };
 
-    static_assert(sizeof(MeshFile::Header) == 14 * sizeof(uint32_t), "sizeof(MeshFile::Header)");
-    static_assert(sizeof(MeshFile::Element) == 16 * sizeof(uint32_t), "sizeof(MeshFile::Element)");
-
     MeshFile::Header header;
     std::memset(&header, 0, sizeof(header));
     header.magic = MeshFile::Magic;
@@ -701,6 +698,10 @@ static void writeMeshFile()
     write(&header, sizeof(header));
 
     write(gStringTable.rawBytes().data(), gStringTable.rawBytes().size());
+
+    char buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    if ((gStringTable.rawBytes().size() & 3) != 0)
+        write(buf, 8 - (gStringTable.rawBytes().size() & 3));
 
     for (const auto& element : gMeshElements)
         write(&element, sizeof(element));

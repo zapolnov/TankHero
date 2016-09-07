@@ -100,12 +100,16 @@ if(TRUE)
     list(APPEND renderer_sources
         src/engine/render/opengles2/GLES2Buffer.cpp
         src/engine/render/opengles2/GLES2Buffer.h
+        src/engine/render/opengles2/GLES2Mesh.cpp
+        src/engine/render/opengles2/GLES2Mesh.h
         src/engine/render/opengles2/GLES2Renderer.cpp
         src/engine/render/opengles2/GLES2Renderer.h
         src/engine/render/opengles2/GLES2Shader2D.cpp
         src/engine/render/opengles2/GLES2Shader2D.h
         src/engine/render/opengles2/GLES2ShaderProgram.cpp
         src/engine/render/opengles2/GLES2ShaderProgram.h
+        src/engine/render/opengles2/GLES2Texture.cpp
+        src/engine/render/opengles2/GLES2Texture.h
         src/engine/render/opengles2/GLES2UberShader.cpp
         src/engine/render/opengles2/GLES2UberShader.h
         src/engine/render/opengles2/OpenGL.h
@@ -165,6 +169,16 @@ add_mesh(
 
 set(source_files
     ${platform_sources}
+    src/game/game/GameScene.cpp
+    src/game/game/GameScene.h
+    src/game/game/Level.cpp
+    src/game/game/Level.h
+    src/game/game/Player.cpp
+    src/game/game/Player.h
+    src/game/menu/GameLoadingScene.cpp
+    src/game/menu/GameLoadingScene.h
+    src/game/menu/LoadingScene.cpp
+    src/game/menu/LoadingScene.h
     src/game/menu/MainMenuScene.cpp
     src/game/menu/MainMenuScene.h
     src/game/main.cpp

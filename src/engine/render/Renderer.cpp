@@ -15,6 +15,8 @@ Renderer::Renderer(Engine* engine)
 {
     mTextureNames.emplace_back(std::string());
     mTextureIds.emplace(std::string(), 0);
+    mMeshNames.emplace_back(std::string());
+    mMeshIds.emplace(std::string(), 0);
 }
 
 Renderer::~Renderer()
@@ -39,6 +41,26 @@ const std::string& Renderer::textureName(uint16_t id) const
 {
     assert(id < mTextureNames.size());
     return mTextureNames[id];
+}
+
+uint16_t Renderer::meshNameId(const std::string& name)
+{
+    auto it = mMeshIds.find(name);
+    if (it != mMeshIds.end())
+        return it->second;
+
+    assert(mMeshNames.size() < 65536);
+    auto id = uint16_t(mMeshNames.size());
+    mMeshNames.emplace_back(name);
+    mMeshIds.emplace(name, id);
+
+    return id;
+}
+
+const std::string& Renderer::meshName(uint16_t id) const
+{
+    assert(id < mMeshNames.size());
+    return mMeshNames[id];
 }
 
 void Renderer::setProjectionMatrix(const glm::mat4& projection)
@@ -69,4 +91,15 @@ void Renderer::end2D()
         submitCanvas(mCanvas.get());
         mCanvas.reset();
     }
+}
+
+void Renderer::drawMesh(const glm::mat4& model, uint16_t mesh)
+{
+    mDrawCalls.emplace_back();
+    auto& drawCall = mDrawCalls.back();
+
+    drawCall.projectionMatrix = mProjectionMatrix;
+    drawCall.viewMatrix = mViewMatrix;
+    drawCall.modelMatrix = model;
+    drawCall.mesh = mesh;
 }

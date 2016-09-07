@@ -1,8 +1,6 @@
 
 #pragma once
 
-#define STBI_NO_STDIO
-
 //#define STBI_NEON
 #define STBI_MINGW_ENABLE_SSE2
 #define STBI_SUPPORT_ZLIB

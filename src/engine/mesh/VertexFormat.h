@@ -43,6 +43,15 @@ public:
     bool hasBoneIndices() const { return (mComponents & BoneIndices) != 0; }
     bool hasBoneWeights() const { return (mComponents & BoneWeights) != 0; }
 
+    size_t positionOffset() const { return mPositionOffset; }
+    size_t normalOffset() const { return mNormalOffset; }
+    size_t tangentOffset() const { return mTangentOffset; }
+    size_t bitangentOffset() const { return mBitangentOffset; }
+    size_t texCoord0Offset() const { return mTexCoord0Offset; }
+    size_t colorOffset() const { return mColorOffset; }
+    size_t boneIndicesOffset() const { return mBoneIndicesOffset; }
+    size_t boneWeightsOffset() const { return mBoneWeightsOffset; }
+
     VertexPosition& position(void* p, size_t n) const
         { return offset<VertexPosition>(p, mPositionOffset, n); }
     const VertexPosition& position(const void* p, size_t n) const

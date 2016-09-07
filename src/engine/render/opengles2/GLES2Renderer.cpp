@@ -29,21 +29,71 @@ void GLES2Renderer::beginFrame(int width, int height)
     glViewport(0, 0, width, height);
     glClearColor(0.1f, 0.3f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glDisable(GL_CULL_FACE);
 }
 
 void GLES2Renderer::endFrame()
 {
+    for (const auto& drawCall : mDrawCalls) {
+        const auto& mesh = mMeshes[drawCall.mesh];
+        for (size_t i = 0; i < mesh->elementCount(); i++) {
+            const auto& shader = useShader(0);
+
+            glUniformMatrix4fv(shader.projectionMatrixUniform(), 1, GL_FALSE, &drawCall.projectionMatrix[0][0]);
+            glUniformMatrix4fv(shader.viewMatrixUniform(), 1, GL_FALSE, &drawCall.viewMatrix[0][0]);
+            glUniformMatrix4fv(shader.modelMatrixUniform(), 1, GL_FALSE, &drawCall.modelMatrix[0][0]);
+            glUniform4f(shader.diffuseColorUniform(), 1.0f, 0.0f, 0.0f, 1.0f);
+
+            mesh->renderElement(i, shader);
+        }
+    }
 }
 
-void GLES2Renderer::useShader(GLES2UberShader::Key key)
+void GLES2Renderer::loadTexture(uint16_t texture)
+{
+    if (texture >= mTextures.size())
+        mTextures.resize(texture + 1);
+
+    if (!mTextures[texture]) {
+        assert(mTextureNames.size() > texture);
+        mTextures[texture].reset(new GLES2Texture);
+        mTextures[texture]->load(mTextureNames[texture]);
+    }
+}
+
+void GLES2Renderer::unloadAllTextures()
+{
+    mTextures.clear();
+}
+
+void GLES2Renderer::loadMesh(uint16_t mesh)
+{
+    if (mesh >= mMeshes.size())
+        mMeshes.resize(mesh + 1);
+
+    if (!mMeshes[mesh]) {
+        assert(mMeshNames.size() > mesh);
+        mMeshes[mesh].reset(new GLES2Mesh);
+        mMeshes[mesh]->load(mMeshNames[mesh]);
+    }
+}
+
+void GLES2Renderer::unloadAllMeshes()
+{
+    mMeshes.clear();
+}
+
+const GLES2UberShader& GLES2Renderer::useShader(GLES2UberShader::Key key)
 {
     auto it = mShaders.find(key);
-    if (it != mShaders.end())
+    if (it != mShaders.end()) {
         it->second.use();
-    else {
+        return it->second;
+    } else {
         auto& shader = mShaders[key];
         shader.load(mShaderSources, key);
         shader.use();
+        return shader;
     }
 }
 

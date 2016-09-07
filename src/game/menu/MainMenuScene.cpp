@@ -1,4 +1,5 @@
 #include "MainMenuScene.h"
+#include "GameLoadingScene.h"
 #include "src/engine/scene/camera/OrthoCamera.h"
 #include "src/engine/scene/Button.h"
 #include "src/engine/scene/RootNode.h"
@@ -16,8 +17,8 @@ MainMenuScene::MainMenuScene(Engine* engine)
 
     auto newGameButton = std::make_shared<Button>(BUTTON_WIDTH, BUTTON_HEIGHT);
     newGameButton->setPosition2D(0.0f, BUTTON_HEIGHT);
-    newGameButton->onClick = [this]() {
-            // FIXME
+    newGameButton->onClick = [engine]() {
+            engine->setScene(std::make_shared<GameLoadingScene>(engine));
         };
     rootNode->appendChild(newGameButton);
 }

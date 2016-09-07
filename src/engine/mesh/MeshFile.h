@@ -29,4 +29,7 @@ struct MeshFile
         uint32_t indexCount;
         MaterialDesc material;
     };
+
+    static_assert(sizeof(MeshFile::Header) == 7 * sizeof(uint64_t), "sizeof(MeshFile::Header)");
+    static_assert(sizeof(MeshFile::Element) == 8 * sizeof(uint64_t), "sizeof(MeshFile::Element)");
 };
