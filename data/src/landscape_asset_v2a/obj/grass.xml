@@ -1,0 +1,9 @@
+<Mesh>
+    <File>grass.obj</File>
+    <IncludeColors>false</IncludeColors>
+    <GenSmoothNormals>false</GenSmoothNormals>
+    <Material name="basecolors">
+        <DiffuseMap>basetexture.jpg</DiffuseMap>
+        <CastsShadow>false</CastsShadow>
+    </Material>
+</Mesh>

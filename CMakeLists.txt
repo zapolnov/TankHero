@@ -177,6 +177,12 @@ add_mesh(
     DEPENDS "data/src/lowpoly-tree/tree.3ds"
     )
 
+add_mesh(
+    INPUT "data/src/landscape_asset_v2a/obj/grass.xml"
+    OUTPUT "data/bin/grass.mesh"
+    DEPENDS "data/src/landscape_asset_v2a/obj/grass.obj" "data/src/landscape_asset_v2a/obj/grass.mtl"
+    )
+
 set(source_files
     ${platform_sources}
     src/game/game/GameScene.cpp

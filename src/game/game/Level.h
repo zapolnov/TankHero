@@ -5,6 +5,7 @@
 #include "src/engine/scene/RootNode.h"
 #include "src/engine/scene/camera/PerspectiveCamera.h"
 #include "src/game/menu/LoadingScene.h"
+#include <glm/glm.hpp>
 #include <string>
 #include <memory>
 
@@ -22,10 +23,16 @@ private:
     std::shared_ptr<PerspectiveCamera> mCamera;
     std::shared_ptr<Player> mPlayer;
     std::vector<std::shared_ptr<Obstacle>> mObstacles;
+    std::vector<glm::mat4> mWorldTransform;
+    std::unique_ptr<char[]> mLevelData;
+    std::vector<char*> mLevelLines;
     uint16_t mTreeMesh;
+    uint16_t mGrassMesh;
     int mWidth;
     int mHeight;
 
     void update(float time) override;
+
     void beforeDraw(Renderer* renderer) override;
+    void draw(Renderer* renderer) override;
 };

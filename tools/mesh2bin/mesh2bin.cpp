@@ -394,8 +394,11 @@ static void readMeshFile()
         meshComponents |= VertexFormat::Position;
 
     if (gNormals || gTangents || gBitangents) {
-        if (gGenSmoothNormals)
+        if (!gGenSmoothNormals)
+            flags |= aiProcess_GenNormals;
+        else
             flags |= aiProcess_GenSmoothNormals;
+
         if (gFixInfacingNormals)
             flags |= aiProcess_FixInfacingNormals;
 
