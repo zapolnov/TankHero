@@ -41,6 +41,8 @@ private:
     std::unordered_map<GLES2UberShader::Key, GLES2UberShader> mShaders;
     std::vector<std::unique_ptr<GLES2Texture>> mTextures;
     std::vector<std::unique_ptr<GLES2Mesh>> mMeshes;
+    glm::mat4 mSavedProjectionMatrix;
+    glm::mat4 mSavedViewMatrix;
     GLES2Shader2D mShader2D;
     GLES2Buffer mStreamVertexBuffer;
     GLES2Buffer mStreamIndexBuffer;

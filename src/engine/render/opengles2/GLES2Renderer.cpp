@@ -2,6 +2,7 @@
 #include "src/engine/utility/TarGzDecompressor.h"
 #include "src/engine/render/Canvas.h"
 #include "OpenGL.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 extern "C" {
     extern const unsigned SHADERS_len;
@@ -51,8 +52,8 @@ void GLES2Renderer::endFrame()
         const auto& mesh = mMeshes[drawCall.mesh];
 
         auto& shader = useShader(GLES2UberShader::WritesShadowMap);
-        glUniformMatrix4fv(shader.projectionMatrixUniform(), 1, GL_FALSE, &drawCall.projectionMatrix[0][0]);
-        glUniformMatrix4fv(shader.viewMatrixUniform(), 1, GL_FALSE, &drawCall.viewMatrix[0][0]);
+        glUniformMatrix4fv(shader.projectionMatrixUniform(), 1, GL_FALSE, &mProjectionMatrix[0][0]);
+        glUniformMatrix4fv(shader.viewMatrixUniform(), 1, GL_FALSE, &mViewMatrix[0][0]);
         glUniformMatrix4fv(shader.modelMatrixUniform(), 1, GL_FALSE, &drawCall.modelMatrix[0][0]);
 
         for (size_t i = 0; i < mesh->elementCount(); i++) {
@@ -227,8 +228,8 @@ const GLES2UberShader& GLES2Renderer::useShader(GLES2UberShader::Key key)
 
 void GLES2Renderer::beginRenderShadowMap()
 {
-    int shadowMapWidth = mViewportWidth;
-    int shadowMapHeight = mViewportHeight;
+    int shadowMapWidth = 1024;//mViewportWidth;
+    int shadowMapHeight = 1024;//mViewportHeight;
 
     GLint savedFramebuffer = 0;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &savedFramebuffer);
@@ -266,6 +267,14 @@ void GLES2Renderer::beginRenderShadowMap()
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
+
+    mSavedProjectionMatrix = mProjectionMatrix;
+    mSavedViewMatrix = mViewMatrix;
+
+    mProjectionMatrix = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, -1000.0f, 1000.0f);
+    mViewMatrix = glm::lookAt(-mLightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    mShadowProjectionMatrix = mProjectionMatrix * mViewMatrix;
 }
 
 void GLES2Renderer::endRenderShadowMap()
@@ -275,7 +284,8 @@ void GLES2Renderer::endRenderShadowMap()
 
     glViewport(0, 0, mViewportWidth, mViewportHeight);
 
-    mShadowProjectionMatrix = mProjectionMatrix * mViewMatrix;
+    mProjectionMatrix = mSavedProjectionMatrix;
+    mViewMatrix = mSavedViewMatrix;
 }
 
 void GLES2Renderer::submitCanvas(const Canvas* canvas)
