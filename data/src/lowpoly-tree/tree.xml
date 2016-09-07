@@ -1,0 +1,13 @@
+<Mesh>
+    <File>tree.3ds</File>
+    <IncludeColors>false</IncludeColors>
+    <IncludeTexCoords0>false</IncludeTexCoords0>
+    <Material name="ac3dmat2">
+        <AcceptsShadow>false</AcceptsShadow>
+        <CastsShadow>true</CastsShadow>
+    </Material>
+    <Material name="ac3dmat6">
+        <AcceptsShadow>false</AcceptsShadow>
+        <CastsShadow>true</CastsShadow>
+    </Material>
+</Mesh>

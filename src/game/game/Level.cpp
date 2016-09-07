@@ -1,5 +1,6 @@
 #include "Level.h"
 #include "src/engine/render/Renderer.h"
+#include "src/engine/Engine.h"
 
 Level::Level(Engine* engine, PendingResources& resourceQueue)
     : mEngine(engine)
@@ -12,11 +13,45 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     setCamera(mCamera);
 
     mPlayer = std::make_shared<Player>(mEngine, resourceQueue);
+
+    resourceQueue.meshes.emplace(mTreeMesh = engine->renderer()->meshNameId("tree.mesh"));
 }
 
 void Level::load(const std::string& file)
 {
     appendChild(mPlayer);
+
+    mWidth = 10;
+    mHeight = 10;
+
+    auto tree = std::make_shared<Obstacle>(mEngine, mTreeMesh);
+    tree->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
+    tree->setScale(0.5f);
+    tree->setPosition(2.0f, 2.0f, 0.0f);
+    appendChild(tree);
+
+    tree = std::make_shared<Obstacle>(mEngine, mTreeMesh);
+    tree->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
+    tree->setScale(0.5f);
+    tree->setPosition(-2.0f, 2.0f, 0.0f);
+    appendChild(tree);
+
+    tree = std::make_shared<Obstacle>(mEngine, mTreeMesh);
+    tree->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
+    tree->setScale(0.5f);
+    tree->setPosition(-2.0f, -2.0f, 0.0f);
+    appendChild(tree);
+
+    tree = std::make_shared<Obstacle>(mEngine, mTreeMesh);
+    tree->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
+    tree->setScale(0.5f);
+    tree->setPosition(2.0f, -2.0f, 0.0f);
+    appendChild(tree);
+}
+
+void Level::update(float time)
+{
+    RootNode::update(time);
 }
 
 void Level::beforeDraw(Renderer* renderer)

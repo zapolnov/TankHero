@@ -171,12 +171,20 @@ add_mesh(
     DEPENDS "data/src/panzerwagen/panzerwagen_3x3.blend"
     )
 
+add_mesh(
+    INPUT "data/src/lowpoly-tree/tree.xml"
+    OUTPUT "data/bin/tree.mesh"
+    DEPENDS "data/src/lowpoly-tree/tree.3ds"
+    )
+
 set(source_files
     ${platform_sources}
     src/game/game/GameScene.cpp
     src/game/game/GameScene.h
     src/game/game/Level.cpp
     src/game/game/Level.h
+    src/game/game/Obstacle.cpp
+    src/game/game/Obstacle.h
     src/game/game/Player.cpp
     src/game/game/Player.h
     src/game/menu/GameLoadingScene.cpp

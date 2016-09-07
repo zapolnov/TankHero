@@ -1,5 +1,6 @@
 <Mesh>
     <File>panzerwagen_3x3.blend</File>
+    <IncludeColors>false</IncludeColors>
     <Material name="Material">
         <AmbientColor r="0.3" g="0.3" b="0.3" />
         <DiffuseMap>texture_panzerwagen.png</DiffuseMap>
