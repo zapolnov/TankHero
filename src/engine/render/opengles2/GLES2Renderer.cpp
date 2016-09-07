@@ -29,22 +29,97 @@ void GLES2Renderer::beginFrame(int width, int height)
     glViewport(0, 0, width, height);
     glClearColor(0.1f, 0.3f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    glDisable(GL_CULL_FACE);
 }
 
 void GLES2Renderer::endFrame()
 {
+    //////////////////////////////////////////////////////////////////////////////////
+    // Phase 1: render shadow map
+
+    /*
     for (const auto& drawCall : mDrawCalls) {
         const auto& mesh = mMeshes[drawCall.mesh];
-        for (size_t i = 0; i < mesh->elementCount(); i++) {
-            const auto& shader = useShader(0);
 
-            glUniformMatrix4fv(shader.projectionMatrixUniform(), 1, GL_FALSE, &drawCall.projectionMatrix[0][0]);
-            glUniformMatrix4fv(shader.viewMatrixUniform(), 1, GL_FALSE, &drawCall.viewMatrix[0][0]);
-            glUniformMatrix4fv(shader.modelMatrixUniform(), 1, GL_FALSE, &drawCall.modelMatrix[0][0]);
-            glUniform4f(shader.diffuseColorUniform(), 1.0f, 0.0f, 0.0f, 1.0f);
+        GLES2UberShader::Key baseKey = 0;
+
+        GLES2UberShader::Key previousKey;
+
+        for (size_t i = 0; i < mesh->elementCount(); i++) {
+            const auto& material = mesh->elementMaterial(i);
+
+            GLES2UberShader::Key key = baseKey;
+
+            if (i == 0 || previousKey != key) {
+                previousKey = key;
+
+                const auto& shader = useShader(key);
+                glUniformMatrix4fv(shader.projectionMatrixUniform(), 1, GL_FALSE, &drawCall.projectionMatrix[0][0]);
+                glUniformMatrix4fv(shader.viewMatrixUniform(), 1, GL_FALSE, &drawCall.viewMatrix[0][0]);
+                glUniformMatrix4fv(shader.modelMatrixUniform(), 1, GL_FALSE, &drawCall.modelMatrix[0][0]);
+            }
 
             mesh->renderElement(i, shader);
+        }
+    }
+    */
+
+    //////////////////////////////////////////////////////////////////////////////////
+    // Phase 2: render scene
+
+    for (const auto& drawCall : mDrawCalls) {
+        const auto& mesh = mMeshes[drawCall.mesh];
+
+        GLES2UberShader::Key baseKey = 0;
+        if (mesh->vertexFormat().hasNormal()
+            && mesh->vertexFormat().hasTangent()
+            && mesh->vertexFormat().hasBitangent())
+            baseKey |= GLES2UberShader::HasLighting;
+        if (mesh->vertexFormat().hasColor())
+            baseKey |= GLES2UberShader::HasColorAttribute;
+
+        GLES2UberShader::Key previousKey;
+        const GLES2UberShader* shader;
+
+        for (size_t i = 0; i < mesh->elementCount(); i++) {
+            const auto& material = mesh->elementMaterial(i);
+
+            GLES2UberShader::Key key = baseKey;
+
+            if (material.diffuseMap != 0) {
+                key |= GLES2UberShader::HasDiffuseMap;
+                glActiveTexture(GL_TEXTURE0);
+                mTextures[material.diffuseMap]->bind(GL_TEXTURE_2D);
+            }
+
+            if (material.normalMap != 0) {
+                key |= GLES2UberShader::HasNormalMap;
+                glActiveTexture(GL_TEXTURE1);
+                mTextures[material.normalMap]->bind(GL_TEXTURE_2D);
+            }
+
+            if (material.specularMap != 0) {
+                key |= GLES2UberShader::HasSpecularMap;
+                glActiveTexture(GL_TEXTURE2);
+                mTextures[material.specularMap]->bind(GL_TEXTURE_2D);
+            }
+
+            if (i == 0 || previousKey != key) {
+                previousKey = key;
+
+                shader = &useShader(key);
+                glUniformMatrix4fv(shader->projectionMatrixUniform(), 1, GL_FALSE, &drawCall.projectionMatrix[0][0]);
+                glUniformMatrix4fv(shader->viewMatrixUniform(), 1, GL_FALSE, &drawCall.viewMatrix[0][0]);
+                glUniformMatrix4fv(shader->modelMatrixUniform(), 1, GL_FALSE, &drawCall.modelMatrix[0][0]);
+
+                if (shader->diffuseMapUniform() >= 0)
+                    glUniform1i(shader->diffuseMapUniform(), 0);
+                if (shader->normalMapUniform() >= 0)
+                    glUniform1i(shader->normalMapUniform(), 1);
+                if (shader->specularMapUniform() >= 0)
+                    glUniform1i(shader->specularMapUniform(), 2);
+            }
+
+            mesh->renderElement(i, *shader);
         }
     }
 }
@@ -100,6 +175,11 @@ const GLES2UberShader& GLES2Renderer::useShader(GLES2UberShader::Key key)
 void GLES2Renderer::submitCanvas(const Canvas* canvas)
 {
     mShader2D.use();
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     const auto& vb = canvas->vertexBuffer();
     mStreamVertexBuffer.bind(GL_ARRAY_BUFFER);

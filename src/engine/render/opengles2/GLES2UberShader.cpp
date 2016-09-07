@@ -21,6 +21,16 @@ void GLES2UberShader::load(const std::unordered_map<std::string, std::string>& s
     std::stringstream ss;
     if (key & HasColorAttribute)
         ss << "#define SHADER_HAS_COLOR_ATTRIBUTE\n";
+    if (key & (HasDiffuseMap | HasSpecularMap | HasNormalMap))
+        ss << "#define SHADER_HAS_TEXCOORD0_ATTRIBUTE\n";
+    if (key & HasLighting)
+        ss << "#define SHADER_HAS_LIGHTING\n";
+    if (key & HasDiffuseMap)
+        ss << "#define SHADER_HAS_DIFFUSE_MAP\n";
+    if (key & HasNormalMap)
+        ss << "#define SHADER_HAS_NORMAL_MAP\n";
+    if (key & HasSpecularMap)
+        ss << "#define SHADER_HAS_SPECULAR_MAP\n";
     std::string prefix = ss.str();
 
     auto vertexShader = sources.find("GLES2UberShader_Vertex.glsl");
@@ -34,8 +44,19 @@ void GLES2UberShader::load(const std::unordered_map<std::string, std::string>& s
     mProjectionMatrixUniform = getUniformLocation("u_projection");
     mViewMatrixUniform = getUniformLocation("u_view");
     mModelMatrixUniform = getUniformLocation("u_model");
+    mAmbientColorUniform = getUniformLocation("u_materialAmbient");
     mDiffuseColorUniform = getUniformLocation("u_materialDiffuse");
+    mSpecularColorUniform = getUniformLocation("u_materialSpecular");
+    mShininessUniform = getUniformLocation("u_shininess");
+    mOpacityUniform = getUniformLocation("u_opacity");
+    mDiffuseMapUniform = getUniformLocation("u_diffuseMap");
+    mNormalMapUniform = getUniformLocation("u_normalMap");
+    mSpecularMapUniform = getUniformLocation("u_specularMap");
 
     mPositionAttribute = getAttribLocation("a_position");
+    mTexCoord0Attribute = getAttribLocation("a_texCoord0");
     mColorAttribute = getAttribLocation("a_color");
+    mNormalAttribute = getAttribLocation("a_normal");
+    mTangentAttribute = getAttribLocation("a_tangent");
+    mBitangentAttribute = getAttribLocation("a_bitangent");
 }
