@@ -299,7 +299,7 @@ void GLES2Renderer::submitCanvas(const Canvas* canvas)
 
         glUniformMatrix4fv(mShader2D.modelMatrixUniform(), 1, GL_FALSE, &call.modelMatrix[0][0]);
 
-        glDrawElements(p, call.indexCount, GL_UNSIGNED_SHORT,
+        glDrawElements(p, GLsizei(call.indexCount), GL_UNSIGNED_SHORT,
             reinterpret_cast<void*>(call.firstIndex * sizeof(uint16_t)));
     }
 

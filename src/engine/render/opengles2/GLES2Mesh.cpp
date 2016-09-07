@@ -82,7 +82,7 @@ void GLES2Mesh::renderElement(size_t index, const GLES2UberShader& shader) const
         if (!mVertexFormat->hasPosition()) {
             glVertexAttrib4f(shader.positionAttribute(), 0.0f, 0.0f, 0.0f, 0.0f);
         } else {
-            glVertexAttribPointer(shader.positionAttribute(), 3, GL_FLOAT, GL_FALSE, mVertexFormat->stride(),
+            glVertexAttribPointer(shader.positionAttribute(), 3, GL_FLOAT, GL_FALSE, GLsizei(mVertexFormat->stride()),
                 reinterpret_cast<void*>(mVertexFormat->positionOffset() + element.bufferOffset * mVertexFormat->stride()));
             glEnableVertexAttribArray(shader.positionAttribute());
         }
@@ -92,7 +92,7 @@ void GLES2Mesh::renderElement(size_t index, const GLES2UberShader& shader) const
         if (!mVertexFormat->hasColor()) {
             glVertexAttrib4f(shader.colorAttribute(), 1.0f, 1.0f, 1.0f, 1.0f);
         } else {
-            glVertexAttribPointer(shader.colorAttribute(), 4, GL_UNSIGNED_BYTE, GL_TRUE, mVertexFormat->stride(),
+            glVertexAttribPointer(shader.colorAttribute(), 4, GL_UNSIGNED_BYTE, GL_TRUE, GLsizei(mVertexFormat->stride()),
                 reinterpret_cast<void*>(mVertexFormat->colorOffset() + element.bufferOffset * mVertexFormat->stride()));
             glEnableVertexAttribArray(shader.colorAttribute());
         }
@@ -102,7 +102,7 @@ void GLES2Mesh::renderElement(size_t index, const GLES2UberShader& shader) const
         if (!mVertexFormat->hasTexCoord0()) {
             glVertexAttrib4f(shader.texCoord0Attribute(), 0.0f, 0.0f, 0.0f, 0.0f);
         } else {
-            glVertexAttribPointer(shader.texCoord0Attribute(), 2, GL_FLOAT, GL_FALSE, mVertexFormat->stride(),
+            glVertexAttribPointer(shader.texCoord0Attribute(), 2, GL_FLOAT, GL_FALSE, GLsizei(mVertexFormat->stride()),
                 reinterpret_cast<void*>(mVertexFormat->texCoord0Offset() + element.bufferOffset * mVertexFormat->stride()));
             glEnableVertexAttribArray(shader.texCoord0Attribute());
         }
@@ -112,7 +112,7 @@ void GLES2Mesh::renderElement(size_t index, const GLES2UberShader& shader) const
         if (!mVertexFormat->hasNormal()) {
             glVertexAttrib4f(shader.normalAttribute(), 0.0f, 1.0f, 0.0f, 0.0f);
         } else {
-            glVertexAttribPointer(shader.normalAttribute(), 3, GL_FLOAT, GL_TRUE, mVertexFormat->stride(),
+            glVertexAttribPointer(shader.normalAttribute(), 3, GL_FLOAT, GL_TRUE, GLsizei(mVertexFormat->stride()),
                 reinterpret_cast<void*>(mVertexFormat->normalOffset() + element.bufferOffset * mVertexFormat->stride()));
             glEnableVertexAttribArray(shader.normalAttribute());
         }
@@ -122,7 +122,7 @@ void GLES2Mesh::renderElement(size_t index, const GLES2UberShader& shader) const
         if (!mVertexFormat->hasTangent()) {
             glVertexAttrib4f(shader.tangentAttribute(), 1.0f, 0.0f, 0.0f, 0.0f);
         } else {
-            glVertexAttribPointer(shader.tangentAttribute(), 3, GL_FLOAT, GL_TRUE, mVertexFormat->stride(),
+            glVertexAttribPointer(shader.tangentAttribute(), 3, GL_FLOAT, GL_TRUE, GLsizei(mVertexFormat->stride()),
                 reinterpret_cast<void*>(mVertexFormat->tangentOffset() + element.bufferOffset * mVertexFormat->stride()));
             glEnableVertexAttribArray(shader.tangentAttribute());
         }
@@ -132,7 +132,7 @@ void GLES2Mesh::renderElement(size_t index, const GLES2UberShader& shader) const
         if (!mVertexFormat->hasBitangent()) {
             glVertexAttrib4f(shader.bitangentAttribute(), 1.0f, 0.0f, 0.0f, 0.0f);
         } else {
-            glVertexAttribPointer(shader.bitangentAttribute(), 3, GL_FLOAT, GL_TRUE, mVertexFormat->stride(),
+            glVertexAttribPointer(shader.bitangentAttribute(), 3, GL_FLOAT, GL_TRUE, GLsizei(mVertexFormat->stride()),
                 reinterpret_cast<void*>(mVertexFormat->bitangentOffset() + element.bufferOffset * mVertexFormat->stride()));
             glEnableVertexAttribArray(shader.bitangentAttribute());
         }
@@ -182,7 +182,7 @@ void GLES2Mesh::renderElement(size_t index, const GLES2UberShader& shader) const
             break;
     }
 
-    glDrawElements(GL_TRIANGLES, element.indexCount, GL_UNSIGNED_SHORT,
+    glDrawElements(GL_TRIANGLES, GLsizei(element.indexCount), GL_UNSIGNED_SHORT,
         reinterpret_cast<void*>(element.firstIndex * sizeof(uint16_t)));
 
     if (shader.bitangentAttribute() >= 0) {

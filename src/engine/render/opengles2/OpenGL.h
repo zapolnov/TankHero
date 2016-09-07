@@ -44,6 +44,7 @@
  #define glGenRenderbuffers (gl->glGenRenderbuffers)
  #define glGetShaderInfoLog (gl->glGetShaderInfoLog)
  #define glGetShaderiv (gl->glGetShaderiv)
+ #define glGetShaderSource (gl->glGetShaderSource)
  #define glGetUniformLocation (gl->glGetUniformLocation)
  #define glLineWidth (gl->glLineWidth)
  #define glLinkProgram (gl->glLinkProgram)

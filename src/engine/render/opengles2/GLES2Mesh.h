@@ -5,6 +5,7 @@
 #include "src/engine/mesh/MaterialDesc.h"
 #include "src/engine/mesh/VertexFormat.h"
 #include <vector>
+#include <memory>
 
 class GLES2Mesh
 {

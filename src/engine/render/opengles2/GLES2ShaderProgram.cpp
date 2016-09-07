@@ -1,4 +1,5 @@
 #include "GLES2ShaderProgram.h"
+#include <memory>
 #include <sstream>
 #include <iostream>
 #include <cassert>
