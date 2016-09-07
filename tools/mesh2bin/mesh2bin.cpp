@@ -102,6 +102,7 @@ static bool gColors = false;
 static bool gFixInfacingNormals = true;
 static bool gFlipUVs = true;
 static bool gJoinIdenticalVertices = true;
+static bool gGenSmoothNormals = true;
 static std::vector<MeshFile::Element> gMeshElements;
 static std::unique_ptr<VertexData> gVertexData;
 static std::vector<uint16_t> gIndexData;
@@ -333,6 +334,8 @@ static void readXmlFile()
             gFlipUVs = xmlToBool(element);
         else if (element->ValueStr() == "JoinIdenticalVertices")
             gJoinIdenticalVertices = xmlToBool(element);
+        else if (element->ValueStr() == "GenSmoothNormals")
+            gGenSmoothNormals = xmlToBool(element);
         else if (element->ValueStr() == "Material")
             readXmlMaterial(element);
         else {
@@ -381,7 +384,8 @@ static void readMeshFile()
         meshComponents |= VertexFormat::Position;
 
     if (gNormals || gTangents || gBitangents) {
-        flags |= aiProcess_GenSmoothNormals;
+        if (gGenSmoothNormals)
+            flags |= aiProcess_GenSmoothNormals;
         if (gFixInfacingNormals)
             flags |= aiProcess_FixInfacingNormals;
 
