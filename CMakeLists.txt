@@ -87,6 +87,8 @@ set(renderer_libraries)
 set(renderer_shaders)
 
 set(renderer_sources
+    src/engine/render/Canvas.cpp
+    src/engine/render/Canvas.h
     src/engine/render/Renderer.cpp
     src/engine/render/Renderer.h
     )
@@ -96,14 +98,22 @@ if(TRUE)
     add_definitions(-DRENDERER_GLES2)
 
     list(APPEND renderer_sources
+        src/engine/render/opengles2/GLES2Buffer.cpp
+        src/engine/render/opengles2/GLES2Buffer.h
         src/engine/render/opengles2/GLES2Renderer.cpp
         src/engine/render/opengles2/GLES2Renderer.h
+        src/engine/render/opengles2/GLES2Shader2D.cpp
+        src/engine/render/opengles2/GLES2Shader2D.h
+        src/engine/render/opengles2/GLES2ShaderProgram.cpp
+        src/engine/render/opengles2/GLES2ShaderProgram.h
         src/engine/render/opengles2/GLES2UberShader.cpp
         src/engine/render/opengles2/GLES2UberShader.h
         src/engine/render/opengles2/OpenGL.h
         )
 
     list(APPEND renderer_shaders
+        src/engine/render/opengles2/GLES2Shader2D_Fragment.glsl
+        src/engine/render/opengles2/GLES2Shader2D_Vertex.glsl
         src/engine/render/opengles2/GLES2UberShader_Fragment.glsl
         src/engine/render/opengles2/GLES2UberShader_Vertex.glsl
         )

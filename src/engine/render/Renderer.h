@@ -7,6 +7,7 @@
 #include <vector>
 
 class Engine;
+class Canvas;
 
 class Renderer
 {
@@ -23,6 +24,9 @@ public:
     void setProjectionMatrix(const glm::mat4& projection);
     void setViewMatrix(const glm::mat4& view);
 
+    Canvas* begin2D();
+    void end2D();
+
 protected:
     enum Flags : uint32_t
     {
@@ -36,8 +40,12 @@ protected:
     uint32_t mFlags;
     std::unordered_map<std::string, uint16_t> mTextureIds;
     std::vector<std::string> mTextureNames;
+    std::unique_ptr<Canvas> mCanvas;
+    int mIn2d = 0;
 
     explicit Renderer(Engine* engine);
+
+    virtual void submitCanvas(const Canvas*) = 0;
 
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;

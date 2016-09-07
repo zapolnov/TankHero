@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "Canvas.h"
 #include <cassert>
 
 #ifdef RENDERER_GLES2
@@ -50,4 +51,22 @@ void Renderer::setViewMatrix(const glm::mat4& view)
 {
     mViewMatrix = view;
     mFlags |= ViewMatrixChanged;
+}
+
+Canvas* Renderer::begin2D()
+{
+    if (mIn2d++ == 0) {
+        if (!mCanvas)
+            mCanvas.reset(new Canvas);
+    }
+    return mCanvas.get();
+}
+
+void Renderer::end2D()
+{
+    assert(mIn2d);
+    if (mIn2d && --mIn2d == 0) {
+        submitCanvas(mCanvas.get());
+        mCanvas.reset();
+    }
 }

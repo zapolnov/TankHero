@@ -123,4 +123,13 @@ void RootNode::beforeDraw(Renderer* renderer)
         renderer->setProjectionMatrix(mCamera->projectionMatrix());
         renderer->setViewMatrix(mCamera->viewMatrix());
     }
+
+    if (m2D)
+        renderer->begin2D();
+}
+
+void RootNode::afterDraw(Renderer* renderer)
+{
+    if (m2D)
+        renderer->end2D();
 }

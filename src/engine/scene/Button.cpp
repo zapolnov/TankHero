@@ -1,4 +1,5 @@
 #include "Button.h"
+#include "src/engine/render/Canvas.h"
 #include "src/engine/Engine.h"
 
 Button::Button(float width, float height)
@@ -10,19 +11,21 @@ Button::Button(float width, float height)
 
 void Button::draw(Renderer* renderer)
 {
-    /*
-    renderer->setModelMatrix(worldMatrix());
-    renderer->useShader(Shader::SolidColor);
+    Canvas* canvas = renderer->begin2D();
+    canvas->pushMatrix(worldMatrix());
 
     if (mPressed)
-        renderer->setColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+        canvas->pushColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
     else
-        renderer->setColor(glm::vec4(0.7f, 0.7f, 0.0f, 1.0f));
+        canvas->pushColor(glm::vec4(0.7f, 0.7f, 0.0f, 1.0f));
 
     float halfWidth = mWidth * 0.5f;
     float halfHeight = mHeight * 0.5f;
-    renderer->drawSolidRect(-halfWidth, -halfHeight, halfWidth, halfHeight);
-    */
+    canvas->drawSolidRect(glm::vec2(-halfWidth, -halfHeight), glm::vec2(halfWidth, halfHeight));
+
+    canvas->popColor();
+    canvas->popMatrix();
+    renderer->end2D();
 }
 
 bool Button::touchBegin(float x, float y)

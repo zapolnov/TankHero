@@ -7,6 +7,7 @@
 MainMenuScene::MainMenuScene(Engine* engine)
 {
     auto rootNode = std::make_shared<RootNode>();
+    rootNode->set2D(true);
     rootNode->setCamera(std::make_shared<OrthoCamera>());
     setRootNode(rootNode);
 

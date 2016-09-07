@@ -1,14 +1,11 @@
 
 #pragma once
-#include "OpenGL.h"
+#include "GLES2ShaderProgram.h"
 #include <cstdint>
-#include <set>
 #include <unordered_map>
 #include <string>
 
-class Engine;
-
-class GLES2UberShader
+class GLES2UberShader : private GLES2ShaderProgram
 {
 public:
     using Key = uint64_t;
@@ -42,9 +39,6 @@ private:
     int mDiffuseColorUniform = -1;
     int mPositionAttribute = -1;
     int mColorAttribute = -1;
-
-    void compileShader(GLuint shader, const std::set<std::string>& defines, const std::string& source);
-    void linkProgram();
 
     GLES2UberShader(const GLES2UberShader&) = delete;
     GLES2UberShader& operator=(const GLES2UberShader&) = delete;
