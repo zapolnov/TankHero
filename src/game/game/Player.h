@@ -12,5 +12,6 @@ private:
     Engine* mEngine;
     uint16_t mTankMesh;
 
+    void update(float time) override;
     void draw(Renderer* renderer) override;
 };

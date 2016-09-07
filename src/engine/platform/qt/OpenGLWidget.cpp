@@ -54,17 +54,32 @@ void OpenGLWidget::paintGL()
     mEngine->runFrame(mWidth, mHeight, frameTime);
 }
 
-void OpenGLWidget::keyPressEvent(QKeyEvent*)
+static Key mapKey(int key)
 {
+    switch (key) {
+        case Qt::Key_Up: return KeyUp;
+        case Qt::Key_Down: return KeyDown;
+        case Qt::Key_Left: return KeyLeft;
+        case Qt::Key_Right: return KeyRight;
+        default: return KeyUnknown;
+    }
 }
 
-void OpenGLWidget::keyReleaseEvent(QKeyEvent*)
+void OpenGLWidget::keyPressEvent(QKeyEvent* event)
 {
+    if (mEngine)
+        mEngine->keyPressed(mapKey(event->key()));
+}
+
+void OpenGLWidget::keyReleaseEvent(QKeyEvent* event)
+{
+    if (mEngine)
+        mEngine->keyReleased(mapKey(event->key()));
 }
 
 void OpenGLWidget::mousePressEvent(QMouseEvent* event)
 {
-    if (!mLeftButtonDown && event->button() == Qt::LeftButton) {
+    if (mEngine && !mLeftButtonDown && event->button() == Qt::LeftButton) {
         mLeftButtonDown = true;
         mEngine->touchBegin(event->pos().x(), event->pos().y());
     }

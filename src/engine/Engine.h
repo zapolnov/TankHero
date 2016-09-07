@@ -5,6 +5,16 @@
 #include <vector>
 #include <memory>
 
+enum Key
+{
+    KeyUnknown = 0,
+    KeyUp,
+    KeyDown,
+    KeyLeft,
+    KeyRight,
+    NumKeys,
+};
+
 class Engine
 {
 public:
@@ -23,11 +33,17 @@ public:
     void touchEnd(float x, float y);
     void touchCancel(float x, float y);
 
+    bool wasKeyPressed(Key key) const { return mKeyWasPressed[key]; }
+    void keyPressed(Key key);
+    void keyReleased(Key key);
+
     void runFrame(int width, int height, float time);
 
 private:
     std::unique_ptr<Renderer> mRenderer;
     std::vector<std::shared_ptr<Scene>> mScenes;
+    bool mKeyPressed[NumKeys];
+    bool mKeyWasPressed[NumKeys];
     int mScreenWidth = 0;
     int mScreenHeight = 0;
     float mLastTouchX = 0.0f;

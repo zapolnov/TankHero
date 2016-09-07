@@ -4,6 +4,7 @@ static const std::shared_ptr<Scene> gNullScene;
 
 Engine::Engine()
 {
+    memset(mKeyPressed, 0, sizeof(mKeyPressed));
     mRenderer.reset(Renderer::create(this));
 }
 
@@ -113,8 +114,22 @@ void Engine::touchCancel(float x, float y)
     }
 }
 
+void Engine::keyPressed(Key key)
+{
+    mKeyPressed[key] = true;
+    mKeyWasPressed[key] = true;
+}
+
+void Engine::keyReleased(Key key)
+{
+    mKeyPressed[key] = false;
+}
+
 void Engine::runFrame(int width, int height, float time)
 {
+    for (int i = 0; i < NumKeys; i++)
+        mKeyWasPressed[i] = mKeyPressed[i] || mKeyWasPressed[i];
+
     auto scene = currentScene();
 
     if (width != mScreenWidth || height != mScreenHeight || mSceneChanged) {
@@ -133,4 +148,6 @@ void Engine::runFrame(int width, int height, float time)
     if (scene)
         scene->runFrame(mRenderer.get(), time);
     mRenderer->endFrame();
+
+    memset(mKeyWasPressed, 0, sizeof(mKeyWasPressed));
 }

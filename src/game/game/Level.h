@@ -11,6 +11,8 @@
 class Level : public RootNode
 {
 public:
+    static const float CELL_SIZE;
+
     Level(Engine* engine, PendingResources& resourceQueue);
 
     void load(const std::string& file);

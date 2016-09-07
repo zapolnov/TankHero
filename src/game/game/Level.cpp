@@ -8,6 +8,8 @@
 #include <vector>
 #include <string>
 
+const float Level::CELL_SIZE = 5.0f;
+
 Level::Level(Engine* engine, PendingResources& resourceQueue)
     : mEngine(engine)
 {
@@ -71,7 +73,6 @@ void Level::load(const std::string& file)
 
     mHeight = int(lines.size());
 
-    const float CELL_SIZE = 5.0f;
     for (int y = 0; y < mHeight; y++) {
         int x = 0;
         for (const char* p = lines[size_t(y)]; *p; ++p, ++x) {
