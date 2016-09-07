@@ -576,7 +576,7 @@ static void readMeshFile()
         allPoints.reserve(allPoints.size() + vertexCount);
 
         for (size_t i = 0; i < vertexCount; i++) {
-            size_t offset = vertexDataCurrentBase + i;
+            size_t offset = vertexDataSize + i;
 
             if (hasPositions && gPositions) {
                 auto& position = vertexFormat.position(gVertexData->data(), offset);
