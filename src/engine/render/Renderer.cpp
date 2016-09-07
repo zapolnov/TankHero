@@ -101,5 +101,8 @@ void Renderer::drawMesh(const glm::mat4& model, uint16_t mesh)
     drawCall.projectionMatrix = mProjectionMatrix;
     drawCall.viewMatrix = mViewMatrix;
     drawCall.modelMatrix = model;
+    drawCall.lightPosition = mLightPosition;
+    drawCall.lightColor = mLightColor;
+    drawCall.lightPower = mLightPower;
     drawCall.mesh = mesh;
 }

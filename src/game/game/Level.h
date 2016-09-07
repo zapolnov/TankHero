@@ -18,4 +18,6 @@ private:
     Engine* mEngine;
     std::shared_ptr<PerspectiveCamera> mCamera;
     std::shared_ptr<Player> mPlayer;
+
+    void beforeDraw(Renderer* renderer) override;
 };

@@ -85,21 +85,27 @@ void GLES2Renderer::endFrame()
 
             GLES2UberShader::Key key = baseKey;
 
-            if (material.diffuseMap != 0) {
+            glActiveTexture(GL_TEXTURE0);
+            if (material.diffuseMap == 0)
+                glBindTexture(GL_TEXTURE_2D, 0);
+            else {
                 key |= GLES2UberShader::HasDiffuseMap;
-                glActiveTexture(GL_TEXTURE0);
                 mTextures[material.diffuseMap]->bind(GL_TEXTURE_2D);
             }
 
-            if (material.normalMap != 0) {
+            glActiveTexture(GL_TEXTURE1);
+            if (!(key & GLES2UberShader::HasLighting) || material.normalMap == 0)
+                glBindTexture(GL_TEXTURE_2D, 0);
+            else {
                 key |= GLES2UberShader::HasNormalMap;
-                glActiveTexture(GL_TEXTURE1);
                 mTextures[material.normalMap]->bind(GL_TEXTURE_2D);
             }
 
-            if (material.specularMap != 0) {
+            glActiveTexture(GL_TEXTURE2);
+            if (!(key & GLES2UberShader::HasLighting) || material.specularMap == 0)
+                glBindTexture(GL_TEXTURE_2D, 0);
+            else {
                 key |= GLES2UberShader::HasSpecularMap;
-                glActiveTexture(GL_TEXTURE2);
                 mTextures[material.specularMap]->bind(GL_TEXTURE_2D);
             }
 
@@ -110,6 +116,19 @@ void GLES2Renderer::endFrame()
                 glUniformMatrix4fv(shader->projectionMatrixUniform(), 1, GL_FALSE, &drawCall.projectionMatrix[0][0]);
                 glUniformMatrix4fv(shader->viewMatrixUniform(), 1, GL_FALSE, &drawCall.viewMatrix[0][0]);
                 glUniformMatrix4fv(shader->modelMatrixUniform(), 1, GL_FALSE, &drawCall.modelMatrix[0][0]);
+
+                if (shader->lightPositionUniform() >= 0) {
+                    const auto& p = drawCall.lightPosition;
+                    glUniform3f(shader->lightPositionUniform(), p.x, p.y, p.z);
+                }
+
+                if (shader->lightColorUniform() >= 0) {
+                    const auto& c = drawCall.lightColor;
+                    glUniform3f(shader->lightColorUniform(), c.x, c.y, c.z);
+                }
+
+                if (shader->lightPowerUniform() >= 0)
+                    glUniform1f(shader->lightPowerUniform(), drawCall.lightPower);
 
                 if (shader->diffuseMapUniform() >= 0)
                     glUniform1i(shader->diffuseMapUniform(), 0);

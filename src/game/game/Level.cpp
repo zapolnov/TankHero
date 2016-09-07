@@ -1,4 +1,5 @@
 #include "Level.h"
+#include "src/engine/render/Renderer.h"
 
 Level::Level(Engine* engine, PendingResources& resourceQueue)
     : mEngine(engine)
@@ -16,4 +17,12 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
 void Level::load(const std::string& file)
 {
     appendChild(mPlayer);
+}
+
+void Level::beforeDraw(Renderer* renderer)
+{
+    auto lightPosition = glm::vec3(-400.0f, -400.0f, -400.0f);
+    renderer->setLight(lightPosition, glm::vec3(1.0f), 1.0f);
+
+    RootNode::beforeDraw(renderer);
 }

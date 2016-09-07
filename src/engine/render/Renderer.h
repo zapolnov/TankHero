@@ -36,6 +36,13 @@ public:
     Canvas* begin2D();
     void end2D();
 
+    void setLight(const glm::vec3& position, const glm::vec3& color, float power)
+    {
+        mLightPosition = position;
+        mLightColor = color;
+        mLightPower = power;
+    }
+
     void drawMesh(const glm::mat4& model, uint16_t mesh);
 
 protected:
@@ -50,6 +57,9 @@ protected:
         glm::mat4 projectionMatrix;
         glm::mat4 viewMatrix;
         glm::mat4 modelMatrix;
+        glm::vec3 lightPosition;
+        glm::vec3 lightColor;
+        float lightPower;
         uint16_t mesh;
     };
 
@@ -63,6 +73,9 @@ protected:
     std::vector<std::string> mTextureNames;
     std::vector<std::string> mMeshNames;
     std::unique_ptr<Canvas> mCanvas;
+    glm::vec3 mLightPosition;
+    glm::vec3 mLightColor;
+    float mLightPower;
     int mIn2d = 0;
 
     explicit Renderer(Engine* engine);

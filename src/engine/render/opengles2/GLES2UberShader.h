@@ -16,6 +16,7 @@ public:
         HasDiffuseMap = 0x0000000000000004,
         HasNormalMap = 0x0000000000000008,
         HasSpecularMap = 0x0000000000000010,
+        AcceptsShadow = 0x0000000000000020,
     };
 
     GLES2UberShader();
@@ -32,6 +33,9 @@ public:
     int diffuseMapUniform() const { return mDiffuseMapUniform; }
     int normalMapUniform() const { return mNormalMapUniform; }
     int specularMapUniform() const { return mSpecularMapUniform; }
+    int lightPositionUniform() const { return mLightPositionUniform; }
+    int lightColorUniform() const { return mLightColorUniform; }
+    int lightPowerUniform() const { return mLightPowerUniform; }
 
     int positionAttribute() const { return mPositionAttribute; }
     int texCoord0Attribute() const { return mTexCoord0Attribute; }
@@ -59,6 +63,9 @@ private:
     int mDiffuseMapUniform = -1;
     int mNormalMapUniform = -1;
     int mSpecularMapUniform = -1;
+    int mLightPositionUniform = -1;
+    int mLightColorUniform = -1;
+    int mLightPowerUniform = -1;
     int mPositionAttribute = -1;
     int mTexCoord0Attribute = -1;
     int mColorAttribute = -1;
