@@ -1,5 +1,6 @@
 #include "GLES2Mesh.h"
 #include "GLES2UberShader.h"
+#include "src/engine/render/Renderer.h"
 #include "src/engine/mesh/MeshFile.h"
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -15,7 +16,7 @@ GLES2Mesh::~GLES2Mesh()
     glDeleteBuffers(2, mBuffers);
 }
 
-void GLES2Mesh::load(const std::string& file)
+void GLES2Mesh::load(Renderer* renderer, const std::string& file)
 {
     struct stat st;
     if (stat(file.c_str(), &st) < 0)
@@ -67,6 +68,9 @@ void GLES2Mesh::load(const std::string& file)
         element.firstIndex = elementList[i].firstIndex;
         element.indexCount = elementList[i].indexCount;
         element.material = elementList[i].material;
+        element.material.diffuseMap = renderer->textureNameId(&stringTable[element.material.diffuseMap]);
+        element.material.normalMap = renderer->textureNameId(&stringTable[element.material.normalMap]);
+        element.material.specularMap = renderer->textureNameId(&stringTable[element.material.specularMap]);
         mElements.emplace_back(std::move(element));
     }
 }

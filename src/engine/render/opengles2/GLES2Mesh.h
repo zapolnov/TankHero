@@ -7,13 +7,15 @@
 #include <vector>
 #include <memory>
 
+class Renderer;
+
 class GLES2Mesh
 {
 public:
     GLES2Mesh();
     ~GLES2Mesh();
 
-    void load(const std::string& file);
+    void load(Renderer* renderer, const std::string& file);
 
     const VertexFormat& vertexFormat() const { return *mVertexFormat; }
 

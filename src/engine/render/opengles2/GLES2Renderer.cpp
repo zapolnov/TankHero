@@ -182,7 +182,7 @@ void GLES2Renderer::loadMesh(uint16_t mesh)
     if (!mMeshes[mesh]) {
         assert(mMeshNames.size() > mesh);
         mMeshes[mesh].reset(new GLES2Mesh);
-        mMeshes[mesh]->load(mMeshNames[mesh]);
+        mMeshes[mesh]->load(this, mMeshNames[mesh]);
     }
 }
 
