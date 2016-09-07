@@ -17,6 +17,7 @@ public:
         HasNormalMap = 0x0000000000000008,
         HasSpecularMap = 0x0000000000000010,
         AcceptsShadow = 0x0000000000000020,
+        WritesShadowMap = 0x0000000000000040,
     };
 
     GLES2UberShader();
@@ -33,6 +34,8 @@ public:
     int diffuseMapUniform() const { return mDiffuseMapUniform; }
     int normalMapUniform() const { return mNormalMapUniform; }
     int specularMapUniform() const { return mSpecularMapUniform; }
+    int shadowMapUniform() const { return mShadowMapUniform; }
+    int shadowProjectionUniform() const { return mShadowProjectionUniform; }
     int lightPositionUniform() const { return mLightPositionUniform; }
     int lightColorUniform() const { return mLightColorUniform; }
     int lightPowerUniform() const { return mLightPowerUniform; }
@@ -63,6 +66,8 @@ private:
     int mDiffuseMapUniform = -1;
     int mNormalMapUniform = -1;
     int mSpecularMapUniform = -1;
+    int mShadowMapUniform = -1;
+    int mShadowProjectionUniform = -1;
     int mLightPositionUniform = -1;
     int mLightColorUniform = -1;
     int mLightPowerUniform = -1;

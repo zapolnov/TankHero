@@ -40,8 +40,58 @@ uniform float u_opacity;
  varying vec4 v_color;
 #endif
 
+#ifdef SHADER_ACCEPTS_SHADOW
+ uniform sampler2D u_shadowMap;
+ varying vec4 v_shadowCoord;
+
+ float unpack(vec4 colour)
+ {
+    const vec4 bitShifts = vec4(1.0 / (256.0 * 256.0 * 256.0),
+                                1.0 / (256.0 * 256.0),
+                                1.0 / 256.0,
+                                1);
+    return dot(colour, bitShifts);
+ }
+
+ float simpleShadow(float bias)
+ {
+    vec4 shadowMapPosition = (v_shadowCoord / v_shadowCoord.w + 1.0) / 2.0;
+    vec4 packedZValue = texture2D(u_shadowMap, shadowMapPosition.xy);
+    float distance = unpack(packedZValue);
+    return float(distance > shadowMapPosition.z - bias);
+ }
+#endif
+
+#ifdef SHADER_WRITES_SHADOWMAP
+ varying vec4 v_position;
+
+ // from Fabien Sangalard's DEngine
+ vec4 pack(float depth)
+ {
+    const vec4 bitSh = vec4(256.0 * 256.0 * 256.0,
+                            256.0 * 256.0,
+                            256.0,
+                            1.0);
+
+    const vec4 bitMsk = vec4(0,
+                             1.0 / 256.0,
+                             1.0 / 256.0,
+                             1.0 / 256.0);
+
+    vec4 comp = fract(depth * bitSh);
+    comp -= comp.xxyz * bitMsk;
+    return comp;
+ }
+#endif
+
 void main()
 {
+  #ifdef SHADER_WRITES_SHADOWMAP
+    float normalizedDistance = v_position.z / v_position.w;
+    normalizedDistance = (normalizedDistance + 1.0) / 2.0;
+    gl_FragColor = pack(normalizedDistance);
+  #else
+
     vec4 pixelColor;
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -79,10 +129,16 @@ void main()
   #endif
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    // Shadow
+    // Calculate shadow
 
   #ifdef SHADER_ACCEPTS_SHADOW
     float shadowCoeff = 1.0;
+    if (v_shadowCoord.w > 0.0) {
+        float cosTheta = clamp(dot(v_tangentSpaceLightDirection, v_tangentSpaceNormal), 0.0, 1.0);
+        float bias = 0.00005 * tan(acos(cosTheta));
+        shadowCoeff = simpleShadow(bias);
+        shadowCoeff = (shadowCoeff * 0.4) + 0.6;
+    }
   #endif
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -117,6 +173,14 @@ void main()
   #endif
 
     /////////////////////////////////////////////////////////////////////////////////////////
+    // Apply shadow
+
+  #ifdef SHADER_ACCEPTS_SHADOW
+    pixelColor *= vec4(vec3(shadowCoeff), 1.0);
+  #endif
+
+    /////////////////////////////////////////////////////////////////////////////////////////
 
     gl_FragColor = pixelColor;
+  #endif
 }

@@ -33,6 +33,8 @@ void GLES2UberShader::load(const std::unordered_map<std::string, std::string>& s
         ss << "#define SHADER_HAS_SPECULAR_MAP\n";
     if (key & AcceptsShadow)
         ss << "#define SHADER_ACCEPTS_SHADOW\n";
+    if (key & WritesShadowMap)
+        ss << "#define SHADER_WRITES_SHADOWMAP\n";
     std::string prefix = ss.str();
 
     auto vertexShader = sources.find("GLES2UberShader_Vertex.glsl");
@@ -54,6 +56,8 @@ void GLES2UberShader::load(const std::unordered_map<std::string, std::string>& s
     mDiffuseMapUniform = getUniformLocation("u_diffuseMap");
     mNormalMapUniform = getUniformLocation("u_normalMap");
     mSpecularMapUniform = getUniformLocation("u_specularMap");
+    mShadowMapUniform = getUniformLocation("u_shadowMap");
+    mShadowProjectionUniform = getUniformLocation("u_shadowProjection");
     mLightPositionUniform = getUniformLocation("u_lightPosition");
     mLightColorUniform = getUniformLocation("u_lightColor");
     mLightPowerUniform = getUniformLocation("u_lightPower");

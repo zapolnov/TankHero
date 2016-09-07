@@ -20,6 +20,15 @@ attribute vec3 a_position;
  varying vec2 v_texCoord0;
 #endif
 
+#ifdef SHADER_ACCEPTS_SHADOW
+ uniform mat4 u_shadowProjection;
+ varying vec4 v_shadowCoord;
+#endif
+
+#ifdef SHADER_WRITES_SHADOWMAP
+ varying vec4 v_position;
+#endif
+
 uniform mat4 u_projection;
 uniform mat4 u_view;
 uniform mat4 u_model;
@@ -34,16 +43,13 @@ void main()
     v_texCoord0 = a_texCoord0;
   #endif
 
-  #ifdef SHADER_ACCEPTS_SHADOW
     vec3 worldSpaceVertexPosition = vec3(u_model * vec4(a_position, 1.0));
+
+  #ifdef SHADER_ACCEPTS_SHADOW
     v_shadowCoord = u_shadowProjection * vec4(worldSpaceVertexPosition, 1.0);
   #endif
 
   #ifdef SHADER_HAS_LIGHTING
-   #ifndef SHADER_ACCEPTS_SHADOW
-    vec3 worldSpaceVertexPosition = vec3(u_model * vec4(a_position, 1.0));
-   #endif
-
     mat4 modelview = u_view * u_model;
     vec3 cameraSpaceVertexPosition = vec3(modelview * vec4(a_position, 1.0));
 
@@ -65,8 +71,14 @@ void main()
     v_tangentSpaceNormal = normalize(tbn * cameraSpaceVertexNormal);
     v_tangentSpaceLightDirection = normalize(tbn * cameraSpaceLightDirection);
 
-    gl_Position = u_projection * vec4(cameraSpaceVertexPosition, 1.0);
+    vec4 finalPosition = u_projection * vec4(cameraSpaceVertexPosition, 1.0);
   #else
-    gl_Position = u_projection * u_view * u_model * vec4(a_position, 1.0);
+    vec4 finalPosition = u_projection * u_view * vec4(worldSpaceVertexPosition, 1.0);
   #endif
+
+  #ifdef SHADER_WRITES_SHADOWMAP
+    v_position = finalPosition;
+  #endif
+
+    gl_Position = finalPosition;
 }
