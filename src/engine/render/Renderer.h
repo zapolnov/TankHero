@@ -24,6 +24,10 @@ public:
 
     uint16_t meshNameId(const std::string& name);
     const std::string& meshName(uint16_t id) const;
+    virtual const glm::vec3& meshBBoxMin(uint16_t id) const = 0;
+    virtual const glm::vec3& meshBBoxMax(uint16_t id) const = 0;
+    virtual const glm::vec3& meshSphereCenter(uint16_t id) const = 0;
+    virtual float meshSphereRadius(uint16_t id) const = 0;
 
     virtual void loadTexture(uint16_t texture) = 0;
     virtual void unloadAllTextures() = 0;
@@ -47,12 +51,6 @@ public:
     void drawMesh(const glm::mat4& model, uint16_t mesh);
 
 protected:
-    enum Flags : uint32_t
-    {
-        ProjectionMatrixChanged = 0x00000001,
-        ViewMatrixChanged = 0x00000002,
-    };
-
     struct DrawCall
     {
         glm::mat4 projectionMatrix;

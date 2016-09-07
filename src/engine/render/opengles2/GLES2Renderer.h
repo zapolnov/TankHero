@@ -29,6 +29,11 @@ public:
     void loadMesh(uint16_t mesh) override;
     void unloadAllMeshes() override;
 
+    const glm::vec3& meshBBoxMin(uint16_t id) const override;
+    const glm::vec3& meshBBoxMax(uint16_t id) const override;
+    const glm::vec3& meshSphereCenter(uint16_t id) const override;
+    float meshSphereRadius(uint16_t id) const override;
+
     const GLES2UberShader& useShader(GLES2UberShader::Key key);
 
 private:

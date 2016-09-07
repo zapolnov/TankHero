@@ -22,11 +22,11 @@ namespace
         {
             if (!mNextScene) {
                 mNextScene = mLoadingScene->constructNextScene(mEngine, mPendingResources);
-                mTotalResources = mPendingResources.meshes.size() + mPendingResources.textures.size();
+                mTotalResources = mPendingResources.totalPending();
             }
 
             size_t total = mTotalResources;
-            size_t pending = mPendingResources.meshes.size() + mPendingResources.textures.size();
+            size_t pending = mPendingResources.totalPending();
 
             auto start = std::chrono::steady_clock::now();
             while (pending > 0) {
@@ -44,6 +44,10 @@ namespace
                     auto it = mPendingResources.textures.begin();
                     mEngine->renderer()->loadTexture(*it);
                     mPendingResources.textures.erase(it);
+                } else if (!mPendingResources.custom.empty()) {
+                    auto it = mPendingResources.custom.begin();
+                    (*it)();
+                    mPendingResources.custom.erase(it);
                 }
 
                 auto current = std::chrono::steady_clock::now();

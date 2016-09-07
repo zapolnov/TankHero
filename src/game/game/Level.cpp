@@ -1,6 +1,12 @@
 #include "Level.h"
 #include "src/engine/render/Renderer.h"
 #include "src/engine/Engine.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <algorithm>
+#include <cstdio>
+#include <vector>
+#include <string>
 
 Level::Level(Engine* engine, PendingResources& resourceQueue)
     : mEngine(engine)
@@ -19,39 +25,97 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
 
 void Level::load(const std::string& file)
 {
-    appendChild(mPlayer);
+    struct stat st;
+    if (stat(file.c_str(), &st) < 0)
+        return;
 
-    mWidth = 10;
-    mHeight = 10;
+    std::unique_ptr<char[]> data;
+    data.reset(new char[st.st_size + 1]);
+    data[st.st_size] = 0;
 
-    auto tree = std::make_shared<Obstacle>(mEngine, mTreeMesh);
-    tree->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
-    tree->setScale(0.5f);
-    tree->setPosition(2.0f, 2.0f, 0.0f);
-    appendChild(tree);
+    FILE* f = fopen(file.c_str(), "rb");
+    if (!f)
+        return;
 
-    tree = std::make_shared<Obstacle>(mEngine, mTreeMesh);
-    tree->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
-    tree->setScale(0.5f);
-    tree->setPosition(-2.0f, 2.0f, 0.0f);
-    appendChild(tree);
+    size_t bytesRead = fread(data.get(), 1, st.st_size, f);
+    fclose(f);
 
-    tree = std::make_shared<Obstacle>(mEngine, mTreeMesh);
-    tree->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
-    tree->setScale(0.5f);
-    tree->setPosition(-2.0f, -2.0f, 0.0f);
-    appendChild(tree);
+    if (bytesRead < st.st_size)
+        return;
 
-    tree = std::make_shared<Obstacle>(mEngine, mTreeMesh);
-    tree->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
-    tree->setScale(0.5f);
-    tree->setPosition(2.0f, -2.0f, 0.0f);
-    appendChild(tree);
+    mWidth = 0;
+
+    std::vector<char*> lines;
+    char* p = data.get();
+    char* end = data.get() + st.st_size;
+    while (p < end) {
+        int length;
+        char* pp = strchr(p, '\n');
+        if (!pp) {
+            pp = end;
+            length = int(end - p);
+        } else {
+            *pp = 0;
+            length = int(pp - p);
+            if (pp > data.get() && pp[-1] == '\r') {
+                pp[-1] = 0;
+                --length;
+            }
+        }
+
+        mWidth = std::max(mWidth, length);
+        lines.emplace_back(p);
+
+        p = pp + 1;
+    }
+
+    mHeight = int(lines.size());
+
+    const float CELL_SIZE = 5.0f;
+    for (int y = 0; y < mHeight; y++) {
+        int x = 0;
+        for (const char* p = lines[size_t(y)]; *p; ++p, ++x) {
+            float posX = CELL_SIZE * float(x);
+            float posY = CELL_SIZE * float(y);
+
+            switch (*p) {
+                case '.':
+                case ' ':
+                    continue;
+
+                case '*':
+                    mPlayer->setPosition2D(posX, posY);
+                    appendChild(mPlayer);
+                    continue;
+
+                case 'T': {
+                    static const float xOffset[] = { -1.0f, -1.0f,  1.0f, 1.0f };
+                    static const float yOffset[] = { -1.0f,  1.0f, -1.0f, 1.0f };
+                    float z = -mEngine->renderer()->meshBBoxMin(mTreeMesh).y;
+                    for (int i = 0; i < 4; i++) {
+                        auto tree = std::make_shared<Obstacle>(mEngine, mTreeMesh);
+                        tree->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
+                        tree->setScale(0.5f);
+                        tree->setPosition(posX + xOffset[i] * CELL_SIZE * 0.3f, posY + yOffset[i] * CELL_SIZE * 0.3f, z);
+                        appendChild(tree);
+                    }
+                    continue;
+                }
+
+                default:
+                    assert(false);
+            }
+        }
+    }
 }
 
 void Level::update(float time)
 {
     RootNode::update(time);
+
+    auto direction = mCamera->position() - mCamera->target();
+    mCamera->setTarget(mPlayer->position());
+    mCamera->setPosition(mPlayer->position() + direction);
 }
 
 void Level::beforeDraw(Renderer* renderer)

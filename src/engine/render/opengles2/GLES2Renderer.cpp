@@ -191,6 +191,26 @@ void GLES2Renderer::unloadAllMeshes()
     mMeshes.clear();
 }
 
+const glm::vec3& GLES2Renderer::meshBBoxMin(uint16_t id) const
+{
+    return mMeshes[id]->bboxMin();
+}
+
+const glm::vec3& GLES2Renderer::meshBBoxMax(uint16_t id) const
+{
+    return mMeshes[id]->bboxMax();
+}
+
+const glm::vec3& GLES2Renderer::meshSphereCenter(uint16_t id) const
+{
+    return mMeshes[id]->sphereCenter();
+}
+
+float GLES2Renderer::meshSphereRadius(uint16_t id) const
+{
+    return mMeshes[id]->sphereRadius();
+}
+
 const GLES2UberShader& GLES2Renderer::useShader(GLES2UberShader::Key key)
 {
     auto it = mShaders.find(key);

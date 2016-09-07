@@ -66,13 +66,11 @@ const std::string& Renderer::meshName(uint16_t id) const
 void Renderer::setProjectionMatrix(const glm::mat4& projection)
 {
     mProjectionMatrix = projection;
-    mFlags |= ProjectionMatrixChanged;
 }
 
 void Renderer::setViewMatrix(const glm::mat4& view)
 {
     mViewMatrix = view;
-    mFlags |= ViewMatrixChanged;
 }
 
 Canvas* Renderer::begin2D()

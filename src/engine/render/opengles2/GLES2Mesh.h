@@ -17,8 +17,14 @@ public:
 
     const VertexFormat& vertexFormat() const { return *mVertexFormat; }
 
+    const glm::vec3& bboxMin() const { return mBBoxMin; }
+    const glm::vec3& bboxMax() const { return mBBoxMax; }
+    const glm::vec3& sphereCenter() const { return mSphereCenter; }
+    float sphereRadius() const { return mSphereRadius; }
+
     size_t elementCount() const { return mElements.size(); }
     const MaterialDesc& elementMaterial(size_t index) const { return mElements[index].material; }
+
     void renderElement(size_t index, const GLES2UberShader& shader) const;
 
 private:
