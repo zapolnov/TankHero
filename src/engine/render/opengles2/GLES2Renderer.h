@@ -6,6 +6,8 @@
 #include "GLES2Buffer.h"
 #include "GLES2Texture.h"
 #include "GLES2Mesh.h"
+#include "GLES2Renderbuffer.h"
+#include "GLES2Framebuffer.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -37,6 +39,18 @@ private:
     GLES2Shader2D mShader2D;
     GLES2Buffer mStreamVertexBuffer;
     GLES2Buffer mStreamIndexBuffer;
+    GLES2Framebuffer mShadowFramebuffer;
+    GLES2Renderbuffer mShadowRenderbuffer;
+    GLES2Texture mShadowTexture;
+    glm::mat4 mShadowProjectionMatrix;
+    int mViewportWidth = 0;
+    int mViewportHeight = 0;
+    int mShadowMapWidth = 0;
+    int mShadowMapHeight = 0;
+    GLuint mSavedFramebuffer;
+
+    void beginRenderShadowMap();
+    void endRenderShadowMap();
 
     void submitCanvas(const Canvas*) override;
 

@@ -100,8 +100,12 @@ if(TRUE)
     list(APPEND renderer_sources
         src/engine/render/opengles2/GLES2Buffer.cpp
         src/engine/render/opengles2/GLES2Buffer.h
+        src/engine/render/opengles2/GLES2Framebuffer.cpp
+        src/engine/render/opengles2/GLES2Framebuffer.h
         src/engine/render/opengles2/GLES2Mesh.cpp
         src/engine/render/opengles2/GLES2Mesh.h
+        src/engine/render/opengles2/GLES2Renderbuffer.cpp
+        src/engine/render/opengles2/GLES2Renderbuffer.h
         src/engine/render/opengles2/GLES2Renderer.cpp
         src/engine/render/opengles2/GLES2Renderer.h
         src/engine/render/opengles2/GLES2Shader2D.cpp

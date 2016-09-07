@@ -26,6 +26,9 @@ GLES2Renderer::~GLES2Renderer()
 
 void GLES2Renderer::beginFrame(int width, int height)
 {
+    mViewportWidth = width;
+    mViewportHeight = height;
+
     glViewport(0, 0, width, height);
     glClearColor(0.1f, 0.3f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -33,8 +36,16 @@ void GLES2Renderer::beginFrame(int width, int height)
 
 void GLES2Renderer::endFrame()
 {
+    if (mDrawCalls.empty())
+        return;
+
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+
     //////////////////////////////////////////////////////////////////////////////////
     // Phase 1: render shadow map
+
+    beginRenderShadowMap();
 
     /*
     for (const auto& drawCall : mDrawCalls) {
@@ -62,6 +73,8 @@ void GLES2Renderer::endFrame()
         }
     }
     */
+
+    endRenderShadowMap();
 
     //////////////////////////////////////////////////////////////////////////////////
     // Phase 2: render scene
@@ -191,12 +204,66 @@ const GLES2UberShader& GLES2Renderer::useShader(GLES2UberShader::Key key)
     }
 }
 
+void GLES2Renderer::beginRenderShadowMap()
+{
+    int shadowMapWidth = mViewportWidth;
+    int shadowMapHeight = mViewportHeight;
+
+    GLint savedFramebuffer = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &savedFramebuffer);
+    mSavedFramebuffer = savedFramebuffer;
+
+    if (shadowMapWidth == mShadowMapWidth && shadowMapHeight == mShadowMapHeight)
+        glBindFramebuffer(GL_FRAMEBUFFER, mShadowFramebuffer.handle());
+    else {
+        glBindRenderbuffer(GL_RENDERBUFFER, mShadowRenderbuffer.handle());
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, shadowMapWidth, shadowMapHeight);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, mShadowTexture.handle());
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, shadowMapWidth, shadowMapHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, mShadowFramebuffer.handle());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mShadowTexture.handle(), 0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mShadowRenderbuffer.handle());
+
+        mShadowMapWidth = shadowMapWidth;
+        mShadowMapHeight = shadowMapHeight;
+
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+    }
+
+    glViewport(0, 0, mShadowMapWidth, mShadowMapHeight);
+
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+}
+
+void GLES2Renderer::endRenderShadowMap()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, mSavedFramebuffer);
+    mSavedFramebuffer = 0;
+
+    glViewport(0, 0, mViewportWidth, mViewportHeight);
+
+    mShadowProjectionMatrix = mProjectionMatrix * mViewMatrix;
+}
+
 void GLES2Renderer::submitCanvas(const Canvas* canvas)
 {
     mShader2D.use();
 
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

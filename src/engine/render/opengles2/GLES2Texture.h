@@ -8,6 +8,8 @@ public:
     GLES2Texture();
     ~GLES2Texture();
 
+    GLuint handle() const { return mHandle; }
+
     void bind(GLenum target) const;
 
     void load(const std::string& file);
