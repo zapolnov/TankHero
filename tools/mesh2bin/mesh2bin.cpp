@@ -101,6 +101,7 @@ static bool gTexCoords0 = true;
 static bool gColors = false;
 static bool gFixInfacingNormals = true;
 static bool gFlipUVs = true;
+static bool gJoinIdenticalVertices = true;
 static std::vector<MeshFile::Element> gMeshElements;
 static std::unique_ptr<VertexData> gVertexData;
 static std::vector<uint16_t> gIndexData;
@@ -330,6 +331,8 @@ static void readXmlFile()
             gFixInfacingNormals = xmlToBool(element);
         else if (element->ValueStr() == "FlipUVs")
             gFlipUVs = xmlToBool(element);
+        else if (element->ValueStr() == "JoinIdenticalVertices")
+            gJoinIdenticalVertices = xmlToBool(element);
         else if (element->ValueStr() == "Material")
             readXmlMaterial(element);
         else {
@@ -366,10 +369,12 @@ static void readMeshFile()
         | aiProcess_FindInvalidData
         | aiProcess_OptimizeMeshes
         | aiProcess_SplitLargeMeshes
-        | aiProcess_JoinIdenticalVertices
         | aiProcess_ImproveCacheLocality
         | aiProcess_PreTransformVertices
         ;
+
+    if (gJoinIdenticalVertices)
+        flags |= aiProcess_JoinIdenticalVertices;
 
     uint8_t meshComponents = 0;
     if (gPositions)

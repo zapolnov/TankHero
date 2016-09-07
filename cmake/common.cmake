@@ -51,6 +51,8 @@ macro(add_mesh)
     list(APPEND asset_src_files "${MESH_INPUT}" ${MESH_DEPENDS})
     list(APPEND asset_bin_files "${MESH_OUTPUT}")
 
+    set_source_files_properties("${MESH_INPUT}" ${MESH_DEPENDS} PROPERTIES HEADER_FILE_ONLY TRUE)
+
     if(TARGET mesh2bin)
         set_source_files_properties(outfile PROPERTIES GENERATED TRUE)
         add_custom_command(OUTPUT "${outfile}"

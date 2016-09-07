@@ -134,8 +134,12 @@ void main()
   #ifdef SHADER_ACCEPTS_SHADOW
     float shadowCoeff = 1.0;
     if (v_shadowCoord.w > 0.0) {
+      #ifdef SHADER_HAS_LIGHTING
         float cosTheta = clamp(dot(v_tangentSpaceLightDirection, v_tangentSpaceNormal), 0.0, 1.0);
         float bias = 0.00005 * tan(acos(cosTheta));
+      #else
+        float bias = 0.00005;
+      #endif
         shadowCoeff = simpleShadow(bias);
         shadowCoeff = (shadowCoeff * 0.4) + 0.6;
     }

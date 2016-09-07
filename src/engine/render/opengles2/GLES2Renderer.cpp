@@ -160,6 +160,8 @@ void GLES2Renderer::endFrame()
             mesh->renderElement(i, *shader);
         }
     }
+
+    mDrawCalls.clear();
 }
 
 void GLES2Renderer::loadTexture(uint16_t texture)
