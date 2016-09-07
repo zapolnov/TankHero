@@ -6,6 +6,8 @@
 enum MaterialFlag : uint8_t
 {
     MaterialTwoSided = 0x01,
+    MaterialAcceptsShadow = 0x02,
+    MaterialCastsShadow = 0x04,
 };
 
 enum MaterialBlendMode : uint8_t

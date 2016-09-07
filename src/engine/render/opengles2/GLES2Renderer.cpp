@@ -50,25 +50,15 @@ void GLES2Renderer::endFrame()
     for (const auto& drawCall : mDrawCalls) {
         const auto& mesh = mMeshes[drawCall.mesh];
 
-        GLES2UberShader::Key baseKey = GLES2UberShader::WritesShadowMap;
-        GLES2UberShader::Key previousKey;
-        const GLES2UberShader* shader;
+        auto& shader = useShader(GLES2UberShader::WritesShadowMap);
+        glUniformMatrix4fv(shader.projectionMatrixUniform(), 1, GL_FALSE, &drawCall.projectionMatrix[0][0]);
+        glUniformMatrix4fv(shader.viewMatrixUniform(), 1, GL_FALSE, &drawCall.viewMatrix[0][0]);
+        glUniformMatrix4fv(shader.modelMatrixUniform(), 1, GL_FALSE, &drawCall.modelMatrix[0][0]);
 
         for (size_t i = 0; i < mesh->elementCount(); i++) {
             const auto& material = mesh->elementMaterial(i);
-
-            GLES2UberShader::Key key = baseKey;
-
-            if (i == 0 || previousKey != key) {
-                previousKey = key;
-
-                shader = &useShader(key);
-                glUniformMatrix4fv(shader->projectionMatrixUniform(), 1, GL_FALSE, &drawCall.projectionMatrix[0][0]);
-                glUniformMatrix4fv(shader->viewMatrixUniform(), 1, GL_FALSE, &drawCall.viewMatrix[0][0]);
-                glUniformMatrix4fv(shader->modelMatrixUniform(), 1, GL_FALSE, &drawCall.modelMatrix[0][0]);
-            }
-
-            mesh->renderElement(i, *shader);
+            if (material.flags & MaterialCastsShadow)
+                mesh->renderElement(i, shader);
         }
     }
 
@@ -80,7 +70,7 @@ void GLES2Renderer::endFrame()
     for (const auto& drawCall : mDrawCalls) {
         const auto& mesh = mMeshes[drawCall.mesh];
 
-        GLES2UberShader::Key baseKey = GLES2UberShader::AcceptsShadow;
+        GLES2UberShader::Key baseKey = 0;
         if (mesh->vertexFormat().hasNormal()
             && mesh->vertexFormat().hasTangent()
             && mesh->vertexFormat().hasBitangent())
@@ -98,6 +88,9 @@ void GLES2Renderer::endFrame()
             const auto& material = mesh->elementMaterial(i);
 
             GLES2UberShader::Key key = baseKey;
+
+            if (material.flags & MaterialAcceptsShadow)
+                key |= GLES2UberShader::AcceptsShadow;
 
             glActiveTexture(GL_TEXTURE0);
             if (material.diffuseMap == 0)

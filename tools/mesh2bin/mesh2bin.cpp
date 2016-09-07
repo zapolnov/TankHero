@@ -40,6 +40,8 @@ namespace
         float shininess;
         MaterialBlendMode blendMode;
         bool twoSided;
+        bool acceptsShadow;
+        bool castsShadow;
         bool hasAmbientColor = false;
         bool hasDiffuseColor = false;
         bool hasSpecularColor = false;
@@ -50,6 +52,8 @@ namespace
         bool hasShininess = false;
         bool hasBlendMode = false;
         bool hasTwoSided = false;
+        bool hasAcceptsShadow = false;
+        bool hasCastsShadow = false;
         bool visited = false;
     };
 
@@ -271,6 +275,12 @@ static void readXmlMaterial(const TiXmlElement* element)
         } else if (child->ValueStr() == "TwoSided") {
             material.hasTwoSided = true;
             material.twoSided = xmlToBool(child);
+        } else if (child->ValueStr() == "AcceptsShadow") {
+            material.hasAcceptsShadow = true;
+            material.acceptsShadow = xmlToBool(child);
+        } else if (child->ValueStr() == "CastsShadow") {
+            material.hasCastsShadow = true;
+            material.castsShadow = xmlToBool(child);
         } else if (child->ValueStr() == "BlendMode") {
             const char* str = child->GetText();
             if (!std::strcmp(str, "none"))
@@ -536,6 +546,9 @@ static void readMeshFile()
                     element.material.flags |= MaterialTwoSided;
             }
 
+            element.material.flags |= MaterialAcceptsShadow;
+            element.material.flags |= MaterialCastsShadow;
+
             auto it = gXmlMaterials.find(material);
             if (it == gXmlMaterials.end())
                 fprintf(stdout, "note: no definition for material \"%s\" in xml file.\n", material.c_str());
@@ -559,6 +572,18 @@ static void readMeshFile()
                         element.material.flags |= MaterialTwoSided;
                     else
                         element.material.flags &= ~MaterialTwoSided;
+                }
+                if (material.hasAcceptsShadow) {
+                    if (material.acceptsShadow)
+                        element.material.flags |= MaterialAcceptsShadow;
+                    else
+                        element.material.flags &= ~MaterialAcceptsShadow;
+                }
+                if (material.hasCastsShadow) {
+                    if (material.castsShadow)
+                        element.material.flags |= MaterialCastsShadow;
+                    else
+                        element.material.flags &= ~MaterialCastsShadow;
                 }
                 if (material.hasDiffuseMap)
                     element.material.diffuseMap = gStringTable.addString(material.diffuseMap);
