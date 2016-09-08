@@ -17,6 +17,8 @@ set(platform_sources)
 # Engine
 
 set(engine_sources
+    src/engine/math/OBB2D.cpp
+    src/engine/math/OBB2D.h
     src/engine/mesh/MaterialDesc.h
     src/engine/mesh/MeshFile.h
     src/engine/mesh/VertexData.cpp
