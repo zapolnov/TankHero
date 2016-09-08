@@ -183,6 +183,36 @@ add_mesh(
     DEPENDS "data/src/landscape_asset_v2a/obj/grass.obj" "data/src/landscape_asset_v2a/obj/grass.mtl"
     )
 
+add_mesh(
+    INPUT "data/src/landscape_asset_v2a/obj/road-straight-low.xml"
+    OUTPUT "data/bin/road-straight-low.mesh"
+    DEPENDS "data/src/landscape_asset_v2a/obj/road-straight-low.obj" "data/src/landscape_asset_v2a/obj/road-straight-low.mtl"
+    )
+
+add_mesh(
+    INPUT "data/src/landscape_asset_v2a/obj/road-corner-low.xml"
+    OUTPUT "data/bin/road-corner-low.mesh"
+    DEPENDS "data/src/landscape_asset_v2a/obj/road-corner-low.obj" "data/src/landscape_asset_v2a/obj/road-corner-low.mtl"
+    )
+
+add_mesh(
+    INPUT "data/src/landscape_asset_v2a/obj/road-tjunction-low.xml"
+    OUTPUT "data/bin/road-tjunction-low.mesh"
+    DEPENDS "data/src/landscape_asset_v2a/obj/road-tjunction-low.obj" "data/src/landscape_asset_v2a/obj/road-tjunction-low.mtl"
+    )
+
+add_mesh(
+    INPUT "data/src/landscape_asset_v2a/obj/road-crossing-low.xml"
+    OUTPUT "data/bin/road-crossing-low.mesh"
+    DEPENDS "data/src/landscape_asset_v2a/obj/road-crossing-low.obj" "data/src/landscape_asset_v2a/obj/road-crossing-low.mtl"
+    )
+
+add_mesh(
+    INPUT "data/src/landscape_asset_v2a/obj/building-office-small.xml"
+    OUTPUT "data/bin/building-office-small.mesh"
+    DEPENDS "data/src/landscape_asset_v2a/obj/building-office-small.obj" "data/src/landscape_asset_v2a/obj/building-office-small.mtl"
+    )
+
 set(source_files
     ${platform_sources}
     src/game/game/GameScene.cpp

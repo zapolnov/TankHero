@@ -27,6 +27,11 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
 
     resourceQueue.meshes.emplace(mTreeMesh = engine->renderer()->meshNameId("tree.mesh"));
     resourceQueue.meshes.emplace(mGrassMesh = engine->renderer()->meshNameId("grass.mesh"));
+    resourceQueue.meshes.emplace(mRoadStraightMesh = engine->renderer()->meshNameId("road-straight-low.mesh"));
+    resourceQueue.meshes.emplace(mRoadCornerMesh = engine->renderer()->meshNameId("road-corner-low.mesh"));
+    resourceQueue.meshes.emplace(mRoadTJunctionMesh = engine->renderer()->meshNameId("road-tjunction-low.mesh"));
+    resourceQueue.meshes.emplace(mRoadCrossingMesh = engine->renderer()->meshNameId("road-crossing-low.mesh"));
+    resourceQueue.meshes.emplace(mOfficeBuildingMesh = engine->renderer()->meshNameId("building-office-small.mesh"));
 }
 
 void Level::load(const std::string& file)
@@ -88,19 +93,52 @@ void Level::load(const std::string& file)
             float scale = 1.0f / 8.0f * CELL_SIZE;
             auto m = glm::translate(worldMatrix(), glm::vec3(posX, posY, 0.0f));
             m = glm::rotate(m, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            m = glm::scale(m, glm::vec3(scale));
-            mWorldTransform[y * mWidth + x] = m;
 
             switch (*p) {
                 case '.':
                 case ' ':
-                    continue;
+                    break;
 
                 case '*':
                     *p = ' ';
                     mPlayer->setPosition2D(posX, posY);
                     appendChild(mPlayer);
-                    continue;
+                    break;
+
+                case '2': // road straight
+                case '5': // road corner
+                case 'c': // road tjunction
+                case 'x': // road crossing
+                case '#': // office building
+                    break;
+
+                case '3': // road corner
+                    m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case '4': // road straight
+                    m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case '1': // road corner
+                    m = glm::rotate(m, glm::radians(-180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case '6': // road corner
+                    m = glm::rotate(m, glm::radians(-270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case 'b': // road tjunction
+                    m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case 'a': // road tjunction
+                    m = glm::rotate(m, glm::radians(-180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case 'd': // road tjunction
+                    m = glm::rotate(m, glm::radians(-270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
 
                 case 'T': {
                     static const float xOffset[] = { -1.0f, -1.0f,  1.0f, 1.0f };
@@ -114,12 +152,15 @@ void Level::load(const std::string& file)
                         tree->setPosition(posX + xOffset[i] * CELL_SIZE * 0.3f, posY + yOffset[i] * CELL_SIZE * 0.3f, z);
                         appendChild(tree);
                     }
-                    continue;
+                    break;
                 }
 
                 default:
                     assert(false);
             }
+
+            m = glm::scale(m, glm::vec3(scale));
+            mWorldTransform[y * mWidth + x] = m;
         }
     }
 }
@@ -152,6 +193,33 @@ void Level::draw(Renderer* renderer)
                 case '.':
                 case 'T':
                     renderer->drawMesh(mWorldTransform[y * mWidth + x], mGrassMesh);
+                    continue;
+
+                case '1':
+                case '3':
+                case '5':
+                case '6':
+                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRoadCornerMesh);
+                    continue;
+
+                case '2':
+                case '4':
+                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRoadStraightMesh);
+                    continue;
+
+                case 'a':
+                case 'b':
+                case 'c':
+                case 'd':
+                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRoadTJunctionMesh);
+                    continue;
+
+                case 'x':
+                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRoadCrossingMesh);
+                    continue;
+
+                case '#':
+                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mOfficeBuildingMesh);
                     continue;
 
                 default:

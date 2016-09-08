@@ -28,6 +28,11 @@ private:
     std::vector<char*> mLevelLines;
     uint16_t mTreeMesh;
     uint16_t mGrassMesh;
+    uint16_t mRoadStraightMesh;
+    uint16_t mRoadCornerMesh;
+    uint16_t mRoadTJunctionMesh;
+    uint16_t mRoadCrossingMesh;
+    uint16_t mOfficeBuildingMesh;
     int mWidth;
     int mHeight;
 

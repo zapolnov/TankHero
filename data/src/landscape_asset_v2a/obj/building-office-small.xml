@@ -1,0 +1,9 @@
+<Mesh>
+    <File>building-office-small.obj</File>
+    <IncludeColors>false</IncludeColors>
+    <GenSmoothNormals>false</GenSmoothNormals>
+    <Material name="basecolors">
+        <DiffuseMap>basetexture.jpg</DiffuseMap>
+        <CastsShadow>true</CastsShadow>
+    </Material>
+</Mesh>
