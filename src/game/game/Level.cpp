@@ -41,30 +41,28 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
 
 void Level::load(const std::string& file)
 {
-    mLevelLines.clear();
-    mLevelData.reset();
-
     struct stat st;
     if (stat(file.c_str(), &st) < 0)
         return;
 
-    mLevelData.reset(new char[st.st_size + 1]);
-    mLevelData[st.st_size] = 0;
+    std::unique_ptr<char[]> levelData(new char[st.st_size + 1]);
+    levelData[st.st_size] = 0;
 
     FILE* f = fopen(file.c_str(), "rb");
     if (!f)
         return;
 
-    size_t bytesRead = fread(mLevelData.get(), 1, st.st_size, f);
+    size_t bytesRead = fread(levelData.get(), 1, st.st_size, f);
     fclose(f);
 
     if (bytesRead < st.st_size)
         return;
 
     mWidth = 0;
+    std::vector<char*> levelLines;
 
-    char* p = mLevelData.get();
-    char* end = mLevelData.get() + st.st_size;
+    char* p = levelData.get();
+    char* end = levelData.get() + st.st_size;
     while (p < end) {
         int length;
         char* pp = strchr(p, '\n');
@@ -74,29 +72,36 @@ void Level::load(const std::string& file)
         } else {
             *pp = 0;
             length = int(pp - p);
-            if (pp > mLevelData.get() && pp[-1] == '\r') {
+            if (pp > levelData.get() && pp[-1] == '\r') {
                 pp[-1] = 0;
                 --length;
             }
         }
 
         mWidth = std::max(mWidth, length);
-        mLevelLines.emplace_back(p);
+        levelLines.emplace_back(p);
 
         p = pp + 1;
     }
 
-    mHeight = int(mLevelLines.size());
-    mWorldTransform.resize(mWidth * mHeight, glm::mat4(1.0f));
+    mHeight = int(levelLines.size());
+    mCells.reserve(levelLines.size());
 
     for (int y = 0; y < mHeight; y++) {
+        mCells.emplace_back();
+        auto& cellLine = mCells.back();
+
         int x = 0;
-        for (char* p = mLevelLines[size_t(y)]; *p; ++p, ++x) {
-            float posX = CELL_SIZE * float(x);
-            float posY = CELL_SIZE * float(y);
+        for (char* p = levelLines[size_t(y)]; *p; ++p, ++x) {
+            cellLine.emplace_back();
+            auto& cell = cellLine.back();
+
+            cell.posX = CELL_SIZE * float(x);
+            cell.posY = CELL_SIZE * float(y);
+            cell.levelMarker = *p;
 
             float scale = 1.0f / 8.0f * CELL_SIZE;
-            auto m = glm::translate(worldMatrix(), glm::vec3(posX, posY, 0.0f));
+            auto m = glm::translate(worldMatrix(), glm::vec3(cell.posX, cell.posY, 0.0f));
             m = glm::rotate(m, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
             switch (*p) {
@@ -105,8 +110,8 @@ void Level::load(const std::string& file)
                     break;
 
                 case '*':
-                    *p = ' ';
-                    mPlayer->setPosition2D(posX, posY);
+                    cell.levelMarker = ' ';
+                    mPlayer->setPosition2D(cell.posX, cell.posY);
                     appendChild(mPlayer);
                     break;
 
@@ -198,8 +203,11 @@ void Level::load(const std::string& file)
                         auto tree = std::make_shared<Obstacle>(mEngine, mTreeMesh);
                         tree->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
                         tree->setScale(0.5f);
-                        tree->setPosition(posX + xOffset[i] * CELL_SIZE * 0.3f, posY + yOffset[i] * CELL_SIZE * 0.3f, z);
+                        tree->setPosition(cell.posX + xOffset[i] * CELL_SIZE * 0.3f,
+                                          cell.posY + yOffset[i] * CELL_SIZE * 0.3f,
+                                          z);
                         appendChild(tree);
+                        cell.obstacles.emplace_back(tree);
                     }
                     break;
                 }
@@ -209,7 +217,7 @@ void Level::load(const std::string& file)
             }
 
             m = glm::scale(m, glm::vec3(scale));
-            mWorldTransform[y * mWidth + x] = m;
+            cell.worldTransform = m;
         }
     }
 }
@@ -233,68 +241,68 @@ void Level::beforeDraw(Renderer* renderer)
 
 void Level::draw(Renderer* renderer)
 {
-    auto m = worldMatrix();
     for (int y = 0; y < mHeight; y++) {
-        int x = 0;
-        for (const char* p = mLevelLines[size_t(y)]; *p; ++p, ++x) {
-            switch (*p) {
+        int x = -1;
+        for (const Cell& cell : mCells[size_t(y)]) {
+            ++x;
+            switch (cell.levelMarker) {
                 case ' ':
                 case '.':
                 case 'T':
-                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mGrassMesh);
+                    renderer->drawMesh(cell.worldTransform, mGrassMesh);
                     continue;
 
                 case '1':
                 case '3':
                 case '5':
                 case '6':
-                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRoadCornerMesh);
+                    renderer->drawMesh(cell.worldTransform, mRoadCornerMesh);
                     continue;
 
                 case '2':
                 case '4':
-                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRoadStraightMesh);
+                    renderer->drawMesh(cell.worldTransform, mRoadStraightMesh);
                     continue;
 
                 case 'a':
                 case 'b':
                 case 'c':
                 case 'd':
-                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRoadTJunctionMesh);
+                    renderer->drawMesh(cell.worldTransform, mRoadTJunctionMesh);
                     continue;
 
                 case 'e':
                 case 'f':
                 case 'g':
                 case 'h':
-                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRoadEndMesh);
+                    renderer->drawMesh(cell.worldTransform, mRoadEndMesh);
                     continue;
 
                 case 'A':
                 case 'B':
                 case 'C':
                 case 'D':
-                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRiverCornerMesh);
+                    renderer->drawMesh(cell.worldTransform, mRiverCornerMesh);
                     continue;
 
                 case 'E':
                 case 'F':
                 case 'G':
                 case 'H':
-                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRiverEndMesh);
+                    renderer->drawMesh(cell.worldTransform, mRiverEndMesh);
                     continue;
 
                 case 'x':
-                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRoadCrossingMesh);
+                    renderer->drawMesh(cell.worldTransform, mRoadCrossingMesh);
                     continue;
 
                 case '~':
                 case '|':
-                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mWaterMesh);
+                    renderer->drawMesh(cell.worldTransform, mWaterMesh);
                     continue;
 
                 case '#':
-                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mOfficeBuildingMesh);
+                    renderer->drawMesh(cell.worldTransform, mOfficeBuildingMesh);
                     continue;
 
                 default:

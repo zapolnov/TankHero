@@ -19,13 +19,19 @@ public:
     void load(const std::string& file);
 
 private:
+    struct Cell
+    {
+        std::vector<std::shared_ptr<Obstacle>> obstacles;
+        glm::mat4 worldTransform{1.0f};
+        float posX;
+        float posY;
+        char levelMarker;
+    };
+
     Engine* mEngine;
     std::shared_ptr<PerspectiveCamera> mCamera;
     std::shared_ptr<Player> mPlayer;
-    std::vector<std::shared_ptr<Obstacle>> mObstacles;
-    std::vector<glm::mat4> mWorldTransform;
-    std::unique_ptr<char[]> mLevelData;
-    std::vector<char*> mLevelLines;
+    std::vector<std::vector<Cell>> mCells;
     uint16_t mTreeMesh;
     uint16_t mGrassMesh;
     uint16_t mRoadStraightMesh;
