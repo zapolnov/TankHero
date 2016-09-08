@@ -1,0 +1,7 @@
+<Mesh>
+    <File>Bullet.dae</File>
+    <IncludeColors>false</IncludeColors>
+    <Material name="Material_004">
+        <AcceptsShadow>false</AcceptsShadow>
+    </Material>
+</Mesh>

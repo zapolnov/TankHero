@@ -17,6 +17,5 @@ std::pair<glm::vec3, glm::vec3> Obstacle::localAABox() const
 
 void Obstacle::draw(Renderer* renderer)
 {
-    debugDraw(renderer);
     renderer->drawMesh(worldMatrix(), mMesh);
 }

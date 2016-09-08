@@ -1,4 +1,5 @@
 #include "Level.h"
+#include "Bullet.h"
 #include "src/engine/render/Canvas.h"
 #include "src/engine/render/Renderer.h"
 #include "src/engine/Engine.h"
@@ -38,6 +39,7 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     resourceQueue.meshes.emplace(mRiverEndMesh = engine->renderer()->meshNameId("river-end-low.mesh"));
     resourceQueue.meshes.emplace(mRiverStraightMesh = engine->renderer()->meshNameId("river-straight-low.mesh"));
     resourceQueue.meshes.emplace(mWaterMesh = engine->renderer()->meshNameId("water.mesh"));
+    resourceQueue.meshes.emplace(mBulletMesh = engine->renderer()->meshNameId("tank_bullet.mesh"));
 }
 
 void Level::load(const std::string& file)
@@ -294,6 +296,13 @@ bool Level::collidesOnMove(const OBB2D& sourceBox, const OBB2D& targetBox, float
     }
 
     return false;
+}
+
+void Level::spawnBullet(const glm::vec3& position, const glm::vec2& dir)
+{
+    auto bullet = std::make_shared<Bullet>(mEngine, this, mBulletMesh, dir);
+    bullet->setPosition(position);
+    appendChild(bullet);
 }
 
 void Level::update(float time)

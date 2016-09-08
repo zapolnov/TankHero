@@ -88,7 +88,9 @@ void Player::update(float time)
         if (mEngine->wasKeyPressed(KeyLeft)) {
             setRotation2D(angle + step);
             invalidateBoundingBox();
-            if (mLevel->collidesOnMove(oldBoundingBox, boundingBox())) {
+            if (!mLevel->collidesOnMove(oldBoundingBox, boundingBox()))
+                angle = angle + step;
+            else {
                 setRotation2D(angle);
                 invalidateBoundingBox();
             }
@@ -97,7 +99,9 @@ void Player::update(float time)
         if (mEngine->wasKeyPressed(KeyRight)) {
             setRotation2D(angle - step);
             invalidateBoundingBox();
-            if (mLevel->collidesOnMove(oldBoundingBox, boundingBox())) {
+            if (!mLevel->collidesOnMove(oldBoundingBox, boundingBox()))
+                angle = angle - step;
+            else {
                 setRotation2D(angle);
                 invalidateBoundingBox();
             }
@@ -127,12 +131,20 @@ void Player::update(float time)
         invalidateBoundingBox();
     }
 
-    if (mEngine->wasKeyPressed(KeyShoot)) {
-        
+    if (!mEngine->wasKeyPressed(KeyShoot))
+        mDidShoot = false;
+    else if (!mDidShoot) {
+        auto position = glm::vec3(worldMatrix() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        position.z = 1.0f;
+
+        float a = angle + glm::radians(-90.0f);
+        auto dir = glm::vec2(cosf(a), sinf(a));
+
+        mLevel->spawnBullet(position, dir);
+        mDidShoot = true;
     }
 }
 
-void Player::draw(Renderer* renderer)
+void Player::draw(Renderer*)
 {
-    debugDraw(renderer);
 }

@@ -186,6 +186,12 @@ add_mesh(
     )
 
 add_mesh(
+    INPUT "data/src/TankAndProps/Tanks/Bullet.xml"
+    OUTPUT "data/bin/tank_bullet.mesh"
+    DEPENDS "data/src/TankAndProps/Tanks/Bullet.dae"
+    )
+
+add_mesh(
     INPUT "data/src/lowpoly-tree/tree.xml"
     OUTPUT "data/bin/tree.mesh"
     DEPENDS "data/src/lowpoly-tree/tree.3ds"
@@ -259,6 +265,8 @@ add_mesh(
 
 set(source_files
     ${platform_sources}
+    src/game/game/Bullet.cpp
+    src/game/game/Bullet.h
     src/game/game/Collidable.cpp
     src/game/game/Collidable.h
     src/game/game/GameScene.cpp
