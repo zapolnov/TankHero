@@ -1,0 +1,17 @@
+<Mesh>
+    <File>Body.dae</File>
+    <IncludeColors>false</IncludeColors>
+    <SimplifiedBoundingSphere>true</SimplifiedBoundingSphere>
+    <Material name="Body_001">
+        <AcceptsShadow>false</AcceptsShadow>
+    </Material>
+    <Material name="Tracks">
+        <AcceptsShadow>false</AcceptsShadow>
+    </Material>
+    <Material name="Wheel">
+        <AcceptsShadow>false</AcceptsShadow>
+    </Material>
+    <Material name="WheelInner">
+        <AcceptsShadow>false</AcceptsShadow>
+    </Material>
+</Mesh>

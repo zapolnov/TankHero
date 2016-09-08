@@ -165,10 +165,22 @@ if(NOT CMAKE_CROSSCOMPILING)
     add_subdirectory(tools)
 endif()
 
+#add_mesh(
+#    INPUT "data/src/panzerwagen/panzerwagen.xml"
+#    OUTPUT "data/bin/tank.mesh"
+#    DEPENDS "data/src/panzerwagen/panzerwagen_3x3.blend"
+#    )
+
 add_mesh(
-    INPUT "data/src/panzerwagen/panzerwagen.xml"
-    OUTPUT "data/bin/tank.mesh"
-    DEPENDS "data/src/panzerwagen/panzerwagen_3x3.blend"
+    INPUT "data/src/TankAndProps/Tanks/Body.xml"
+    OUTPUT "data/bin/tank_body.mesh"
+    DEPENDS "data/src/TankAndProps/Tanks/Body.dae"
+    )
+
+add_mesh(
+    INPUT "data/src/TankAndProps/Tanks/Gun.xml"
+    OUTPUT "data/bin/tank_gun.mesh"
+    DEPENDS "data/src/TankAndProps/Tanks/Gun.dae"
     )
 
 add_mesh(

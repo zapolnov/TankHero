@@ -17,9 +17,9 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
 {
     mCamera = std::make_shared<PerspectiveCamera>();
     mCamera->setFov(glm::radians(45.0f));
-    mCamera->setNearZ(1.0f);
+    mCamera->setNearZ(10.0f);
     mCamera->setFarZ(100.0f);
-    mCamera->lookAt(glm::vec3(-20.0f, 20.0f, 35.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    mCamera->lookAt(glm::vec3(-15.0f, 15.0f, 17.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     setCamera(mCamera);
 
     mPlayer = std::make_shared<Player>(mEngine, resourceQueue);
@@ -231,9 +231,12 @@ void Level::update(float time)
 {
     RootNode::update(time);
 
-    auto direction = mCamera->position() - mCamera->target();
-    mCamera->setTarget(mPlayer->position());
-    mCamera->setPosition(mPlayer->position() + direction);
+    auto pos = mPlayer->position();
+    float angle = mPlayer->rotation2D();
+
+    auto length = glm::length(glm::vec2(mCamera->position()) - glm::vec2(mCamera->target()));
+    mCamera->setTarget(pos);
+    mCamera->setPosition(glm::vec3(pos.x + length * sinf(-angle), pos.y + length * cosf(-angle), mCamera->position().z));
 }
 
 void Level::beforeDraw(Renderer* renderer)

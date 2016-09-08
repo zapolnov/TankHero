@@ -9,9 +9,12 @@ public:
     Player(Engine* engine, PendingResources& resourceQueue);
 
 private:
+    class Body;
+    class Gun;
+
     Engine* mEngine;
-    uint16_t mTankMesh;
+    std::shared_ptr<Body> mBody;
+    std::shared_ptr<Gun> mGun;
 
     void update(float time) override;
-    void draw(Renderer* renderer) override;
 };

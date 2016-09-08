@@ -3,11 +3,55 @@
 #include "src/engine/render/Renderer.h"
 #include "src/engine/Engine.h"
 
+class Player::Body : public Node
+{
+public:
+    Body(Engine* engine, PendingResources& resourceQueue)
+    {
+        resourceQueue.meshes.emplace(mMesh = engine->renderer()->meshNameId("tank_body.mesh"));
+        setScale(5.0f);
+        setRotation(glm::vec3(glm::radians(90.0f), glm::radians(180.0f), 0.0f));
+        setPosition(glm::vec3(-4.0f, 0.0f, 1.0f));
+    }
+
+    void draw(Renderer* renderer) override
+    {
+        renderer->drawMesh(worldMatrix(), mMesh);
+    }
+
+private:
+    uint16_t mMesh;
+};
+
+class Player::Gun : public Node
+{
+public:
+    Gun(Engine* engine, PendingResources& resourceQueue)
+    {
+        resourceQueue.meshes.emplace(mMesh = engine->renderer()->meshNameId("tank_gun.mesh"));
+        setScale(5.0f);
+        setRotation(glm::vec3(glm::radians(90.0f), glm::radians(180.0f), 0.0f));
+        setPosition(glm::vec3(-4.0f, 0.0f, 1.0f));
+    }
+
+    void draw(Renderer* renderer) override
+    {
+        renderer->drawMesh(worldMatrix(), mMesh);
+    }
+
+private:
+    uint16_t mMesh;
+};
+
 Player::Player(Engine* engine, PendingResources& resourceQueue)
     : mEngine(engine)
 {
-    resourceQueue.textures.emplace(engine->renderer()->textureNameId("texture_panzerwagen.png"));
-    resourceQueue.meshes.emplace(mTankMesh = engine->renderer()->meshNameId("tank.mesh"));
+    mBody = std::make_shared<Body>(engine, resourceQueue);
+    mGun = std::make_shared<Gun>(engine, resourceQueue);
+    resourceQueue.custom.emplace_back([this]() {
+        appendChild(mBody);
+        appendChild(mGun);
+    });
 }
 
 void Player::update(float time)
@@ -38,9 +82,4 @@ void Player::update(float time)
 
         setPosition2D(pos);
     }
-}
-
-void Player::draw(Renderer* renderer)
-{
-    renderer->drawMesh(worldMatrix(), mTankMesh);
 }

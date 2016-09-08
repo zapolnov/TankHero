@@ -1,0 +1,13 @@
+<Mesh>
+    <File>Gun.dae</File>
+    <IncludeColors>false</IncludeColors>
+    <Material name="Black">
+        <AcceptsShadow>false</AcceptsShadow>
+    </Material>
+    <Material name="Body">
+        <AcceptsShadow>false</AcceptsShadow>
+    </Material>
+    <Material name="Material_003">
+        <AcceptsShadow>false</AcceptsShadow>
+    </Material>
+</Mesh>

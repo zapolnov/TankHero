@@ -110,6 +110,7 @@ static bool gFixInfacingNormals = true;
 static bool gFlipUVs = true;
 static bool gJoinIdenticalVertices = true;
 static bool gGenSmoothNormals = true;
+static bool gSimplifiedBoundingSphere = false;
 static std::vector<MeshFile::Element> gMeshElements;
 static std::unique_ptr<VertexData> gVertexData;
 static std::vector<uint16_t> gIndexData;
@@ -349,6 +350,8 @@ static void readXmlFile()
             gJoinIdenticalVertices = xmlToBool(element);
         else if (element->ValueStr() == "GenSmoothNormals")
             gGenSmoothNormals = xmlToBool(element);
+        else if (element->ValueStr() == "SimplifiedBoundingSphere")
+            gSimplifiedBoundingSphere = xmlToBool(element);
         else if (element->ValueStr() == "Material")
             readXmlMaterial(element);
         else {
@@ -686,7 +689,10 @@ static void readMeshFile()
     if (allPoints.empty()) {
         gBoundingSphereCenter = glm::vec3(0.0f);
         gBoundingSphereRadius = 0.0f;
-    } else {
+    } else if (gSimplifiedBoundingSphere) {
+        gBoundingSphereCenter = (gBoundingBoxMin + gBoundingBoxMax) * 0.5f;
+        gBoundingSphereRadius = glm::length((gBoundingBoxMax - gBoundingBoxMin)) * 0.5f;
+    } else{
         Seb::Smallest_enclosing_ball<float, glm::vec3> sphereCalculator(3, allPoints);
         const float* c = sphereCalculator.center_begin();
         gBoundingSphereCenter = glm::vec3(c[0], c[1], c[2]);
