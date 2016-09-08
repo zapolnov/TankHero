@@ -32,7 +32,12 @@ private:
     uint16_t mRoadCornerMesh;
     uint16_t mRoadTJunctionMesh;
     uint16_t mRoadCrossingMesh;
+    uint16_t mRoadEndMesh;
     uint16_t mOfficeBuildingMesh;
+    uint16_t mRiverCornerMesh;
+    uint16_t mRiverEndMesh;
+    uint16_t mRiverStraightMesh;
+    uint16_t mWaterMesh;
     int mWidth;
     int mHeight;
 

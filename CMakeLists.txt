@@ -213,6 +213,36 @@ add_mesh(
     DEPENDS "data/src/landscape_asset_v2a/obj/building-office-small.obj" "data/src/landscape_asset_v2a/obj/building-office-small.mtl"
     )
 
+add_mesh(
+    INPUT "data/src/landscape_asset_v2a/obj/river-corner-low.xml"
+    OUTPUT "data/bin/river-corner-low.mesh"
+    DEPENDS "data/src/landscape_asset_v2a/obj/river-corner-low.obj" "data/src/landscape_asset_v2a/obj/river-corner-low.mtl"
+    )
+
+add_mesh(
+    INPUT "data/src/landscape_asset_v2a/obj/river-end-low.xml"
+    OUTPUT "data/bin/river-end-low.mesh"
+    DEPENDS "data/src/landscape_asset_v2a/obj/river-end-low.obj" "data/src/landscape_asset_v2a/obj/river-end-low.mtl"
+    )
+
+add_mesh(
+    INPUT "data/src/landscape_asset_v2a/obj/river-straight-low.xml"
+    OUTPUT "data/bin/river-straight-low.mesh"
+    DEPENDS "data/src/landscape_asset_v2a/obj/river-straight-low.obj" "data/src/landscape_asset_v2a/obj/river-straight-low.mtl"
+    )
+
+add_mesh(
+    INPUT "data/src/landscape_asset_v2a/obj/water.xml"
+    OUTPUT "data/bin/water.mesh"
+    DEPENDS "data/src/landscape_asset_v2a/obj/water.obj" "data/src/landscape_asset_v2a/obj/water.mtl"
+    )
+
+add_mesh(
+    INPUT "data/src/landscape_asset_v2a/obj/road-end-low.xml"
+    OUTPUT "data/bin/road-end-low.mesh"
+    DEPENDS "data/src/landscape_asset_v2a/obj/road-end-low.obj" "data/src/landscape_asset_v2a/obj/road-end-low.mtl"
+    )
+
 set(source_files
     ${platform_sources}
     src/game/game/GameScene.cpp

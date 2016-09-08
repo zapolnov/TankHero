@@ -31,7 +31,12 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     resourceQueue.meshes.emplace(mRoadCornerMesh = engine->renderer()->meshNameId("road-corner-low.mesh"));
     resourceQueue.meshes.emplace(mRoadTJunctionMesh = engine->renderer()->meshNameId("road-tjunction-low.mesh"));
     resourceQueue.meshes.emplace(mRoadCrossingMesh = engine->renderer()->meshNameId("road-crossing-low.mesh"));
+    resourceQueue.meshes.emplace(mRoadEndMesh = engine->renderer()->meshNameId("road-end-low.mesh"));
     resourceQueue.meshes.emplace(mOfficeBuildingMesh = engine->renderer()->meshNameId("building-office-small.mesh"));
+    resourceQueue.meshes.emplace(mRiverCornerMesh = engine->renderer()->meshNameId("river-corner-low.mesh"));
+    resourceQueue.meshes.emplace(mRiverEndMesh = engine->renderer()->meshNameId("river-end-low.mesh"));
+    resourceQueue.meshes.emplace(mRiverStraightMesh = engine->renderer()->meshNameId("river-straight-low.mesh"));
+    resourceQueue.meshes.emplace(mWaterMesh = engine->renderer()->meshNameId("water.mesh"));
 }
 
 void Level::load(const std::string& file)
@@ -108,8 +113,12 @@ void Level::load(const std::string& file)
                 case '2': // road straight
                 case '5': // road corner
                 case 'c': // road tjunction
+                case 'g': // road end
                 case 'x': // road crossing
                 case '#': // office building
+                case 'C': // river corner
+                case 'G': // river end
+                case '~': // water
                     break;
 
                 case '3': // road corner
@@ -138,6 +147,46 @@ void Level::load(const std::string& file)
 
                 case 'd': // road tjunction
                     m = glm::rotate(m, glm::radians(-270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case 'A': // river corner
+                    m = glm::rotate(m, glm::radians(-180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case 'B': // river corner
+                    m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case 'D': // river corner
+                    m = glm::rotate(m, glm::radians(-270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case 'F': // river end
+                    m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case 'E': // river end
+                    m = glm::rotate(m, glm::radians(-180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case 'H': // river end
+                    m = glm::rotate(m, glm::radians(-270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case 'f': // road end
+                    m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case 'e': // road end
+                    m = glm::rotate(m, glm::radians(-180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case 'h': // road end
+                    m = glm::rotate(m, glm::radians(-270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    break;
+
+                case '|': // water
+                    m = glm::rotate(m, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
                     break;
 
                 case 'T': {
@@ -214,8 +263,34 @@ void Level::draw(Renderer* renderer)
                     renderer->drawMesh(mWorldTransform[y * mWidth + x], mRoadTJunctionMesh);
                     continue;
 
+                case 'e':
+                case 'f':
+                case 'g':
+                case 'h':
+                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRoadEndMesh);
+                    continue;
+
+                case 'A':
+                case 'B':
+                case 'C':
+                case 'D':
+                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRiverCornerMesh);
+                    continue;
+
+                case 'E':
+                case 'F':
+                case 'G':
+                case 'H':
+                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mRiverEndMesh);
+                    continue;
+
                 case 'x':
                     renderer->drawMesh(mWorldTransform[y * mWidth + x], mRoadCrossingMesh);
+                    continue;
+
+                case '~':
+                case '|':
+                    renderer->drawMesh(mWorldTransform[y * mWidth + x], mWaterMesh);
                     continue;
 
                 case '#':
