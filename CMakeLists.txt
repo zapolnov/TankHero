@@ -259,6 +259,8 @@ add_mesh(
 
 set(source_files
     ${platform_sources}
+    src/game/game/Collidable.cpp
+    src/game/game/Collidable.h
     src/game/game/GameScene.cpp
     src/game/game/GameScene.h
     src/game/game/Level.cpp
