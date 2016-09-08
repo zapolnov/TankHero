@@ -228,8 +228,8 @@ const GLES2UberShader& GLES2Renderer::useShader(GLES2UberShader::Key key)
 
 void GLES2Renderer::beginRenderShadowMap()
 {
-    int shadowMapWidth = 1024;//mViewportWidth;
-    int shadowMapHeight = 1024;//mViewportHeight;
+    int shadowMapWidth = 2048;//mViewportWidth;
+    int shadowMapHeight = 2048;//mViewportHeight;
 
     GLint savedFramebuffer = 0;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &savedFramebuffer);
@@ -271,7 +271,7 @@ void GLES2Renderer::beginRenderShadowMap()
     mSavedProjectionMatrix = mProjectionMatrix;
     mSavedViewMatrix = mViewMatrix;
 
-    mProjectionMatrix = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, -1000.0f, 1000.0f);
+    mProjectionMatrix = glm::ortho(mShadowMapMin.x, mShadowMapMax.x, mShadowMapMin.y, mShadowMapMax.y, -1000.0f, 1000.0f);
     mViewMatrix = glm::lookAt(-mLightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     mShadowProjectionMatrix = mProjectionMatrix * mViewMatrix;

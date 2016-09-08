@@ -1,4 +1,5 @@
 #include "Level.h"
+#include "src/engine/render/Canvas.h"
 #include "src/engine/render/Renderer.h"
 #include "src/engine/Engine.h"
 #include <glm/gtc/matrix_transform.hpp>
@@ -18,7 +19,7 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     mCamera->setFov(glm::radians(45.0f));
     mCamera->setNearZ(1.0f);
     mCamera->setFarZ(100.0f);
-    mCamera->lookAt(glm::vec3(-15.0f, 15.0f, 15.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    mCamera->lookAt(glm::vec3(-20.0f, 20.0f, 35.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     setCamera(mCamera);
 
     mPlayer = std::make_shared<Player>(mEngine, resourceQueue);
@@ -233,18 +234,38 @@ void Level::update(float time)
 
 void Level::beforeDraw(Renderer* renderer)
 {
-    auto lightPosition = glm::vec3(-400.0f, -400.0f, -400.0f);
+    auto lightPosition = glm::vec3(0.0f, 0.0f, -400.0f);
     renderer->setLight(lightPosition, glm::vec3(1.0f), 1.0f);
+
+    glm::vec2 p[4] = {
+        { -1.0f, -1.0f },
+        {  1.0f, -1.0f },
+        {  1.0f,  1.0f },
+        { -1.0f,  1.0f },
+    };
+
+    mCamera->unproject2D(p[0]);
+    mCamera->unproject2D(p[1]);
+    mCamera->unproject2D(p[2]);
+    mCamera->unproject2D(p[3]);
+
+    mVisibleMin = glm::min(glm::min(p[0], p[1]), glm::min(p[2], p[3]));
+    mVisibleMax = glm::max(glm::max(p[0], p[1]), glm::max(p[2], p[3]));
+    renderer->setShadowMapBoundaries(mVisibleMin - 3.0f * glm::vec2(CELL_SIZE), mVisibleMax);
 
     RootNode::beforeDraw(renderer);
 }
 
 void Level::draw(Renderer* renderer)
 {
-    for (int y = 0; y < mHeight; y++) {
-        int x = -1;
-        for (const Cell& cell : mCells[size_t(y)]) {
-            ++x;
+    int startX = std::max(int(floorf(mVisibleMin.x / CELL_SIZE)), 0);
+    int startY = std::max(int(floorf(mVisibleMin.y / CELL_SIZE)), 0);
+    int endX = std::min(int(ceilf(mVisibleMax.x / CELL_SIZE)), mWidth - 1);
+    int endY = std::min(int(ceilf(mVisibleMax.y / CELL_SIZE)), mHeight - 1);
+
+    for (int y = startY; y <= endY; y++) {
+        for (int x = startX; x <= endX; x++) {
+            const Cell& cell = mCells[size_t(y)][size_t(x)];
             switch (cell.levelMarker) {
                 case ' ':
                 case '.':

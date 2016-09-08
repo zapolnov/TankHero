@@ -32,6 +32,8 @@ private:
     std::shared_ptr<PerspectiveCamera> mCamera;
     std::shared_ptr<Player> mPlayer;
     std::vector<std::vector<Cell>> mCells;
+    glm::vec2 mVisibleMin;
+    glm::vec2 mVisibleMax;
     uint16_t mTreeMesh;
     uint16_t mGrassMesh;
     uint16_t mRoadStraightMesh;

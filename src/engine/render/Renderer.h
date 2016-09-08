@@ -48,6 +48,12 @@ public:
         mLightPower = power;
     }
 
+    void setShadowMapBoundaries(const glm::vec2& min, const glm::vec2& max)
+    {
+        mShadowMapMin = min;
+        mShadowMapMax = max;
+    }
+
     void drawMesh(const glm::mat4& model, uint16_t mesh);
 
 protected:
@@ -74,6 +80,8 @@ protected:
     std::unique_ptr<Canvas> mCanvas;
     glm::vec3 mLightPosition;
     glm::vec3 mLightColor;
+    glm::vec2 mShadowMapMin{-10.0f};
+    glm::vec2 mShadowMapMax{10.0f};
     float mLightPower;
     int mIn2d = 0;
 
