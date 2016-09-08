@@ -50,8 +50,9 @@ private:
     uint16_t mMesh;
 };
 
-Player::Player(Engine* engine, PendingResources& resourceQueue)
+Player::Player(Engine* engine, Level* level, PendingResources& resourceQueue)
     : Collidable(engine)
+    , mLevel(level)
 {
     mBody = std::make_shared<Body>(engine, resourceQueue);
     mGun = std::make_shared<Gun>(engine, resourceQueue);
@@ -79,24 +80,48 @@ void Player::update(float time)
     auto angle = rotation2D();
 
     if (mEngine->wasKeyPressed(KeyLeft) || mEngine->wasKeyPressed(KeyRight)) {
-        if (mEngine->wasKeyPressed(KeyLeft))
-            angle += ROTATE_SPEED * time;
-        if (mEngine->wasKeyPressed(KeyRight))
-            angle -= ROTATE_SPEED * time;
-        setRotation2D(angle);
-        invalidateBoundingBox();
+        float step = ROTATE_SPEED * time;
+
+        float oldAngle = angle;
+        auto oldBoundingBox = boundingBox();
+
+        if (mEngine->wasKeyPressed(KeyLeft)) {
+            setRotation2D(angle + step);
+            invalidateBoundingBox();
+            if (mLevel->collidesOnMove(oldBoundingBox, boundingBox())) {
+                setRotation2D(angle);
+                invalidateBoundingBox();
+            }
+        }
+
+        if (mEngine->wasKeyPressed(KeyRight)) {
+            setRotation2D(angle - step);
+            invalidateBoundingBox();
+            if (mLevel->collidesOnMove(oldBoundingBox, boundingBox())) {
+                setRotation2D(angle);
+                invalidateBoundingBox();
+            }
+        }
     }
 
     if (mEngine->wasKeyPressed(KeyUp) || mEngine->wasKeyPressed(KeyDown)) {
         auto pos = position2D();
 
         float a = angle + glm::radians(-90.0f);
-        auto dir = glm::vec2(cosf(a), sinf(a)) * MOVE_SPEED;
+        auto dir = glm::vec2(cosf(a), sinf(a));
+        float length = time * MOVE_SPEED;
 
-        if (mEngine->wasKeyPressed(KeyUp))
-            pos += dir * time;
-        if (mEngine->wasKeyPressed(KeyDown))
-            pos -= dir * time;
+        if (mEngine->wasKeyPressed(KeyUp)) {
+            float dist = length;
+            mLevel->collidesOnMove(*this, dir, dist);
+            pos += dir * dist;
+        }
+
+        if (mEngine->wasKeyPressed(KeyDown)) {
+            float dist = length;
+            mLevel->collidesOnMove(*this, -dir, dist);
+            pos -= dir * dist;
+        }
 
         setPosition2D(pos);
         invalidateBoundingBox();

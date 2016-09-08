@@ -4,15 +4,20 @@
 #include "src/engine/scene/Node.h"
 #include "src/game/menu/LoadingScene.h"
 
+class Level;
+
 class Player : public Node, public Collidable
 {
 public:
-    Player(Engine* engine, PendingResources& resourceQueue);
+    Player(Engine* engine, Level* level, PendingResources& resourceQueue);
+
+    bool isPlayer() const override { return true; }
 
 private:
     class Body;
     class Gun;
 
+    Level* mLevel;
     std::shared_ptr<Body> mBody;
     std::shared_ptr<Gun> mGun;
 

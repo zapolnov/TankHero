@@ -15,6 +15,8 @@ public:
 
     const OBB2D& boundingBox();
 
+    virtual bool isPlayer() const { return false; }
+
 protected:
     Engine* mEngine;
     OBB2D mBoundingBox;

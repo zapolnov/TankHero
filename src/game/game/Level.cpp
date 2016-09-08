@@ -22,7 +22,7 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     mCamera->lookAt(glm::vec3(-15.0f, 15.0f, 17.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     setCamera(mCamera);
 
-    mPlayer = std::make_shared<Player>(mEngine, resourceQueue);
+    mPlayer = std::make_shared<Player>(mEngine, this, resourceQueue);
 
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("basetexture.jpg"));
 
@@ -225,6 +225,66 @@ void Level::load(const std::string& file)
             cell.worldTransform = m;
         }
     }
+}
+
+glm::ivec2 Level::cellForPoint(const glm::vec2& point) const
+{
+    return glm::ivec2(
+            int(floorf((point.x + CELL_SIZE * 0.5f) / CELL_SIZE)),
+            int(floorf((point.y + CELL_SIZE * 0.5f) / CELL_SIZE))
+        );
+}
+
+std::pair<glm::ivec2, glm::ivec2> Level::cellsForBoundingBox(const OBB2D& box) const
+{
+    auto min = cellForPoint(box.p[0]);
+    auto max = min;
+    for (int i = 1; i < 4; i++) {
+        auto p = cellForPoint(box.p[i]);
+        min = glm::min(min, p);
+        max = glm::max(max, p);
+    }
+    return std::make_pair(min, max);
+}
+
+bool Level::collidesOnMove(Collidable& collidable, const glm::vec2& dir, float& length) const
+{
+    const auto& sourceBox = collidable.boundingBox();
+
+    auto vec = dir * length;
+    auto targetBox = sourceBox;
+    targetBox.p[0] += vec;
+    targetBox.p[1] += vec;
+    targetBox.p[2] += vec;
+    targetBox.p[3] += vec;
+
+    float depth = 0.0f;
+    if (collidesOnMove(sourceBox, targetBox, &depth)) {
+        length = std::max(length - depth - 0.1f, 0.0f);
+        return true;
+    }
+
+    return false;
+}
+
+bool Level::collidesOnMove(const OBB2D& sourceBox, const OBB2D& targetBox, float* penetrationDepth) const
+{
+    auto range1 = cellsForBoundingBox(sourceBox);
+    auto range2 = cellsForBoundingBox(targetBox);
+
+    auto min = glm::min(range1.first, range2.first);
+    auto max = glm::max(range1.second, range2.second);
+
+    for (int y = min.y; y <= max.y; y++) {
+        for (int x = min.x; x <= max.x; x++) {
+            for (const auto& obstacle : mCells[y][x].obstacles) {
+                if (obstacle->boundingBox().intersectsWith(targetBox, penetrationDepth))
+                    return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void Level::update(float time)

@@ -6,6 +6,7 @@
 #include "src/engine/scene/camera/PerspectiveCamera.h"
 #include "src/game/menu/LoadingScene.h"
 #include <glm/glm.hpp>
+#include <utility>
 #include <string>
 #include <memory>
 
@@ -17,6 +18,12 @@ public:
     Level(Engine* engine, PendingResources& resourceQueue);
 
     void load(const std::string& file);
+
+    glm::ivec2 cellForPoint(const glm::vec2& point) const;
+    std::pair<glm::ivec2, glm::ivec2> cellsForBoundingBox(const OBB2D& box) const;
+
+    bool collidesOnMove(Collidable& collidable, const glm::vec2& dir, float& length) const;
+    bool collidesOnMove(const OBB2D& sourceBox, const OBB2D& targetBox, float* penetrationDepth = nullptr) const;
 
 private:
     struct Cell
