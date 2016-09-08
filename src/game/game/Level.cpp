@@ -91,9 +91,10 @@ void Level::load(const std::string& file)
     for (int y = 0; y < mHeight; y++) {
         mCells.emplace_back();
         auto& cellLine = mCells.back();
+        cellLine.reserve(size_t(mWidth));
 
         int x = 0;
-        for (char* p = levelLines[size_t(y)]; *p; ++p, ++x) {
+        for (char* p = levelLines[size_t(y)]; x < mWidth; (*p ? (void)++p : (void)0), ++x) {
             cellLine.emplace_back();
             auto& cell = cellLine.back();
 
@@ -106,6 +107,10 @@ void Level::load(const std::string& file)
             m = glm::rotate(m, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
             switch (*p) {
+                case 0:
+                    cell.levelMarker = ' ';
+                    break;
+
                 case '.':
                 case ' ':
                     break;
@@ -216,7 +221,6 @@ void Level::load(const std::string& file)
                 default:
                     assert(false);
             }
-
             m = glm::scale(m, glm::vec3(scale));
             cell.worldTransform = m;
         }
