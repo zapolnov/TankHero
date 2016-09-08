@@ -82,4 +82,8 @@ void Player::update(float time)
 
         setPosition2D(pos);
     }
+
+    if (mEngine->wasKeyPressed(KeyShoot)) {
+        
+    }
 }

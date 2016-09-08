@@ -61,6 +61,7 @@ static Key mapKey(int key)
         case Qt::Key_Down: return KeyDown;
         case Qt::Key_Left: return KeyLeft;
         case Qt::Key_Right: return KeyRight;
+        case Qt::Key_Space: return KeyShoot;
         default: return KeyUnknown;
     }
 }

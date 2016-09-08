@@ -12,6 +12,7 @@ enum Key
     KeyDown,
     KeyLeft,
     KeyRight,
+    KeyShoot,
     NumKeys,
 };
 
