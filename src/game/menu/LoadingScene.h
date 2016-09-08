@@ -1,8 +1,10 @@
 
 #pragma once
 #include "src/engine/scene/Scene.h"
+#include <cstdint>
 #include <functional>
 #include <unordered_set>
+#include <vector>
 
 class Engine;
 
