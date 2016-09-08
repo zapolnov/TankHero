@@ -224,7 +224,7 @@ add_mesh(
 add_mesh(
     INPUT "data/src/landscape_asset_v2a/obj/building-office-small.xml"
     OUTPUT "data/bin/building-office-small.mesh"
-    DEPENDS "data/src/landscape_asset_v2a/obj/building-office-small.obj" "data/src/landscape_asset_v2a/obj/building-office-small.mtl"
+    DEPENDS "data/src/landscape_asset_v2a/obj/building-office-small_modified.obj" "data/src/landscape_asset_v2a/obj/building-office-small.mtl"
     )
 
 add_mesh(

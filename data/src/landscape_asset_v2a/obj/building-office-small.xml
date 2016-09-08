@@ -1,9 +1,11 @@
 <Mesh>
-    <File>building-office-small.obj</File>
+    <File>building-office-small_modified.obj</File>
     <IncludeColors>false</IncludeColors>
+    <SimplifiedBoundingSphere>true</SimplifiedBoundingSphere>
     <GenSmoothNormals>false</GenSmoothNormals>
     <Material name="basecolors">
         <DiffuseMap>basetexture.jpg</DiffuseMap>
+        <AcceptsShadow>false</AcceptsShadow>
         <CastsShadow>true</CastsShadow>
     </Material>
 </Mesh>

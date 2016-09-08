@@ -126,7 +126,6 @@ void Level::load(const std::string& file)
                 case 'c': // road tjunction
                 case 'g': // road end
                 case 'x': // road crossing
-                case '#': // office building
                 case 'C': // river corner
                 case 'G': // river end
                 case '~': // water
@@ -215,6 +214,16 @@ void Level::load(const std::string& file)
                         appendChild(tree);
                         cell.obstacles.emplace_back(tree);
                     }
+                    break;
+                }
+
+                case '#': { // office building
+                    auto building = std::make_shared<Obstacle>(mEngine, mOfficeBuildingMesh);
+                    building->setPosition(cell.posX, cell.posY, 0.0f);
+                    building->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
+                    building->setScale(scale);
+                    appendChild(building);
+                    cell.obstacles.emplace_back(building);
                     break;
                 }
 
@@ -318,7 +327,7 @@ void Level::beforeDraw(Renderer* renderer)
 
     mVisibleMin = glm::min(glm::min(p[0], p[1]), glm::min(p[2], p[3]));
     mVisibleMax = glm::max(glm::max(p[0], p[1]), glm::max(p[2], p[3]));
-    renderer->setShadowMapBoundaries(mVisibleMin - 3.0f * glm::vec2(CELL_SIZE), mVisibleMax);
+    renderer->setShadowMapBoundaries(mVisibleMin - 3.0f * glm::vec2(CELL_SIZE), mVisibleMax + glm::vec2(CELL_SIZE));
 
     RootNode::beforeDraw(renderer);
 }
@@ -337,6 +346,7 @@ void Level::draw(Renderer* renderer)
                 case ' ':
                 case '.':
                 case 'T':
+                case '#':
                     renderer->drawMesh(cell.worldTransform, mGrassMesh);
                     continue;
 
@@ -387,10 +397,6 @@ void Level::draw(Renderer* renderer)
                 case '~':
                 case '|':
                     renderer->drawMesh(cell.worldTransform, mWaterMesh);
-                    continue;
-
-                case '#':
-                    renderer->drawMesh(cell.worldTransform, mOfficeBuildingMesh);
                     continue;
 
                 default:
