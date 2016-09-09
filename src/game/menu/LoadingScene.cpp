@@ -28,35 +28,43 @@ namespace
             size_t total = mTotalResources;
             size_t pending = mPendingResources.totalPending();
 
-            auto start = std::chrono::steady_clock::now();
-            while (pending > 0) {
-                --pending;
+            if (mFirstUpdate)
+                mFirstUpdate = false;
+            else {
+                auto start = std::chrono::steady_clock::now();
+                size_t count = 0;
+                while (pending > 0) {
+                    --pending;
 
-              #ifndef NDEBUG
-                printf("Loading %d/%d\n", int(total - pending), int(total));
-              #endif
+                  #ifndef NDEBUG
+                    printf("Loading %d/%d\n", int(total - pending), int(total));
+                  #endif
 
-                if (!mPendingResources.meshes.empty()) {
-                    auto it = mPendingResources.meshes.begin();
-                    mEngine->renderer()->loadMesh(*it);
-                    mPendingResources.meshes.erase(it);
-                } else if (!mPendingResources.sounds.empty()) {
-                    auto it = mPendingResources.sounds.begin();
-                    mEngine->soundManager()->loadSound(*it);
-                    mPendingResources.sounds.erase(it);
-                } else if (!mPendingResources.textures.empty()) {
-                    auto it = mPendingResources.textures.begin();
-                    mEngine->renderer()->loadTexture(*it);
-                    mPendingResources.textures.erase(it);
-                } else if (!mPendingResources.custom.empty()) {
-                    auto it = mPendingResources.custom.begin();
-                    (*it)();
-                    mPendingResources.custom.erase(it);
+                    if (!mPendingResources.meshes.empty()) {
+                        auto it = mPendingResources.meshes.begin();
+                        mEngine->renderer()->loadMesh(*it);
+                        mPendingResources.meshes.erase(it);
+                    } else if (!mPendingResources.sounds.empty()) {
+                        auto it = mPendingResources.sounds.begin();
+                        mEngine->soundManager()->loadSound(*it);
+                        mPendingResources.sounds.erase(it);
+                    } else if (!mPendingResources.textures.empty()) {
+                        auto it = mPendingResources.textures.begin();
+                        mEngine->renderer()->loadTexture(*it);
+                        mPendingResources.textures.erase(it);
+                    } else if (!mPendingResources.custom.empty()) {
+                        auto it = mPendingResources.custom.begin();
+                        (*it)();
+                        mPendingResources.custom.erase(it);
+                    }
+
+                    if (++count >= 3)
+                        break;
+
+                    auto current = std::chrono::steady_clock::now();
+                    if (std::chrono::duration_cast<std::chrono::duration<double>>(current - start).count() >= 1000.0 / 30.0)
+                        break;
                 }
-
-                auto current = std::chrono::steady_clock::now();
-                if (std::chrono::duration_cast<std::chrono::duration<double>>(current - start).count() >= 1000.0 / 30.0)
-                    break;
             }
 
             if (pending == 0) {
@@ -100,6 +108,7 @@ namespace
         PendingResources mPendingResources;
         size_t mTotalResources;
         float mProgress = 0.0f;
+        bool mFirstUpdate = true;
     };
 }
 
