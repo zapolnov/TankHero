@@ -5,3 +5,4 @@ add_subdirectory(../lib/tinyxml tinyxml)
 add_subdirectory(../lib/zlib zlib)
 
 add_subdirectory(mesh2bin)
+add_subdirectory(packsprites)

@@ -140,7 +140,7 @@ void GLES2Renderer::endFrame()
                 bindDiffuseMap(baseKey, drawCall.u.ip.texture);
                 auto shader = bindShader(baseKey, drawCall);
 
-                glEnable(GL_DEPTH_TEST);
+                glDisable(GL_DEPTH_TEST);
                 glEnable(GL_CULL_FACE);
                 glCullFace(GL_BACK);
                 glEnable(GL_BLEND);

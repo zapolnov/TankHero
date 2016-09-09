@@ -54,11 +54,53 @@ macro(add_mesh)
     set_source_files_properties("${MESH_INPUT}" ${MESH_DEPENDS} PROPERTIES HEADER_FILE_ONLY TRUE)
 
     if(TARGET mesh2bin)
-        set_source_files_properties(outfile PROPERTIES GENERATED TRUE)
+        set_source_files_properties("${outfile}" PROPERTIES GENERATED TRUE)
         add_custom_command(OUTPUT "${outfile}"
             COMMAND mesh2bin "${infile}" "${outfile}"
             DEPENDS mesh2bin "${infile}" ${MESH_DEPENDS}
             MAIN_DEPENDENCY "${infile}"
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+            )
+    endif()
+endmacro()
+
+macro(pack_sprites)
+    set(options)
+    set(oneValueArgs OUTPUT WIDTH HEIGHT)
+    set(multiValueArgs INPUT DEPENDS)
+    cmake_parse_arguments(PACK "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    set(infiles)
+    foreach(file ${PACK_INPUT})
+        get_filename_component(infile "${file}" ABSOLUTE)
+        list(APPEND infiles "${infile}")
+    endforeach()
+
+    get_filename_component(outfile "${PACK_OUTPUT}" ABSOLUTE)
+
+    set_source_groups_with_dir("Data Files/src" "data/src" ${PACK_INPUT} ${PACK_DEPENDS})
+    set_source_groups_with_dir("Data Files/bin" "data/bin" "${PACK_OUTPUT}")
+
+    list(APPEND asset_src_files ${PACK_INPUT} ${PACK_DEPENDS})
+    list(APPEND asset_bin_files "${PACK_OUTPUT}")
+
+    set_source_files_properties(${PACK_INPUT} ${PACK_DEPENDS} PROPERTIES HEADER_FILE_ONLY TRUE)
+
+    if(TARGET packsprites)
+        set(width 512)
+        if(PACK_WIDTH)
+            set(width "${PACK_WIDTH}")
+        endif()
+
+        set(height 512)
+        if(PACK_HEIGHT)
+            set(height "${PACK_HEIGHT}")
+        endif()
+
+        set_source_files_properties("${outfile}" PROPERTIES GENERATED TRUE)
+        add_custom_command(OUTPUT "${outfile}"
+            COMMAND packsprites -o "${outfile}" -w "${width}" -h "${height}" ${infiles}
+            DEPENDS packsprites ${infiles} ${PACK_DEPENDS}
             WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
             )
     endif()

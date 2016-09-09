@@ -307,6 +307,44 @@ add_mesh(
     DEPENDS "data/src/landscape_asset_v2a/obj/road-end-low.obj" "data/src/landscape_asset_v2a/obj/road-end-low.mtl"
     )
 
+pack_sprites(
+    OUTPUT "data/bin/explosion1.png"
+    WIDTH 512
+    HEIGHT 512
+    INPUT "data/src/explosions/images/explosion/expl_06_0000.png"
+          "data/src/explosions/images/explosion/expl_06_0001.png"
+          "data/src/explosions/images/explosion/expl_06_0002.png"
+          "data/src/explosions/images/explosion/expl_06_0003.png"
+          "data/src/explosions/images/explosion/expl_06_0004.png"
+          "data/src/explosions/images/explosion/expl_06_0005.png"
+          "data/src/explosions/images/explosion/expl_06_0006.png"
+          "data/src/explosions/images/explosion/expl_06_0007.png"
+          "data/src/explosions/images/explosion/expl_06_0008.png"
+          "data/src/explosions/images/explosion/expl_06_0009.png"
+          "data/src/explosions/images/explosion/expl_06_0010.png"
+          "data/src/explosions/images/explosion/expl_06_0011.png"
+          "data/src/explosions/images/explosion/expl_06_0012.png"
+          "data/src/explosions/images/explosion/expl_06_0013.png"
+          "data/src/explosions/images/explosion/expl_06_0014.png"
+          "data/src/explosions/images/explosion/expl_06_0015.png"
+          "data/src/explosions/images/explosion/expl_06_0016.png"
+          "data/src/explosions/images/explosion/expl_06_0017.png"
+          "data/src/explosions/images/explosion/expl_06_0018.png"
+          "data/src/explosions/images/explosion/expl_06_0019.png"
+          "data/src/explosions/images/explosion/expl_06_0020.png"
+          "data/src/explosions/images/explosion/expl_06_0021.png"
+          "data/src/explosions/images/explosion/expl_06_0022.png"
+          "data/src/explosions/images/explosion/expl_06_0023.png"
+          "data/src/explosions/images/explosion/expl_06_0024.png"
+          "data/src/explosions/images/explosion/expl_06_0025.png"
+          "data/src/explosions/images/explosion/expl_06_0026.png"
+          "data/src/explosions/images/explosion/expl_06_0027.png"
+          "data/src/explosions/images/explosion/expl_06_0028.png"
+          "data/src/explosions/images/explosion/expl_06_0029.png"
+          "data/src/explosions/images/explosion/expl_06_0030.png"
+          "data/src/explosions/images/explosion/expl_06_0031.png"
+    )
+
 set(source_files
     ${platform_sources}
     src/game/game/Bullet.cpp
