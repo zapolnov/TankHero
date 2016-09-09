@@ -97,6 +97,8 @@ MainMenuScene::MainMenuScene(Engine* engine, PendingResources& resourceQueue)
     resourceQueue.textures.emplace(mHelpNormalImage = engine->renderer()->textureNameId("help_normal.png"));
     resourceQueue.textures.emplace(mHelpPressedImage = engine->renderer()->textureNameId("help_pressed.png"));
 
+    mHelpScene = std::make_shared<HelpScene>(mEngine, resourceQueue);
+
     resourceQueue.custom.emplace_back([this, music] {
         auto rootNode = std::make_shared<RootNode>();
         rootNode->set2D(true);
@@ -122,9 +124,8 @@ MainMenuScene::MainMenuScene(Engine* engine, PendingResources& resourceQueue)
             mClickSound, mHelpNormalImage, mHelpPressedImage);
         helpButton->setPosition2D(0.0f, 30.0f - (BUTTON_HEIGHT + 15.0f + BUTTON_HEIGHT));
         helpButton->onClick = [this]() {
-                if (mStartLevelTimeout < 0.0f) {
-                    // FIXME
-                }
+                if (mStartLevelTimeout < 0.0f)
+                    mEngine->pushScene(mHelpScene);
             };
         rootNode->appendChild(helpButton);
 

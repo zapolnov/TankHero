@@ -2,9 +2,10 @@
 #pragma once
 #include "src/engine/scene/Scene.h"
 #include "src/game/menu/LoadingScene.h"
+#include "HelpScene.h"
 #include <glm/glm.hpp>
 
-class Enigne;
+class Engine;
 
 class MainMenuScene : public Scene
 {
@@ -23,6 +24,7 @@ private:
     uint16_t mHelpPressedImage;
     uint16_t mClickSound;
     float mStartLevelTimeout = -1.0f;
+    std::shared_ptr<HelpScene> mHelpScene;
 
     void runFrame(Renderer* renderer, float time) override;
 };
