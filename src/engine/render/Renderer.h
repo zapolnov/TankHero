@@ -76,19 +76,18 @@ protected:
         glm::vec3 lightPosition;
         glm::vec3 lightColor;
         float lightPower;
-        union U {
+        union {
             struct {
                 uint16_t mesh;
             } m;
             struct {
-                VertexFormat format;
+                uint8_t vertexFormat;
                 const void* vertices;
                 size_t vertexCount;
                 const uint16_t* indices;
                 size_t indexCount;
                 uint16_t texture;
             } ip;
-            U() {}
         } u;
     };
 

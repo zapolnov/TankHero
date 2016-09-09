@@ -129,8 +129,10 @@ void GLES2Renderer::endFrame()
 
         switch (drawCall.type) {
             case DrawIndexedPrimitive: {
+                VertexFormat format(drawCall.u.ip.vertexFormat);
+
                 mStreamVertexBuffer.bind(GL_ARRAY_BUFFER);
-                glBufferData(GL_ARRAY_BUFFER, drawCall.u.ip.vertexCount * drawCall.u.ip.format.stride(),
+                glBufferData(GL_ARRAY_BUFFER, drawCall.u.ip.vertexCount * format.stride(),
                     drawCall.u.ip.vertices, GL_STREAM_DRAW);
 
                 mStreamIndexBuffer.bind(GL_ELEMENT_ARRAY_BUFFER);
@@ -157,9 +159,9 @@ void GLES2Renderer::endFrame()
                 if (shader->shininessUniform() >= 0)
                     glUniform1f(shader->shininessUniform(), 0.0f);
 
-                GLES2Mesh::enableAttributes(*shader, drawCall.u.ip.format);
+                GLES2Mesh::enableAttributes(*shader, format);
                 glDrawElements(GL_TRIANGLES, GLsizei(drawCall.u.ip.indexCount), GL_UNSIGNED_SHORT, nullptr);
-                GLES2Mesh::disableAttributes(*shader, drawCall.u.ip.format);
+                GLES2Mesh::disableAttributes(*shader, format);
                 continue;
             }
 

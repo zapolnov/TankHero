@@ -99,7 +99,7 @@ void Renderer::drawIndexedPrimitive(const glm::mat4& model, VertexFormat format,
     drawCall.lightPosition = mLightPosition;
     drawCall.lightColor = mLightColor;
     drawCall.lightPower = mLightPower;
-    new (&drawCall.u.ip.format) VertexFormat(format);
+    drawCall.u.ip.vertexFormat = format.components();
     drawCall.u.ip.vertices = vertices;
     drawCall.u.ip.vertexCount = vertexCount;
     drawCall.u.ip.indices = indices;

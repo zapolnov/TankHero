@@ -4,6 +4,7 @@
 #include <cstring>
 #include <vector>
 #include <memory>
+#include <algorithm>
 #include "src/engine/utility/StbImage.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
