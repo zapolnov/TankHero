@@ -376,10 +376,14 @@ set(source_files
     src/game/game/Explosion.h
     src/game/game/GameScene.cpp
     src/game/game/GameScene.h
+    src/game/game/Hud.cpp
+    src/game/game/Hud.h
     src/game/game/Level.cpp
     src/game/game/Level.h
     src/game/game/Obstacle.cpp
     src/game/game/Obstacle.h
+    src/game/game/PauseScene.cpp
+    src/game/game/PauseScene.h
     src/game/game/Player.cpp
     src/game/game/Player.h
     src/game/menu/GameLoadingScene.cpp
@@ -392,6 +396,8 @@ set(source_files
     src/game/menu/LoadingScene.h
     src/game/menu/MainMenuScene.cpp
     src/game/menu/MainMenuScene.h
+    src/game/menu/MenuLoadingScene.cpp
+    src/game/menu/MenuLoadingScene.h
     src/game/main.cpp
     )
 

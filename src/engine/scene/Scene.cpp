@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "src/engine/render/Renderer.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <cassert>
 
@@ -121,6 +122,8 @@ void Scene::runFrame(Renderer* renderer, float frameTime)
 
     auto hudNode = mHudNode;
     if (hudNode) {
+        renderer->flushFrame();
+
         if (mHudSizeChanged) {
             hudNode->resize(mWidth, mHeight);
             mHudSizeChanged = false;

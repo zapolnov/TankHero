@@ -116,7 +116,7 @@ MainMenuScene::MainMenuScene(Engine* engine, PendingResources& resourceQueue)
         newGameButton->setPosition2D(0.0f, 30.0f - BUTTON_HEIGHT);
         newGameButton->onClick = [this]() {
                 if (mStartLevelTimeout < 0.0f)
-                    mStartLevelTimeout = 0.3f;
+                    mStartLevelTimeout = 0.2f;
             };
         rootNode->appendChild(newGameButton);
 

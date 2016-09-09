@@ -45,6 +45,11 @@ void GLES2Renderer::beginFrame(int width, int height)
 
 void GLES2Renderer::endFrame()
 {
+    flushFrame();
+}
+
+void GLES2Renderer::flushFrame()
+{
     if (mDrawCalls.empty())
         return;
 

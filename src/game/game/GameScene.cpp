@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "Hud.h"
 #include "Level.h"
 #include "src/engine/sound/SoundManager.h"
 #include "src/engine/Engine.h"
@@ -10,6 +11,9 @@ GameScene::GameScene(Engine* engine, PendingResources& resourceQueue)
 {
     uint16_t music = engine->soundManager()->soundNameId("S31-Unexpected Trouble.ogg");
     resourceQueue.sounds.emplace(music);
+
+    auto hud = std::make_shared<Hud>(engine, resourceQueue);
+    setHudNode(hud);
 
     auto level = std::make_shared<Level>(engine, resourceQueue);
     resourceQueue.custom.emplace_back([this, level, music] {

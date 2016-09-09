@@ -22,6 +22,7 @@ public:
 
     void beginFrame(int width, int height) override;
     void endFrame() override;
+    void flushFrame() override;
 
     void loadTexture(uint16_t texture) override;
     void unloadAllTextures() override;
