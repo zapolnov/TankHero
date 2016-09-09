@@ -2,6 +2,7 @@
 #pragma once
 #include "src/engine/scene/Scene.h"
 #include "src/engine/render/Renderer.h"
+#include "src/engine/sound/SoundManager.h"
 #include <vector>
 #include <memory>
 
@@ -23,6 +24,7 @@ public:
     ~Engine();
 
     Renderer* renderer() const { return mRenderer.get(); }
+    SoundManager* soundManager() const { return mSoundManager.get(); }
 
     const std::shared_ptr<Scene>& currentScene() const;
     void setScene(const std::shared_ptr<Scene>& scene);
@@ -42,6 +44,7 @@ public:
 
 private:
     std::unique_ptr<Renderer> mRenderer;
+    std::unique_ptr<SoundManager> mSoundManager;
     std::vector<std::shared_ptr<Scene>> mScenes;
     bool mKeyPressed[NumKeys];
     bool mKeyWasPressed[NumKeys];

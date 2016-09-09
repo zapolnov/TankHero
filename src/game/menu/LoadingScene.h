@@ -12,9 +12,10 @@ struct PendingResources
 {
     std::unordered_set<uint16_t> meshes;
     std::unordered_set<uint16_t> textures;
+    std::unordered_set<uint16_t> sounds;
     std::vector<std::function<void()>> custom;
 
-    size_t totalPending() const { return meshes.size() + textures.size() + custom.size(); }
+    size_t totalPending() const { return meshes.size() + textures.size() + sounds.size() + custom.size(); }
 };
 
 class LoadingScene : public Scene

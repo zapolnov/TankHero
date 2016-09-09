@@ -398,3 +398,8 @@ void GLES2Renderer::submitCanvas(const Canvas* canvas)
     glDisableVertexAttribArray(mShader2D.texCoordAttribute());
     glDisableVertexAttribArray(mShader2D.colorAttribute());
 }
+
+Renderer* Renderer::create(Engine* engine)
+{
+    return new GLES2Renderer(engine);
+}

@@ -40,6 +40,10 @@ namespace
                     auto it = mPendingResources.meshes.begin();
                     mEngine->renderer()->loadMesh(*it);
                     mPendingResources.meshes.erase(it);
+                } else if (!mPendingResources.sounds.empty()) {
+                    auto it = mPendingResources.sounds.begin();
+                    mEngine->soundManager()->loadSound(*it);
+                    mPendingResources.sounds.erase(it);
                 } else if (!mPendingResources.textures.empty()) {
                     auto it = mPendingResources.textures.begin();
                     mEngine->renderer()->loadTexture(*it);
@@ -101,6 +105,7 @@ namespace
 
 LoadingScene::LoadingScene(Engine* engine)
 {
+    engine->soundManager()->unloadAllSounds();
     engine->renderer()->unloadAllMeshes();
     engine->renderer()->unloadAllTextures();
 
@@ -108,5 +113,4 @@ LoadingScene::LoadingScene(Engine* engine)
     rootNode->setCamera(std::make_shared<OrthoCamera>());
     rootNode->set2D(true);
     setRootNode(rootNode);
-
 }

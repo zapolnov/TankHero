@@ -6,10 +6,12 @@ Engine::Engine()
 {
     memset(mKeyPressed, 0, sizeof(mKeyPressed));
     mRenderer.reset(Renderer::create(this));
+    mSoundManager.reset(SoundManager::create(this));
 }
 
 Engine::~Engine()
 {
+    mSoundManager.reset();
     mRenderer.reset();
 }
 

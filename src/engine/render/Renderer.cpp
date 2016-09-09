@@ -2,11 +2,6 @@
 #include "Canvas.h"
 #include <cassert>
 
-#ifdef RENDERER_GLES2
- #include "opengles2/GLES2Renderer.h"
- Renderer* Renderer::create(Engine* engine) { return new GLES2Renderer(engine); }
-#endif
-
 Renderer::Renderer(Engine* engine)
     : mEngine(engine)
     , mProjectionMatrix(1.0f)

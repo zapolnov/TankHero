@@ -41,6 +41,8 @@ set(engine_sources
     src/engine/scene/Scene.h
     src/engine/utility/StbImage.cpp
     src/engine/utility/StbImage.h
+    src/engine/utility/StbVorbis.cpp
+    src/engine/utility/StbVorbis.h
     src/engine/utility/TarGzDecompressor.cpp
     src/engine/utility/TarGzDecompressor.h
     src/engine/Engine.cpp
@@ -79,7 +81,7 @@ endif()
 
 set_source_groups_with_dir("Source Files" "src/engine" ${engine_sources})
 add_library(engine STATIC ${engine_sources})
-target_link_libraries(engine renderer stb glm ${platform_libraries})
+target_link_libraries(engine renderer sound stb glm ${platform_libraries})
 
 
 #######################################################################################################################
@@ -155,6 +157,48 @@ set_source_groups_with_dir("Source Files" "src/engine/render" ${renderer_sources
 set_source_groups_with_dir("Source Files" "src/engine/render" ${renderer_shaders})
 add_library(renderer STATIC ${renderer_sources} ${renderer_shaders} ${shaders_tgz_c})
 target_link_libraries(renderer engine glm ${renderer_libraries})
+
+
+#######################################################################################################################
+# Sound
+
+set(sound_libraries)
+
+set(sound_sources
+    src/engine/sound/SoundManager.cpp
+    src/engine/sound/SoundManager.h
+    )
+
+find_package(OpenAL)
+
+if(OPENAL_FOUND)
+    add_definitions(-DSOUND_OPENAL)
+
+    list(APPEND sound_sources
+        src/engine/sound/openal/OpenAL.h
+        src/engine/sound/openal/OpenALSound.cpp
+        src/engine/sound/openal/OpenALSound.h
+        src/engine/sound/openal/OpenALSoundManager.cpp
+        src/engine/sound/openal/OpenALSoundManager.h
+        )
+
+    if(OPENAL_INCLUDE_DIR)
+        include_directories("${OPENAL_INCLUDE_DIR}")
+    endif()
+
+    list(APPEND sound_libraries ${OPENAL_LIBRARY})
+else()
+    add_definitions(-DSOUND_DUMMY)
+
+    list(APPEND sound_sources
+        src/engine/sound/dummy/DummySoundManager.cpp
+        src/engine/sound/dummy/DummySoundManager.h
+    )
+endif()
+
+set_source_groups_with_dir("Source Files" "src/engine/sound" ${sound_sources})
+add_library(sound STATIC ${sound_sources})
+target_link_libraries(sound engine stb glm ${sound_libraries})
 
 
 #######################################################################################################################

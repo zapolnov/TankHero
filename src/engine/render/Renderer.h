@@ -15,7 +15,7 @@ class Renderer
 {
 public:
     static Renderer* create(Engine* engine);
-    ~Renderer();
+    virtual ~Renderer();
 
     virtual void beginFrame(int width, int height) = 0;
     virtual void endFrame() = 0;
