@@ -216,14 +216,14 @@ void Level::load(const std::string& file)
                 case 'T': {
                     static const float xOffset[] = { -1.0f, -1.0f,  1.0f, 1.0f };
                     static const float yOffset[] = { -1.0f,  1.0f, -1.0f, 1.0f };
-                    float z = -mEngine->renderer()->meshBBoxMin(mTreeMesh).y * 0.5f
+                    float z = -mEngine->renderer()->meshBBoxMin(mTreeMesh).y * 0.3f
                             +  mEngine->renderer()->meshBBoxMax(mGrassMesh).y * scale;
                     for (int i = 0; i < 4; i++) {
                         auto tree = std::make_shared<Obstacle>(mEngine, mTreeMesh);
                         tree->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
-                        tree->setScale(0.5f);
-                        tree->setPosition(cell.posX + xOffset[i] * CELL_SIZE * 0.3f,
-                                          cell.posY + yOffset[i] * CELL_SIZE * 0.3f,
+                        tree->setScale(0.3f);
+                        tree->setPosition(cell.posX + xOffset[i] * CELL_SIZE * 0.25f,
+                                          cell.posY + yOffset[i] * CELL_SIZE * 0.25f,
                                           z);
                         appendChild(tree);
                         cell.obstacles.emplace_back(tree);
@@ -297,6 +297,11 @@ bool Level::collidesOnMove(const OBB2D& sourceBox, const OBB2D& targetBox, float
 
     auto min = glm::min(range1.first, range2.first);
     auto max = glm::max(range1.second, range2.second);
+
+    min.x = std::max(min.x, 0);
+    min.y = std::max(min.y, 0);
+    max.x = std::min(max.x, mWidth - 1);
+    max.y = std::min(max.y, mHeight - 1);
 
     for (int y = min.y; y <= max.y; y++) {
         for (int x = min.x; x <= max.x; x++) {
