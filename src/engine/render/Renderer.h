@@ -36,6 +36,8 @@ public:
     virtual void loadMesh(uint16_t mesh) = 0;
     virtual void unloadAllMeshes() = 0;
 
+    virtual void setClearColor(const glm::vec4& c) = 0;
+
     void setProjectionMatrix(const glm::mat4& projection);
     void setViewMatrix(const glm::mat4& view);
 

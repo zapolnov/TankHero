@@ -24,4 +24,11 @@ public:
     explicit LoadingScene(Engine* engine);
 
     virtual std::shared_ptr<Scene> constructNextScene(Engine* engine, PendingResources& resources) = 0;
+    virtual void advanceToScene(const std::shared_ptr<Scene>& scene);
+
+    void setProgressBarPosition(float y);
+    void setProgressBarColors(const glm::vec4& fill, const glm::vec4& border);
+
+protected:
+    Engine* mEngine;
 };

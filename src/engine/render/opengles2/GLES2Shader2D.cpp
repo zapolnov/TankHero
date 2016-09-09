@@ -28,6 +28,7 @@ void GLES2Shader2D::load(const std::unordered_map<std::string, std::string>& sou
 
     mProjectionMatrixUniform = getUniformLocation("u_projection");
     mModelMatrixUniform = getUniformLocation("u_model");
+    mTextureUniform = getUniformLocation("u_texture");
 
     mPositionAttribute = getAttribLocation("a_position");
     mColorAttribute = getAttribLocation("a_color");

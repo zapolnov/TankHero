@@ -12,6 +12,7 @@ public:
 
     int projectionMatrixUniform() const { return mProjectionMatrixUniform; }
     int modelMatrixUniform() const { return mModelMatrixUniform; }
+    int textureUniform() const { return mTextureUniform; }
 
     int positionAttribute() const { return mPositionAttribute; }
     int colorAttribute() const { return mColorAttribute; }
@@ -27,6 +28,7 @@ private:
     GLuint mProgram;
     int mProjectionMatrixUniform = -1;
     int mModelMatrixUniform = -1;
+    int mTextureUniform = -1;
     int mPositionAttribute = -1;
     int mColorAttribute = -1;
     int mTexCoordAttribute = -1;

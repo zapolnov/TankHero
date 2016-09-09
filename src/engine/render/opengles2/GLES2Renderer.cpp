@@ -18,6 +18,14 @@ GLES2Renderer::GLES2Renderer(Engine* engine)
             std::string(reinterpret_cast<const char*>(shadersTarGz.currentFileData()), shadersTarGz.currentFileSize());
     }
 
+    mDummyTexture.bind(GL_TEXTURE_2D);
+    static const uint8_t dummyTexture[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, dummyTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     mShader2D.load(mShaderSources);
 }
 
@@ -31,7 +39,7 @@ void GLES2Renderer::beginFrame(int width, int height)
     mViewportHeight = height;
 
     glViewport(0, 0, width, height);
-    glClearColor(0.1f, 0.3f, 0.5f, 1.0f);
+    glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
@@ -355,8 +363,7 @@ void GLES2Renderer::submitCanvas(const Canvas* canvas)
     mShader2D.use();
 
     glDisable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -381,6 +388,9 @@ void GLES2Renderer::submitCanvas(const Canvas* canvas)
     glEnableVertexAttribArray(mShader2D.texCoordAttribute());
     glEnableVertexAttribArray(mShader2D.colorAttribute());
 
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i(mShader2D.textureUniform(), 0);
+
     for (const auto& call : canvas->drawCalls()) {
         GLenum p = GLenum(-1);
         switch (call.primitive) {
@@ -389,6 +399,11 @@ void GLES2Renderer::submitCanvas(const Canvas* canvas)
             case Canvas::Triangles: p = GL_TRIANGLES; break;
             case Canvas::TriangleStrip: p = GL_TRIANGLE_STRIP; break;
         }
+
+        if (call.texture == 0)
+            mDummyTexture.bind(GL_TEXTURE_2D);
+        else
+            mTextures[call.texture]->bind(GL_TEXTURE_2D);
 
         glUniformMatrix4fv(mShader2D.modelMatrixUniform(), 1, GL_FALSE, &call.modelMatrix[0][0]);
 

@@ -29,6 +29,7 @@ public:
         glm::mat4 modelMatrix;
         size_t firstIndex;
         size_t indexCount;
+        uint16_t texture;
     };
 
     Canvas();
@@ -48,7 +49,7 @@ public:
     void pushColor(const glm::vec4& color);
     void popColor();
 
-    void beginPrimitive(Primitive primitive);
+    void beginPrimitive(Primitive primitive, uint16_t texture = 0);
     void endPrimitive();
 
     uint16_t emitVertex(const glm::vec2& position, const glm::vec4& color);
@@ -57,7 +58,8 @@ public:
     uint16_t emitVertex(const glm::vec2& position, const glm::vec2& texCoord, const VertexColor& color);
     void emitIndex(uint16_t index);
 
-    void drawSolidRect(const glm::vec2& tl, const glm::vec2& br);
+    void drawSolidRect(const glm::vec2& tl, const glm::vec2& br, uint16_t texture = 0,
+        const glm::vec2& t1 = glm::vec2(0.0f), const glm::vec2& t2 = glm::vec2(1.0f));
 
 private:
     std::vector<DrawCall> mDrawCalls;

@@ -384,6 +384,8 @@ set(source_files
     src/game/game/Player.h
     src/game/menu/GameLoadingScene.cpp
     src/game/menu/GameLoadingScene.h
+    src/game/menu/InitialLoadingScene.cpp
+    src/game/menu/InitialLoadingScene.h
     src/game/menu/LoadingScene.cpp
     src/game/menu/LoadingScene.h
     src/game/menu/MainMenuScene.cpp

@@ -62,7 +62,7 @@ void Canvas::popColor()
         mColorStack.pop_back();
 }
 
-void Canvas::beginPrimitive(Primitive primitive)
+void Canvas::beginPrimitive(Primitive primitive, uint16_t texture)
 {
     assert(!mInPrimitive);
 
@@ -73,6 +73,7 @@ void Canvas::beginPrimitive(Primitive primitive)
     drawCall.modelMatrix = mMatrixStack.back();
     drawCall.firstIndex = mIndexBuffer.size();
     drawCall.indexCount = 0;
+    drawCall.texture = texture;
 
     mInPrimitive = true;
 }
@@ -121,13 +122,14 @@ void Canvas::emitIndex(uint16_t index)
     mIndexBuffer.emplace_back(index);
 }
 
-void Canvas::drawSolidRect(const glm::vec2& tl, const glm::vec2& br)
+void Canvas::drawSolidRect(const glm::vec2& tl, const glm::vec2& br,
+    uint16_t texture, const glm::vec2& t1, const glm::vec2& t2)
 {
     auto c = convertColor(color());
-    beginPrimitive(TriangleStrip);
-    emitVertex(glm::vec2(tl.x, tl.y), glm::vec2(0.0f, 0.0f), c);
-    emitVertex(glm::vec2(br.x, tl.y), glm::vec2(1.0f, 0.0f), c);
-    emitVertex(glm::vec2(tl.x, br.y), glm::vec2(0.0f, 1.0f), c);
-    emitVertex(glm::vec2(br.x, br.y), glm::vec2(1.0f, 1.0f), c);
+    beginPrimitive(TriangleStrip, texture);
+    emitVertex(glm::vec2(tl.x, tl.y), glm::vec2(t1.x, t1.y), c);
+    emitVertex(glm::vec2(br.x, tl.y), glm::vec2(t2.x, t1.y), c);
+    emitVertex(glm::vec2(tl.x, br.y), glm::vec2(t1.x, t2.y), c);
+    emitVertex(glm::vec2(br.x, br.y), glm::vec2(t2.x, t2.y), c);
     endPrimitive();
 }

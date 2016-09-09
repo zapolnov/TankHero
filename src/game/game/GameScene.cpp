@@ -6,6 +6,8 @@
 GameScene::GameScene(Engine* engine, PendingResources& resourceQueue)
     : mEngine(engine)
 {
+    mEngine->renderer()->setClearColor(glm::vec4(0.1f, 0.3f, 0.7f, 1.0f));
+
     uint16_t music = engine->soundManager()->soundNameId("S31-Unexpected Trouble.ogg");
     resourceQueue.sounds.emplace(music);
 

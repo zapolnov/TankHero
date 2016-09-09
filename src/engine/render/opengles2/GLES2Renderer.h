@@ -34,6 +34,8 @@ public:
     const glm::vec3& meshSphereCenter(uint16_t id) const override;
     float meshSphereRadius(uint16_t id) const override;
 
+    void setClearColor(const glm::vec4& c) override { mClearColor = c; }
+
     const GLES2UberShader& useShader(GLES2UberShader::Key key);
 
 private:
@@ -49,7 +51,9 @@ private:
     GLES2Framebuffer mShadowFramebuffer;
     GLES2Renderbuffer mShadowRenderbuffer;
     GLES2Texture mShadowTexture;
+    GLES2Texture mDummyTexture;
     glm::mat4 mShadowProjectionMatrix;
+    glm::vec4 mClearColor;
     int mViewportWidth = 0;
     int mViewportHeight = 0;
     int mShadowMapWidth = 0;
