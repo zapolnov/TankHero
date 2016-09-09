@@ -27,6 +27,9 @@ public:
     size_t elementCount() const { return mElements.size(); }
     const MaterialDesc& elementMaterial(size_t index) const { return mElements[index].material; }
 
+    static void enableAttributes(const GLES2UberShader& shader, const VertexFormat& format, size_t bufferOffset = 0);
+    static void disableAttributes(const GLES2UberShader& shader, const VertexFormat& format);
+
     void renderElement(size_t index, const GLES2UberShader& shader) const;
 
 private:

@@ -27,6 +27,7 @@ public:
     bool collidesOnMove(const OBB2D& sourceBox, const OBB2D& targetBox, float* penetrationDepth = nullptr) const;
 
     void spawnBullet(const glm::vec3& position, const glm::vec2& dir);
+    void spawnBulletExplosion(const glm::vec3& position);
 
 private:
     struct Cell
@@ -57,6 +58,7 @@ private:
     uint16_t mRiverStraightMesh;
     uint16_t mWaterMesh;
     uint16_t mBulletMesh;
+    uint16_t mExplosion1Texture;
     Enemy::Descriptor mEnemy1;
     int mWidth;
     int mHeight;

@@ -91,16 +91,38 @@ void Renderer::end2D()
     }
 }
 
-void Renderer::drawMesh(const glm::mat4& model, uint16_t mesh)
+void Renderer::drawIndexedPrimitive(const glm::mat4& model, VertexFormat format, const void* vertices, size_t vertexCount,
+    const uint16_t* indices, size_t indexCount, uint16_t texture)
 {
     mDrawCalls.emplace_back();
     auto& drawCall = mDrawCalls.back();
 
+    drawCall.type = DrawIndexedPrimitive;
     drawCall.projectionMatrix = mProjectionMatrix;
     drawCall.viewMatrix = mViewMatrix;
     drawCall.modelMatrix = model;
     drawCall.lightPosition = mLightPosition;
     drawCall.lightColor = mLightColor;
     drawCall.lightPower = mLightPower;
-    drawCall.mesh = mesh;
+    new (&drawCall.u.ip.format) VertexFormat(format);
+    drawCall.u.ip.vertices = vertices;
+    drawCall.u.ip.vertexCount = vertexCount;
+    drawCall.u.ip.indices = indices;
+    drawCall.u.ip.indexCount = indexCount;
+    drawCall.u.ip.texture = texture;
+}
+
+void Renderer::drawMesh(const glm::mat4& model, uint16_t mesh)
+{
+    mDrawCalls.emplace_back();
+    auto& drawCall = mDrawCalls.back();
+
+    drawCall.type = DrawMesh;
+    drawCall.projectionMatrix = mProjectionMatrix;
+    drawCall.viewMatrix = mViewMatrix;
+    drawCall.modelMatrix = model;
+    drawCall.lightPosition = mLightPosition;
+    drawCall.lightColor = mLightColor;
+    drawCall.lightPower = mLightPower;
+    drawCall.u.m.mesh = mesh;
 }

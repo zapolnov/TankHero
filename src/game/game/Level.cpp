@@ -1,4 +1,5 @@
 #include "Level.h"
+#include "Explosion.h"
 #include "Bullet.h"
 #include "src/engine/render/Canvas.h"
 #include "src/engine/render/Renderer.h"
@@ -27,6 +28,7 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
 
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("basetexture.jpg"));
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("texture_panzerwagen.jpg"));
+    resourceQueue.textures.emplace(mExplosion1Texture = engine->renderer()->textureNameId("explosion1.png"));
 
     resourceQueue.meshes.emplace(mTreeMesh = engine->renderer()->meshNameId("tree.mesh"));
     resourceQueue.meshes.emplace(mGrassMesh = engine->renderer()->meshNameId("grass.mesh"));
@@ -320,6 +322,13 @@ void Level::spawnBullet(const glm::vec3& position, const glm::vec2& dir)
     auto bullet = std::make_shared<Bullet>(mEngine, this, mBulletMesh, dir);
     bullet->setPosition(position);
     appendChild(bullet);
+}
+
+void Level::spawnBulletExplosion(const glm::vec3& position)
+{
+    auto e = std::make_shared<Explosion>(mCamera.get(), mExplosion1Texture, 2.0f, 32);
+    e->setPosition(position);
+    appendChild(e);
 }
 
 void Level::update(float time)

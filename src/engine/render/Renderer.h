@@ -1,5 +1,6 @@
 
 #pragma once
+#include "src/engine/mesh/VertexFormat.h"
 #include <glm/glm.hpp>
 #include <cstdint>
 #include <unordered_map>
@@ -54,18 +55,41 @@ public:
         mShadowMapMax = max;
     }
 
+    void drawIndexedPrimitive(const glm::mat4& model, VertexFormat format, const void* vertices, size_t vertexCount,
+        const uint16_t* indices, size_t indexCount, uint16_t texture);
+
     void drawMesh(const glm::mat4& model, uint16_t mesh);
 
 protected:
+    enum DrawCallType
+    {
+        DrawMesh,
+        DrawIndexedPrimitive,
+    };
+
     struct DrawCall
     {
+        DrawCallType type;
         glm::mat4 projectionMatrix;
         glm::mat4 viewMatrix;
         glm::mat4 modelMatrix;
         glm::vec3 lightPosition;
         glm::vec3 lightColor;
         float lightPower;
-        uint16_t mesh;
+        union U {
+            struct {
+                uint16_t mesh;
+            } m;
+            struct {
+                VertexFormat format;
+                const void* vertices;
+                size_t vertexCount;
+                const uint16_t* indices;
+                size_t indexCount;
+                uint16_t texture;
+            } ip;
+            U() {}
+        } u;
     };
 
     Engine* mEngine;

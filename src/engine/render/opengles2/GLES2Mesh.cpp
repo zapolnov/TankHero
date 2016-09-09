@@ -75,6 +75,97 @@ void GLES2Mesh::load(Renderer* renderer, const std::string& file)
     }
 }
 
+void GLES2Mesh::enableAttributes(const GLES2UberShader& shader, const VertexFormat& format, size_t bufferOffset)
+{
+    if (shader.positionAttribute() >= 0) {
+        if (!format.hasPosition()) {
+            glVertexAttrib4f(shader.positionAttribute(), 0.0f, 0.0f, 0.0f, 0.0f);
+        } else {
+            glVertexAttribPointer(shader.positionAttribute(), 3, GL_FLOAT, GL_FALSE, GLsizei(format.stride()),
+                reinterpret_cast<void*>(format.positionOffset() + bufferOffset * format.stride()));
+            glEnableVertexAttribArray(shader.positionAttribute());
+        }
+    }
+
+    if (shader.colorAttribute() >= 0) {
+        if (!format.hasColor()) {
+            glVertexAttrib4f(shader.colorAttribute(), 1.0f, 1.0f, 1.0f, 1.0f);
+        } else {
+            glVertexAttribPointer(shader.colorAttribute(), 4, GL_UNSIGNED_BYTE, GL_TRUE, GLsizei(format.stride()),
+                reinterpret_cast<void*>(format.colorOffset() + bufferOffset * format.stride()));
+            glEnableVertexAttribArray(shader.colorAttribute());
+        }
+    }
+
+    if (shader.texCoord0Attribute() >= 0) {
+        if (!format.hasTexCoord0()) {
+            glVertexAttrib4f(shader.texCoord0Attribute(), 0.0f, 0.0f, 0.0f, 0.0f);
+        } else {
+            glVertexAttribPointer(shader.texCoord0Attribute(), 2, GL_FLOAT, GL_FALSE, GLsizei(format.stride()),
+                reinterpret_cast<void*>(format.texCoord0Offset() + bufferOffset * format.stride()));
+            glEnableVertexAttribArray(shader.texCoord0Attribute());
+        }
+    }
+
+    if (shader.normalAttribute() >= 0) {
+        if (!format.hasNormal()) {
+            glVertexAttrib4f(shader.normalAttribute(), 0.0f, 1.0f, 0.0f, 0.0f);
+        } else {
+            glVertexAttribPointer(shader.normalAttribute(), 3, GL_FLOAT, GL_TRUE, GLsizei(format.stride()),
+                reinterpret_cast<void*>(format.normalOffset() + bufferOffset * format.stride()));
+            glEnableVertexAttribArray(shader.normalAttribute());
+        }
+    }
+
+    if (shader.tangentAttribute() >= 0) {
+        if (!format.hasTangent()) {
+            glVertexAttrib4f(shader.tangentAttribute(), 1.0f, 0.0f, 0.0f, 0.0f);
+        } else {
+            glVertexAttribPointer(shader.tangentAttribute(), 3, GL_FLOAT, GL_TRUE, GLsizei(format.stride()),
+                reinterpret_cast<void*>(format.tangentOffset() + bufferOffset * format.stride()));
+            glEnableVertexAttribArray(shader.tangentAttribute());
+        }
+    }
+
+    if (shader.bitangentAttribute() >= 0) {
+        if (!format.hasBitangent()) {
+            glVertexAttrib4f(shader.bitangentAttribute(), 1.0f, 0.0f, 0.0f, 0.0f);
+        } else {
+            glVertexAttribPointer(shader.bitangentAttribute(), 3, GL_FLOAT, GL_TRUE, GLsizei(format.stride()),
+                reinterpret_cast<void*>(format.bitangentOffset() + bufferOffset * format.stride()));
+            glEnableVertexAttribArray(shader.bitangentAttribute());
+        }
+    }
+}
+
+void GLES2Mesh::disableAttributes(const GLES2UberShader& shader, const VertexFormat& format)
+{
+    if (shader.bitangentAttribute() >= 0) {
+        if (format.hasBitangent())
+            glDisableVertexAttribArray(shader.bitangentAttribute());
+    }
+    if (shader.tangentAttribute() >= 0) {
+        if (format.hasTangent())
+            glDisableVertexAttribArray(shader.tangentAttribute());
+    }
+    if (shader.normalAttribute() >= 0) {
+        if (format.hasNormal())
+            glDisableVertexAttribArray(shader.normalAttribute());
+    }
+    if (shader.texCoord0Attribute() >= 0) {
+        if (format.hasTexCoord0())
+            glDisableVertexAttribArray(shader.texCoord0Attribute());
+    }
+    if (shader.colorAttribute() >= 0) {
+        if (format.hasColor())
+            glDisableVertexAttribArray(shader.colorAttribute());
+    }
+    if (shader.positionAttribute() >= 0) {
+        if (format.hasPosition())
+            glDisableVertexAttribArray(shader.positionAttribute());
+    }
+}
+
 void GLES2Mesh::renderElement(size_t index, const GLES2UberShader& shader) const
 {
     const auto& element = mElements[index];
@@ -82,65 +173,7 @@ void GLES2Mesh::renderElement(size_t index, const GLES2UberShader& shader) const
     glBindBuffer(GL_ARRAY_BUFFER, mBuffers[0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffers[1]);
 
-    if (shader.positionAttribute() >= 0) {
-        if (!mVertexFormat->hasPosition()) {
-            glVertexAttrib4f(shader.positionAttribute(), 0.0f, 0.0f, 0.0f, 0.0f);
-        } else {
-            glVertexAttribPointer(shader.positionAttribute(), 3, GL_FLOAT, GL_FALSE, GLsizei(mVertexFormat->stride()),
-                reinterpret_cast<void*>(mVertexFormat->positionOffset() + element.bufferOffset * mVertexFormat->stride()));
-            glEnableVertexAttribArray(shader.positionAttribute());
-        }
-    }
-
-    if (shader.colorAttribute() >= 0) {
-        if (!mVertexFormat->hasColor()) {
-            glVertexAttrib4f(shader.colorAttribute(), 1.0f, 1.0f, 1.0f, 1.0f);
-        } else {
-            glVertexAttribPointer(shader.colorAttribute(), 4, GL_UNSIGNED_BYTE, GL_TRUE, GLsizei(mVertexFormat->stride()),
-                reinterpret_cast<void*>(mVertexFormat->colorOffset() + element.bufferOffset * mVertexFormat->stride()));
-            glEnableVertexAttribArray(shader.colorAttribute());
-        }
-    }
-
-    if (shader.texCoord0Attribute() >= 0) {
-        if (!mVertexFormat->hasTexCoord0()) {
-            glVertexAttrib4f(shader.texCoord0Attribute(), 0.0f, 0.0f, 0.0f, 0.0f);
-        } else {
-            glVertexAttribPointer(shader.texCoord0Attribute(), 2, GL_FLOAT, GL_FALSE, GLsizei(mVertexFormat->stride()),
-                reinterpret_cast<void*>(mVertexFormat->texCoord0Offset() + element.bufferOffset * mVertexFormat->stride()));
-            glEnableVertexAttribArray(shader.texCoord0Attribute());
-        }
-    }
-
-    if (shader.normalAttribute() >= 0) {
-        if (!mVertexFormat->hasNormal()) {
-            glVertexAttrib4f(shader.normalAttribute(), 0.0f, 1.0f, 0.0f, 0.0f);
-        } else {
-            glVertexAttribPointer(shader.normalAttribute(), 3, GL_FLOAT, GL_TRUE, GLsizei(mVertexFormat->stride()),
-                reinterpret_cast<void*>(mVertexFormat->normalOffset() + element.bufferOffset * mVertexFormat->stride()));
-            glEnableVertexAttribArray(shader.normalAttribute());
-        }
-    }
-
-    if (shader.tangentAttribute() >= 0) {
-        if (!mVertexFormat->hasTangent()) {
-            glVertexAttrib4f(shader.tangentAttribute(), 1.0f, 0.0f, 0.0f, 0.0f);
-        } else {
-            glVertexAttribPointer(shader.tangentAttribute(), 3, GL_FLOAT, GL_TRUE, GLsizei(mVertexFormat->stride()),
-                reinterpret_cast<void*>(mVertexFormat->tangentOffset() + element.bufferOffset * mVertexFormat->stride()));
-            glEnableVertexAttribArray(shader.tangentAttribute());
-        }
-    }
-
-    if (shader.bitangentAttribute() >= 0) {
-        if (!mVertexFormat->hasBitangent()) {
-            glVertexAttrib4f(shader.bitangentAttribute(), 1.0f, 0.0f, 0.0f, 0.0f);
-        } else {
-            glVertexAttribPointer(shader.bitangentAttribute(), 3, GL_FLOAT, GL_TRUE, GLsizei(mVertexFormat->stride()),
-                reinterpret_cast<void*>(mVertexFormat->bitangentOffset() + element.bufferOffset * mVertexFormat->stride()));
-            glEnableVertexAttribArray(shader.bitangentAttribute());
-        }
-    }
+    enableAttributes(shader, *mVertexFormat);
 
     if (shader.ambientColorUniform() >= 0) {
         const auto& c = element.material.ambientColor;
@@ -189,28 +222,5 @@ void GLES2Mesh::renderElement(size_t index, const GLES2UberShader& shader) const
     glDrawElements(GL_TRIANGLES, GLsizei(element.indexCount), GL_UNSIGNED_SHORT,
         reinterpret_cast<void*>(element.firstIndex * sizeof(uint16_t)));
 
-    if (shader.bitangentAttribute() >= 0) {
-        if (mVertexFormat->hasBitangent())
-            glDisableVertexAttribArray(shader.bitangentAttribute());
-    }
-    if (shader.tangentAttribute() >= 0) {
-        if (mVertexFormat->hasTangent())
-            glDisableVertexAttribArray(shader.tangentAttribute());
-    }
-    if (shader.normalAttribute() >= 0) {
-        if (mVertexFormat->hasNormal())
-            glDisableVertexAttribArray(shader.normalAttribute());
-    }
-    if (shader.texCoord0Attribute() >= 0) {
-        if (mVertexFormat->hasTexCoord0())
-            glDisableVertexAttribArray(shader.texCoord0Attribute());
-    }
-    if (shader.colorAttribute() >= 0) {
-        if (mVertexFormat->hasColor())
-            glDisableVertexAttribArray(shader.colorAttribute());
-    }
-    if (shader.positionAttribute() >= 0) {
-        if (mVertexFormat->hasPosition())
-            glDisableVertexAttribArray(shader.positionAttribute());
-    }
+    disableAttributes(shader, *mVertexFormat);
 }

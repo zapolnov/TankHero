@@ -271,6 +271,8 @@ set(source_files
     src/game/game/Collidable.h
     src/game/game/Enemy.cpp
     src/game/game/Enemy.h
+    src/game/game/Explosion.cpp
+    src/game/game/Explosion.h
     src/game/game/GameScene.cpp
     src/game/game/GameScene.h
     src/game/game/Level.cpp
