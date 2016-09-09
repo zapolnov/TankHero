@@ -2,6 +2,7 @@
 #pragma once
 #include "Player.h"
 #include "Obstacle.h"
+#include "Enemy.h"
 #include "src/engine/scene/RootNode.h"
 #include "src/engine/scene/camera/PerspectiveCamera.h"
 #include "src/game/menu/LoadingScene.h"
@@ -56,6 +57,7 @@ private:
     uint16_t mRiverStraightMesh;
     uint16_t mWaterMesh;
     uint16_t mBulletMesh;
+    Enemy::Descriptor mEnemy1;
     int mWidth;
     int mHeight;
 

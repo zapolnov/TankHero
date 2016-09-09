@@ -26,6 +26,7 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     mPlayer = std::make_shared<Player>(mEngine, this, resourceQueue);
 
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("basetexture.jpg"));
+    resourceQueue.textures.emplace(engine->renderer()->textureNameId("texture_panzerwagen.jpg"));
 
     resourceQueue.meshes.emplace(mTreeMesh = engine->renderer()->meshNameId("tree.mesh"));
     resourceQueue.meshes.emplace(mGrassMesh = engine->renderer()->meshNameId("grass.mesh"));
@@ -40,6 +41,9 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     resourceQueue.meshes.emplace(mRiverStraightMesh = engine->renderer()->meshNameId("river-straight-low.mesh"));
     resourceQueue.meshes.emplace(mWaterMesh = engine->renderer()->meshNameId("water.mesh"));
     resourceQueue.meshes.emplace(mBulletMesh = engine->renderer()->meshNameId("tank_bullet.mesh"));
+
+    mEnemy1.visualPosition = glm::vec3(0.0f, 0.0f, 0.6f);
+    resourceQueue.meshes.emplace(mEnemy1.mesh = engine->renderer()->meshNameId("enemy1.mesh"));
 }
 
 void Level::load(const std::string& file)
@@ -122,6 +126,14 @@ void Level::load(const std::string& file)
                     mPlayer->setPosition2D(cell.posX, cell.posY);
                     appendChild(mPlayer);
                     break;
+
+                case '!': {
+                    cell.levelMarker = ' ';
+                    auto enemy = std::make_shared<Enemy>(mEngine, this, mEnemy1);
+                    enemy->setPosition2D(cell.posX, cell.posY);
+                    appendChild(enemy);
+                    break;
+                }
 
                 case '2': // road straight
                 case '5': // road corner

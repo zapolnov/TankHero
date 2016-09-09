@@ -167,11 +167,11 @@ if(NOT CMAKE_CROSSCOMPILING)
     add_subdirectory(tools)
 endif()
 
-#add_mesh(
-#    INPUT "data/src/panzerwagen/panzerwagen.xml"
-#    OUTPUT "data/bin/tank.mesh"
-#    DEPENDS "data/src/panzerwagen/panzerwagen_3x3.blend"
-#    )
+add_mesh(
+    INPUT "data/src/panzerwagen/panzerwagen.xml"
+    OUTPUT "data/bin/enemy1.mesh"
+    DEPENDS "data/src/panzerwagen/panzerwagen_3x3.blend"
+    )
 
 add_mesh(
     INPUT "data/src/TankAndProps/Tanks/Body.xml"
@@ -269,6 +269,8 @@ set(source_files
     src/game/game/Bullet.h
     src/game/game/Collidable.cpp
     src/game/game/Collidable.h
+    src/game/game/Enemy.cpp
+    src/game/game/Enemy.h
     src/game/game/GameScene.cpp
     src/game/game/GameScene.h
     src/game/game/Level.cpp
