@@ -62,7 +62,9 @@ void Bullet::update(float time)
     auto pos = position2D();
 
     float length = time * MOVE_SPEED;
-    if (mLevel->collidesOnMove(*this, mDirection, length)) {
+    auto target = mLevel->collideOnMove(*this, mDirection, length);
+    if (target) {
+        target->hitWithBullet(rotation2D());
         removeFromParent();
         mLevel->spawnBulletExplosion(position() + glm::vec3(mDirection * (length + 2.0f), 4.0f / 5.0f));
         return;

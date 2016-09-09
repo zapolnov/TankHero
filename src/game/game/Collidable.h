@@ -16,6 +16,7 @@ public:
     const OBB2D& boundingBox();
 
     virtual bool isPlayer() const { return false; }
+    virtual void hitWithBullet(float bulletAngle) {}
 
 protected:
     Engine* mEngine;

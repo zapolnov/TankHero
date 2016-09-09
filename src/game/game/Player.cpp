@@ -94,7 +94,7 @@ void Player::update(float time)
         if (mEngine->wasKeyPressed(KeyLeft)) {
             setRotation2D(angle + step);
             invalidateBoundingBox();
-            if (!mLevel->collidesOnMove(oldBoundingBox, boundingBox())) {
+            if (!mLevel->collideOnMove(oldBoundingBox, boundingBox())) {
                 angle = angle + step;
                 orientationChanged = true;
             } else {
@@ -106,7 +106,7 @@ void Player::update(float time)
         if (mEngine->wasKeyPressed(KeyRight)) {
             setRotation2D(angle - step);
             invalidateBoundingBox();
-            if (!mLevel->collidesOnMove(oldBoundingBox, boundingBox())) {
+            if (!mLevel->collideOnMove(oldBoundingBox, boundingBox())) {
                 angle = angle - step;
                 orientationChanged = true;
             } else {
@@ -127,13 +127,13 @@ void Player::update(float time)
 
         if (mEngine->wasKeyPressed(KeyUp)) {
             float dist = length;
-            mLevel->collidesOnMove(*this, dir, dist);
+            mLevel->collideOnMove(*this, dir, dist);
             pos += dir * dist;
         }
 
         if (mEngine->wasKeyPressed(KeyDown)) {
             float dist = length;
-            mLevel->collidesOnMove(*this, -dir, dist);
+            mLevel->collideOnMove(*this, -dir, dist);
             pos -= dir * dist;
         }
 

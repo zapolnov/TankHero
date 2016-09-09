@@ -1,4 +1,5 @@
 #include "Level.h"
+#include "Tree.h"
 #include "Explosion.h"
 #include "Bullet.h"
 #include "src/engine/render/Canvas.h"
@@ -224,11 +225,10 @@ void Level::load(const std::string& file)
                     static const float xOffset[] = { -1.0f, -1.0f,  1.0f, 1.0f };
                     static const float yOffset[] = { -1.0f,  1.0f, -1.0f, 1.0f };
                     float z = -mEngine->renderer()->meshBBoxMin(mTreeMesh).y * 0.3f
-                            +  mEngine->renderer()->meshBBoxMax(mGrassMesh).y * scale;
+                            +  mEngine->renderer()->meshBBoxMax(mGrassMesh).y * scale
+                            -  1.0f;
                     for (int i = 0; i < 4; i++) {
-                        auto tree = std::make_shared<Obstacle>(mEngine, mTreeMesh);
-                        tree->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
-                        tree->setScale(0.3f);
+                        auto tree = std::make_shared<Tree>(mEngine, mTreeMesh);
                         tree->setPosition(cell.posX + xOffset[i] * CELL_SIZE * 0.25f,
                                           cell.posY + yOffset[i] * CELL_SIZE * 0.25f,
                                           z);
@@ -277,7 +277,7 @@ std::pair<glm::ivec2, glm::ivec2> Level::cellsForBoundingBox(const OBB2D& box) c
     return std::make_pair(min, max);
 }
 
-bool Level::collidesOnMove(Collidable& collidable, const glm::vec2& dir, float& length) const
+std::shared_ptr<Collidable> Level::collideOnMove(Collidable& collidable, const glm::vec2& dir, float& length) const
 {
     const auto& sourceBox = collidable.boundingBox();
 
@@ -289,15 +289,14 @@ bool Level::collidesOnMove(Collidable& collidable, const glm::vec2& dir, float& 
     targetBox.p[3] += vec;
 
     float depth = 0.0f;
-    if (collidesOnMove(sourceBox, targetBox, &depth)) {
+    auto obstacle = collideOnMove(sourceBox, targetBox, &depth);
+    if (obstacle)
         length = std::max(length - depth - 0.1f, 0.0f);
-        return true;
-    }
 
-    return false;
+    return obstacle;
 }
 
-bool Level::collidesOnMove(const OBB2D& sourceBox, const OBB2D& targetBox, float* penetrationDepth) const
+std::shared_ptr<Collidable> Level::collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox, float* penetrationDepth) const
 {
     auto range1 = cellsForBoundingBox(sourceBox);
     auto range2 = cellsForBoundingBox(targetBox);
@@ -312,14 +311,15 @@ bool Level::collidesOnMove(const OBB2D& sourceBox, const OBB2D& targetBox, float
 
     for (int y = min.y; y <= max.y; y++) {
         for (int x = min.x; x <= max.x; x++) {
-            for (const auto& obstacle : mCells[y][x].obstacles) {
-                if (obstacle->boundingBox().intersectsWith(targetBox, penetrationDepth))
-                    return true;
+            for (const auto& obstacleRef : mCells[y][x].obstacles) {
+                auto obstacle = obstacleRef.lock();
+                if (obstacle && obstacle->boundingBox().intersectsWith(targetBox, penetrationDepth))
+                    return obstacle;
             }
         }
     }
 
-    return false;
+    return nullptr;
 }
 
 void Level::spawnBullet(const glm::vec3& position, const glm::vec2& dir)

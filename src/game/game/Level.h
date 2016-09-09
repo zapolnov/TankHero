@@ -23,8 +23,8 @@ public:
     glm::ivec2 cellForPoint(const glm::vec2& point) const;
     std::pair<glm::ivec2, glm::ivec2> cellsForBoundingBox(const OBB2D& box) const;
 
-    bool collidesOnMove(Collidable& collidable, const glm::vec2& dir, float& length) const;
-    bool collidesOnMove(const OBB2D& sourceBox, const OBB2D& targetBox, float* penetrationDepth = nullptr) const;
+    std::shared_ptr<Collidable> collideOnMove(Collidable& collidable, const glm::vec2& dir, float& length) const;
+    std::shared_ptr<Collidable> collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox, float* penetrationDepth = nullptr) const;
 
     void spawnBullet(const glm::vec3& position, const glm::vec2& dir);
     void spawnBulletExplosion(const glm::vec3& position);
@@ -35,7 +35,7 @@ public:
 private:
     struct Cell
     {
-        std::vector<std::shared_ptr<Obstacle>> obstacles;
+        std::vector<std::weak_ptr<Obstacle>> obstacles;
         glm::mat4 worldTransform{1.0f};
         float posX;
         float posY;
