@@ -169,7 +169,26 @@ set(sound_sources
     src/engine/sound/SoundManager.h
     )
 
-find_package(OpenAL)
+if(NOT WIN32)
+    find_package(OpenAL)
+else()
+    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(bits 32)
+    else()
+        set(bits 64)
+    endif()
+
+    set(openal_dll "${CMAKE_CURRENT_SOURCE_DIR}/lib/openal/soft/bin/Win${bits}/soft_oal.dll")
+
+    set(OPENAL_FOUND TRUE)
+    set(OPENAL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/openal/soft/include")
+
+    if(MINGW)
+        set(OPENAL_LIBRARY "${CMAKE_CURRENT_SOURCE_DIR}/lib/openal/soft/libs/Win${bits}/libOpenAL32.dll.a")
+    else()
+        set(OPENAL_LIBRARY "${CMAKE_CURRENT_SOURCE_DIR}/lib/openal/soft/libs/Win${bits}/OpenAL32.lib")
+    endif()
+endif()
 
 if(OPENAL_FOUND)
     add_definitions(-DSOUND_OPENAL)
@@ -375,3 +394,9 @@ set(source_files
 set_source_groups_with_dir("Source Files" "src" ${source_files})
 add_executable(Game ${source_files} ${asset_src_files} ${asset_bin_files})
 target_link_libraries(Game engine)
+
+if(WIN32)
+    add_custom_command(TARGET Game POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${openal_dll}" "$<TARGET_FILE_DIR:Game>/openal32.dll"
+        COMMENT "Copying openal32.dll")
+endif()

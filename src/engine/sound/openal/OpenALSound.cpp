@@ -46,7 +46,7 @@ void OpenALSound::load(const std::string& file)
     size_t bufferSize = size_t(nSamples) * size_t(channels) * sizeof(short);
 
     alcMakeContextCurrent(mContext);
-    alBufferData(mBuffer, format, buffer, bufferSize, sampleRate);
+    alBufferData(mBuffer, format, buffer, ALsizei(bufferSize), sampleRate);
 
     free(buffer);
 }
