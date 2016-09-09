@@ -1,6 +1,7 @@
 
 #pragma once
 #include "OpenAL.h"
+#include <glm/glm.hpp>
 #include <string>
 
 class OpenALSound
@@ -12,6 +13,7 @@ public:
     void load(const std::string& file);
 
     void play(ALuint source, bool looping);
+    void play(ALuint source, const glm::vec3& position, bool looping);
 
 private:
     ALCcontext* mContext;

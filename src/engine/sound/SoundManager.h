@@ -1,5 +1,6 @@
 
 #pragma once
+#include <glm/glm.hpp>
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
@@ -19,7 +20,11 @@ public:
     virtual void loadSound(uint16_t sound) = 0;
     virtual void unloadAllSounds() = 0;
 
+    virtual void setListenerPosition(const glm::vec3& position) = 0;
+    virtual void setListenerOrientation(const glm::vec3& forward, const glm::vec3& up) = 0;
+
     virtual void play(uint16_t id, bool looping = false) = 0;
+    virtual void play(const glm::vec3& position, uint16_t id, bool looping = false) = 0;
 
 protected:
     Engine* mEngine;

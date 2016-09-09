@@ -11,6 +11,8 @@ class Player : public Node, public Collidable
 public:
     Player(Engine* engine, Level* level, PendingResources& resourceQueue);
 
+    glm::vec2 direction() const;
+
     bool isPlayer() const override { return true; }
 
 private:

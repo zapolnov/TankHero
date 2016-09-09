@@ -44,6 +44,8 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     resourceQueue.meshes.emplace(mWaterMesh = engine->renderer()->meshNameId("water.mesh"));
     resourceQueue.meshes.emplace(mBulletMesh = engine->renderer()->meshNameId("tank_bullet.mesh"));
 
+    resourceQueue.sounds.emplace(mShootSound = engine->soundManager()->soundNameId("8bit_gunloop_explosion.ogg"));
+
     mEnemy1.visualPosition = glm::vec3(0.0f, 0.0f, 0.6f);
     resourceQueue.meshes.emplace(mEnemy1.mesh = engine->renderer()->meshNameId("enemy1.mesh"));
 }
@@ -127,6 +129,8 @@ void Level::load(const std::string& file)
                     cell.levelMarker = ' ';
                     mPlayer->setPosition2D(cell.posX, cell.posY);
                     appendChild(mPlayer);
+                    updateListenerPosition();
+                    updateListenerOrientation();
                     break;
 
                 case '!': {
@@ -322,6 +326,7 @@ void Level::spawnBullet(const glm::vec3& position, const glm::vec2& dir)
     auto bullet = std::make_shared<Bullet>(mEngine, this, mBulletMesh, dir);
     bullet->setPosition(position);
     appendChild(bullet);
+    mEngine->soundManager()->play(position, mShootSound);
 }
 
 void Level::spawnBulletExplosion(const glm::vec3& position)
@@ -329,6 +334,16 @@ void Level::spawnBulletExplosion(const glm::vec3& position)
     auto e = std::make_shared<Explosion>(mCamera.get(), mExplosion1Texture, 2.0f, 32);
     e->setPosition(position);
     appendChild(e);
+}
+
+void Level::updateListenerPosition()
+{
+    mEngine->soundManager()->setListenerPosition(mPlayer->position());
+}
+
+void Level::updateListenerOrientation()
+{
+    mEngine->soundManager()->setListenerOrientation(glm::vec3(mPlayer->direction(), 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
 void Level::update(float time)

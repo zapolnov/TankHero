@@ -29,6 +29,9 @@ public:
     void spawnBullet(const glm::vec3& position, const glm::vec2& dir);
     void spawnBulletExplosion(const glm::vec3& position);
 
+    void updateListenerPosition();
+    void updateListenerOrientation();
+
 private:
     struct Cell
     {
@@ -59,6 +62,7 @@ private:
     uint16_t mWaterMesh;
     uint16_t mBulletMesh;
     uint16_t mExplosion1Texture;
+    uint16_t mShootSound;
     Enemy::Descriptor mEnemy1;
     int mWidth;
     int mHeight;

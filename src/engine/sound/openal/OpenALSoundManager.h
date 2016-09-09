@@ -15,11 +15,17 @@ public:
     void loadSound(uint16_t sound) override;
     void unloadAllSounds() override;
 
-    void play(uint16_t sound, bool looping = false) override;
+    void setListenerPosition(const glm::vec3& position) override;
+    void setListenerOrientation(const glm::vec3& forward, const glm::vec3& up) override;
+
+    void play(uint16_t id, bool looping) override;
+    void play(const glm::vec3& position, uint16_t id, bool looping) override;
 
 private:
     ALCdevice* mDevice;
     ALCcontext* mContext;
     std::vector<ALuint> mAllSources;
     std::vector<std::unique_ptr<OpenALSound>> mSounds;
+
+    ALuint allocSource();
 };

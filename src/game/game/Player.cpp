@@ -62,6 +62,12 @@ Player::Player(Engine* engine, Level* level, PendingResources& resourceQueue)
     });
 }
 
+glm::vec2 Player::direction() const
+{
+    float a = rotation2D() + glm::radians(-90.0f);
+    return glm::vec2(cosf(a), sinf(a));
+}
+
 const glm::mat4& Player::bboxToWorldTransform()
 {
     return mBody->worldMatrix();
@@ -77,20 +83,21 @@ void Player::update(float time)
     const float ROTATE_SPEED = glm::radians(90.0f);
     const float MOVE_SPEED = Level::CELL_SIZE;
 
-    auto angle = rotation2D();
-
     if (mEngine->wasKeyPressed(KeyLeft) || mEngine->wasKeyPressed(KeyRight)) {
         float step = ROTATE_SPEED * time;
+        bool orientationChanged = false;
 
+        auto angle = rotation2D();
         float oldAngle = angle;
         auto oldBoundingBox = boundingBox();
 
         if (mEngine->wasKeyPressed(KeyLeft)) {
             setRotation2D(angle + step);
             invalidateBoundingBox();
-            if (!mLevel->collidesOnMove(oldBoundingBox, boundingBox()))
+            if (!mLevel->collidesOnMove(oldBoundingBox, boundingBox())) {
                 angle = angle + step;
-            else {
+                orientationChanged = true;
+            } else {
                 setRotation2D(angle);
                 invalidateBoundingBox();
             }
@@ -99,20 +106,23 @@ void Player::update(float time)
         if (mEngine->wasKeyPressed(KeyRight)) {
             setRotation2D(angle - step);
             invalidateBoundingBox();
-            if (!mLevel->collidesOnMove(oldBoundingBox, boundingBox()))
+            if (!mLevel->collidesOnMove(oldBoundingBox, boundingBox())) {
                 angle = angle - step;
-            else {
+                orientationChanged = true;
+            } else {
                 setRotation2D(angle);
                 invalidateBoundingBox();
             }
         }
+
+        if (orientationChanged)
+            mLevel->updateListenerOrientation();
     }
 
     if (mEngine->wasKeyPressed(KeyUp) || mEngine->wasKeyPressed(KeyDown)) {
         auto pos = position2D();
 
-        float a = angle + glm::radians(-90.0f);
-        auto dir = glm::vec2(cosf(a), sinf(a));
+        auto dir = direction();
         float length = time * MOVE_SPEED;
 
         if (mEngine->wasKeyPressed(KeyUp)) {
@@ -129,6 +139,7 @@ void Player::update(float time)
 
         setPosition2D(pos);
         invalidateBoundingBox();
+        mLevel->updateListenerPosition();
     }
 
     if (!mEngine->wasKeyPressed(KeyShoot))
@@ -136,11 +147,7 @@ void Player::update(float time)
     else if (!mDidShoot) {
         auto position = glm::vec3(worldMatrix() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
         position.z = 1.0f;
-
-        float a = angle + glm::radians(-90.0f);
-        auto dir = glm::vec2(cosf(a), sinf(a));
-
-        mLevel->spawnBullet(position, dir);
+        mLevel->spawnBullet(position, direction());
         mDidShoot = true;
     }
 }

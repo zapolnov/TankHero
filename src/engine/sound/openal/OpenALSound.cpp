@@ -57,6 +57,23 @@ void OpenALSound::play(ALuint source, bool looping)
         return;
 
     alcMakeContextCurrent(mContext);
+    alSource3f(source, AL_POSITION, 0.0f, 0.0f, 0.0f);
+    alSourcei(source, AL_SOURCE_RELATIVE, AL_TRUE);
+    alSourcef(source, AL_PITCH, 1.0f);
+    alSourcef(source, AL_GAIN, 1.0f);
+    alSourcei(source, AL_BUFFER, mBuffer);
+    alSourcei(source, AL_LOOPING, (looping ? AL_TRUE : AL_FALSE));
+    alSourcePlay(source);
+}
+
+void OpenALSound::play(ALuint source, const glm::vec3& position, bool looping)
+{
+    if (!mContext)
+        return;
+
+    alcMakeContextCurrent(mContext);
+    alSourcefv(source, AL_POSITION, &position[0]);
+    alSourcei(source, AL_SOURCE_RELATIVE, AL_FALSE);
     alSourcef(source, AL_PITCH, 1.0f);
     alSourcef(source, AL_GAIN, 1.0f);
     alSourcei(source, AL_BUFFER, mBuffer);

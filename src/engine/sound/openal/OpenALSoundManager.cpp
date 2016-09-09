@@ -53,32 +53,53 @@ void OpenALSoundManager::unloadAllSounds()
     mSounds.clear();
 }
 
+void OpenALSoundManager::setListenerPosition(const glm::vec3& position)
+{
+    alListenerfv(AL_POSITION, &position[0]);
+}
+
+void OpenALSoundManager::setListenerOrientation(const glm::vec3& forward, const glm::vec3& up)
+{
+    float v[6] = { forward.x, forward.y, forward.z, up.x, up.y, up.z };
+    alListenerfv(AL_ORIENTATION, v);
+}
+
 void OpenALSoundManager::play(uint16_t sound, bool looping)
 {
     if (!mContext || sound == 0 || sound >= mSounds.size() || !mSounds[sound])
         return;
 
     alcMakeContextCurrent(mContext);
+    ALuint source = allocSource();
+    mSounds[sound]->play(source, looping);
+}
 
-    bool found = false;
+void OpenALSoundManager::play(const glm::vec3& position, uint16_t sound, bool looping)
+{
+    if (!mContext || sound == 0 || sound >= mSounds.size() || !mSounds[sound])
+        return;
+
+    alcMakeContextCurrent(mContext);
+    ALuint source = allocSource();
+    mSounds[sound]->play(source, position, looping);
+}
+
+ALuint OpenALSoundManager::allocSource()
+{
     ALuint source = 0;
     for (auto it : mAllSources) {
         ALint state = 0;
         alGetSourcei(it, AL_SOURCE_STATE, &state);
         if (state != AL_PLAYING) {
-            found = true;
             source = it;
             alSourceStop(source);
-            break;
+            return source;
         }
     }
 
-    if (!found) {
-        alGenSources(1, &source);
-        mAllSources.push_back(source);
-    }
-
-    mSounds[sound]->play(source, looping);
+    alGenSources(1, &source);
+    mAllSources.push_back(source);
+    return source;
 }
 
 SoundManager* SoundManager::create(Engine* engine)
