@@ -63,6 +63,7 @@ private:
     uint16_t mBulletMesh;
     uint16_t mExplosion1Texture;
     uint16_t mShootSound;
+    uint16_t mExplosionSound;
     Enemy::Descriptor mEnemy1;
     int mWidth;
     int mHeight;

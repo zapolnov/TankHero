@@ -45,6 +45,7 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     resourceQueue.meshes.emplace(mBulletMesh = engine->renderer()->meshNameId("tank_bullet.mesh"));
 
     resourceQueue.sounds.emplace(mShootSound = engine->soundManager()->soundNameId("8bit_gunloop_explosion.ogg"));
+    resourceQueue.sounds.emplace(mExplosionSound = engine->soundManager()->soundNameId("explosion.ogg"));
 
     mEnemy1.visualPosition = glm::vec3(0.0f, 0.0f, 0.6f);
     resourceQueue.meshes.emplace(mEnemy1.mesh = engine->renderer()->meshNameId("enemy1.mesh"));
@@ -334,6 +335,7 @@ void Level::spawnBulletExplosion(const glm::vec3& position)
     auto e = std::make_shared<Explosion>(mCamera.get(), mExplosion1Texture, 2.0f, 32);
     e->setPosition(position);
     appendChild(e);
+    mEngine->soundManager()->play(position, mExplosionSound);
 }
 
 void Level::updateListenerPosition()
