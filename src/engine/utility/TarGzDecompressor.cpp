@@ -1,5 +1,6 @@
 #include "TarGzDecompressor.h"
 #include "stb/src/stb_image.h"
+#include <cstring>
 
 TarGzDecompressor::TarGzDecompressor(const void* data, size_t size)
     : mData(reinterpret_cast<const uint8_t*>(data))
@@ -187,7 +188,7 @@ bool TarGzDecompressor::next()
     const char* name = reinterpret_cast<const char*>(mTarPosition);
     if (name[99] != 0)
         return false;
-    const char* nameStart = strrchr(name, '/');
+    const char* nameStart = std::strrchr(name, '/');
     name = (nameStart ? nameStart + 1 : name);
 
     // Get pointer to file data

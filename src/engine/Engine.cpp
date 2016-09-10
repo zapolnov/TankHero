@@ -1,10 +1,11 @@
 #include "Engine.h"
+#include <cstring>
 
 static const std::shared_ptr<Scene> gNullScene;
 
 Engine::Engine()
 {
-    memset(mKeyPressed, 0, sizeof(mKeyPressed));
+    std::memset(mKeyPressed, 0, sizeof(mKeyPressed));
     mRenderer.reset(Renderer::create(this));
     mSoundManager.reset(SoundManager::create(this));
 }
@@ -151,5 +152,5 @@ void Engine::runFrame(int width, int height, float time)
         scene->runFrame(mRenderer.get(), time);
     mRenderer->endFrame();
 
-    memset(mKeyWasPressed, 0, sizeof(mKeyWasPressed));
+    std::memset(mKeyWasPressed, 0, sizeof(mKeyWasPressed));
 }

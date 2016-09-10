@@ -32,7 +32,7 @@ public:
     void load();
 
     int playerLives() const { return mPlayer->lives(); }
-    const glm::vec2& playerPosition() const { return mPlayer->position2D(); }
+    glm::vec2 playerPosition() const { return mPlayer->position2D(); }
 
     glm::ivec2 cellForPoint(const glm::vec2& point) const;
     std::pair<glm::ivec2, glm::ivec2> cellsForBoundingBox(const OBB2D& box) const;
