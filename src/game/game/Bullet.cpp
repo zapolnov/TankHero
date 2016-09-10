@@ -71,7 +71,7 @@ void Bullet::update(float time)
     auto pos = position2D();
 
     float length = std::min(time, 1.0f / 40.0f) * MOVE_SPEED;
-    auto target = mLevel->collideOnMove(*this, mDirection, length, emitter.get());
+    auto target = mLevel->collideOnMove(*this, mDirection, length, emitter.get(), true);
     if (target) {
         if (!target->hitWithBullet(rotation2D(), mShotByPlayer))
             mLevel->spawnBulletExplosion(position() + glm::vec3(mDirection * (length + 2.0f), 4.0f / 5.0f));

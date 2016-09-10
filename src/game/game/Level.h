@@ -2,6 +2,7 @@
 #pragma once
 #include "Player.h"
 #include "Obstacle.h"
+#include "InvisibleObstacle.h"
 #include "Enemy.h"
 #include "LoseScene.h"
 #include "WinScene.h"
@@ -37,11 +38,11 @@ public:
     std::pair<glm::ivec2, glm::ivec2> cellsForBoundingCircle(const glm::vec2& center, float radius) const;
 
     std::shared_ptr<Collidable> collideOnMove(Collidable& collidable, const glm::vec2& dir, float& length,
-        const Collidable* ignore = nullptr);
+        const Collidable* ignore = nullptr, bool isBullet = false);
     std::shared_ptr<Collidable> collideCircleOnMove(Collidable& collidable, const glm::vec2& dir, float& length,
         const Collidable* ignore = nullptr);
     std::shared_ptr<Collidable> collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox,
-        float* penetrationDepth = nullptr, const Collidable* ignore = nullptr);
+        float* penetrationDepth = nullptr, const Collidable* ignore = nullptr, bool isBullet = false);
 
     void showWinScreen();
     void showLoseScreen();
@@ -59,6 +60,7 @@ private:
     struct Cell
     {
         std::vector<std::weak_ptr<Obstacle>> obstacles;
+        std::vector<std::shared_ptr<InvisibleObstacle>> invisibleObstacles;
         glm::mat4 worldTransform{1.0f};
         float posX;
         float posY;

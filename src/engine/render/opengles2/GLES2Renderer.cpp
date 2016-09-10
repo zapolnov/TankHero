@@ -383,7 +383,8 @@ void GLES2Renderer::submitCanvas(const Canvas* canvas)
 {
     mShader2D.use();
 
-    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -435,6 +436,8 @@ void GLES2Renderer::submitCanvas(const Canvas* canvas)
     glDisableVertexAttribArray(mShader2D.positionAttribute());
     glDisableVertexAttribArray(mShader2D.texCoordAttribute());
     glDisableVertexAttribArray(mShader2D.colorAttribute());
+
+    glDepthMask(GL_TRUE);
 }
 
 Renderer* Renderer::create(Engine* engine)

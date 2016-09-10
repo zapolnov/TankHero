@@ -378,6 +378,8 @@ set(source_files
     src/game/game/GameScene.h
     src/game/game/Hud.cpp
     src/game/game/Hud.h
+    src/game/game/InvisibleObstacle.cpp
+    src/game/game/InvisibleObstacle.h
     src/game/game/Level.cpp
     src/game/game/Level.h
     src/game/game/Obstacle.cpp

@@ -2,6 +2,7 @@
 #include "Tree.h"
 #include "Explosion.h"
 #include "Bullet.h"
+#include "InvisibleObstacle.h"
 #include "src/engine/render/Canvas.h"
 #include "src/engine/render/Renderer.h"
 #include "src/engine/Engine.h"
@@ -159,10 +160,53 @@ void Level::load()
                 case 'c': // road tjunction
                 case 'g': // road end
                 case 'x': // road crossing
-                case 'C': // river corner
-                case 'G': // river end
-                case '~': // water
                     break;
+
+                case 'C': { // river corner
+                    auto obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.6f, -CELL_SIZE * 0.5f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.6f, -CELL_SIZE * 0.5f * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.6f, -CELL_SIZE * 0.5f * 0.6f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.4f, -CELL_SIZE * 0.5f * 0.2f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f       , -CELL_SIZE * 0.5f * 0.6f),
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.6f,  CELL_SIZE * 0.5f * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.6f, -CELL_SIZE * 0.5f * 0.6f),
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.2f,  CELL_SIZE * 0.5f * 0.4f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.2f, -CELL_SIZE * 0.5f * 0.2f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.2f,  CELL_SIZE * 0.5f * 0.2f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    break;
+                }
+
+                case 'G': { // river end
+                    auto obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f,        -CELL_SIZE * 0.5f * 0.6f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.3f,  CELL_SIZE * 0.5f * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    break;
+                }
+
+                case '~': { // water
+                    auto obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(CELL_SIZE, CELL_SIZE * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    break;
+                }
 
                 case '3': // road corner
                     m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -192,29 +236,125 @@ void Level::load()
                     m = glm::rotate(m, glm::radians(-270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
                     break;
 
-                case 'A': // river corner
+                case 'A': { // river corner
                     m = glm::rotate(m, glm::radians(-180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    auto obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.6f,  CELL_SIZE * 0.5f * 0.6f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.6f,  CELL_SIZE * 0.5f       ));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.4f,  CELL_SIZE * 0.5f * 0.2f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.6f,  CELL_SIZE * 0.5f * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2( CELL_SIZE * 0.5f * 0.6f, -CELL_SIZE * 0.5f * 0.6f),
+                        glm::vec2( CELL_SIZE * 0.5f       ,  CELL_SIZE * 0.5f * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2( CELL_SIZE * 0.5f * 0.2f, -CELL_SIZE * 0.5f * 0.4f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.6f,  CELL_SIZE * 0.5f * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.2f, -CELL_SIZE * 0.5f * 0.2f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.2f,  CELL_SIZE * 0.5f * 0.2f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
                     break;
+                }
 
-                case 'B': // river corner
+                case 'B': { // river corner
                     m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    auto obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.6f,  CELL_SIZE * 0.5f * 0.6f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.6f,  CELL_SIZE * 0.5f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.6f,  CELL_SIZE * 0.5f * 0.2f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.4f,  CELL_SIZE * 0.5f * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f       , -CELL_SIZE * 0.5f * 0.6f),
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.6f,  CELL_SIZE * 0.5f * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.6f, -CELL_SIZE * 0.5f * 0.4f),
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.2f,  CELL_SIZE * 0.5f * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.2f, -CELL_SIZE * 0.5f * 0.2f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.2f,  CELL_SIZE * 0.5f * 0.2f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
                     break;
+                }
 
-                case 'D': // river corner
+                case 'D': { // river corner
                     m = glm::rotate(m, glm::radians(-270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    auto obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.6f, -CELL_SIZE * 0.5f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.6f, -CELL_SIZE * 0.5f * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.4f, -CELL_SIZE * 0.5f * 0.6f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.6f, -CELL_SIZE * 0.5f * 0.2f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2( CELL_SIZE * 0.5f * 0.6f, -CELL_SIZE * 0.5f * 0.6f),
+                        glm::vec2( CELL_SIZE * 0.5f       ,  CELL_SIZE * 0.5f * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2( CELL_SIZE * 0.5f * 0.2f, -CELL_SIZE * 0.5f * 0.6f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.6f,  CELL_SIZE * 0.5f * 0.4f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
+                    obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.2f, -CELL_SIZE * 0.5f * 0.2f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.2f,  CELL_SIZE * 0.5f * 0.2f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
                     break;
+                }
 
-                case 'F': // river end
+                case 'F': { // river end
                     m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    auto obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.6f, -CELL_SIZE * 0.5f * 0.3f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.6f,  CELL_SIZE * 0.5f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
                     break;
+                }
 
-                case 'E': // river end
+                case 'E': { // river end
                     m = glm::rotate(m, glm::radians(-180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    auto obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.3f, -CELL_SIZE * 0.5f * 0.6f),
+                        glm::vec2( CELL_SIZE * 0.5f,         CELL_SIZE * 0.5f * 0.6f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
                     break;
+                }
 
-                case 'H': // river end
+                case 'H': { // river end
                     m = glm::rotate(m, glm::radians(-270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    auto obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(-CELL_SIZE * 0.5f * 0.6f, -CELL_SIZE * 0.5f),
+                        glm::vec2( CELL_SIZE * 0.5f * 0.6f,  CELL_SIZE * 0.5f * 0.3f));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
                     break;
+                }
 
                 case 'f': // road end
                     m = glm::rotate(m, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -228,9 +368,14 @@ void Level::load()
                     m = glm::rotate(m, glm::radians(-270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
                     break;
 
-                case '|': // water
+                case '|': { // water
                     m = glm::rotate(m, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    auto obstacle = std::make_shared<InvisibleObstacle>(mEngine,
+                        glm::vec2(CELL_SIZE * 0.6f, CELL_SIZE));
+                    obstacle->setPosition2D(cell.posX, cell.posY);
+                    cell.invisibleObstacles.emplace_back(obstacle);
                     break;
+                }
 
                 case 'T': {
                     static const float xOffset[] = { -1.0f, -1.0f,  1.0f, 1.0f };
@@ -296,7 +441,7 @@ std::pair<glm::ivec2, glm::ivec2> Level::cellsForBoundingCircle(const glm::vec2&
 }
 
 std::shared_ptr<Collidable> Level::collideOnMove(Collidable& collidable, const glm::vec2& dir,
-    float& length, const Collidable* ignore)
+    float& length, const Collidable* ignore, bool isBullet)
 {
     const auto& sourceBox = collidable.boundingBox();
 
@@ -308,7 +453,7 @@ std::shared_ptr<Collidable> Level::collideOnMove(Collidable& collidable, const g
     targetBox.p[3] += vec;
 
     float depth = 0.0f;
-    auto obstacle = collideOnMove(sourceBox, targetBox, &depth, ignore);
+    auto obstacle = collideOnMove(sourceBox, targetBox, &depth, ignore, isBullet);
     if (obstacle)
         length = std::max(length - depth - 0.1f, 0.0f);
 
@@ -340,6 +485,10 @@ std::shared_ptr<Collidable> Level::collideCircleOnMove(Collidable& collidable, c
                 if (obstacle && obstacle->boundingBox().intersectsWithCircle(targetCircleCenter, circleRadius))
                     return obstacle;
             }
+            for (const auto& obstacle : mCells[y][x].invisibleObstacles) {
+                if (obstacle && obstacle->boundingBox().intersectsWithCircle(targetCircleCenter, circleRadius))
+                    return obstacle;
+            }
         }
     }
 
@@ -368,7 +517,7 @@ std::shared_ptr<Collidable> Level::collideCircleOnMove(Collidable& collidable, c
 }
 
 std::shared_ptr<Collidable> Level::collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox,
-    float* penetrationDepth, const Collidable* ignore)
+    float* penetrationDepth, const Collidable* ignore, bool isBullet)
 {
     //auto range1 = cellsForBoundingBox(sourceBox);
     auto range2 = cellsForBoundingBox(targetBox);
@@ -387,6 +536,13 @@ std::shared_ptr<Collidable> Level::collideOnMove(const OBB2D& sourceBox, const O
                 auto obstacle = obstacleRef.lock();
                 if (obstacle && obstacle->boundingBox().intersectsWith(targetBox, penetrationDepth))
                     return obstacle;
+            }
+
+            if (!isBullet) {
+                for (const auto& obstacle : mCells[y][x].invisibleObstacles) {
+                    if (obstacle && obstacle->boundingBox().intersectsWith(targetBox, penetrationDepth))
+                        return obstacle;
+                }
             }
         }
     }

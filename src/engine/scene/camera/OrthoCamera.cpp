@@ -6,8 +6,8 @@ OrthoCamera::OrthoCamera()
     , mTop(1.0f)
     , mRight(1.0f)
     , mBottom(-1.0f)
-    , mNearZ(-1.0f)
-    , mFarZ(1.0f)
+    , mNearZ(-10.0f)
+    , mFarZ(10.0f)
 {
 }
 

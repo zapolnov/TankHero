@@ -3,6 +3,7 @@
 #include "src/engine/render/Renderer.h"
 #include "src/engine/Engine.h"
 #include <random>
+#include <algorithm>
 
 class Enemy::Visual : public Node
 {
@@ -108,6 +109,7 @@ void Enemy::update(float time)
         mTimeSinceLastShot = 0.0f;
     }
 
+    time = std::min(time, 1.0f / 40.0f);
     const float ROTATE_SPEED = glm::radians(180.0f);
     const float MOVE_SPEED = Level::CELL_SIZE * 1.2f;
 

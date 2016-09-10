@@ -39,6 +39,8 @@ public:
 
     virtual void setClearColor(const glm::vec4& c) = 0;
 
+    const glm::mat4& projectionMatrix() const { return mProjectionMatrix; }
+    const glm::mat4& viewMatrix() const { return mViewMatrix; }
     void setProjectionMatrix(const glm::mat4& projection);
     void setViewMatrix(const glm::mat4& view);
 
