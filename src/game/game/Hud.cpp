@@ -10,8 +10,8 @@
 static const float PAUSE_BUTTON_WIDTH = 64.0f;
 static const float PAUSE_BUTTON_HEIGHT = 64.0f;
 
-static const float HEART_WIDTH = 64.0f;
-static const float HEART_HEIGHT = 64.0f;
+static const float HEART_WIDTH = 32.0f;
+static const float HEART_HEIGHT = 32.0f;
 
 Hud::Hud(const std::shared_ptr<Level>& level, Engine* engine, PendingResources& resourceQueue)
     : mEngine(engine)
