@@ -352,8 +352,15 @@ std::shared_ptr<Collidable> Level::collideCircleOnMove(Collidable& collidable, c
             it = mEnemies.erase(it);
         else {
             ++it;
-            if (enemy.get() != ignore && enemy->boundingBox().intersectsWithCircle(targetCircleCenter, circleRadius))
-                return enemy;
+            //if (enemy.get() != ignore && enemy->boundingBox().intersectsWithCircle(targetCircleCenter, circleRadius))
+            if (enemy.get() != ignore) {
+                glm::vec2 c1 = enemy->boundingSphereWorldCenter();
+                float r1 = enemy->boundingSphereRadius();
+                float x = (c1.x - targetCircleCenter.x) * (c1.x - targetCircleCenter.x) +
+                          (c1.y - targetCircleCenter.y) * (c1.y - targetCircleCenter.y);
+                if (x <= (r1 + circleRadius) * (r1 + circleRadius))
+                    return enemy;
+            }
         }
     }
 

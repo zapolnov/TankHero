@@ -113,7 +113,23 @@ void Enemy::update(float time)
 
     auto angle = rotation2D();
     if (mRotating) {
-        float delta = mTargetAngle - angle;
+        float targetAngle = mTargetAngle;
+        while (targetAngle < glm::radians(-180.0f))
+            targetAngle += glm::radians(360.0f);
+        while (targetAngle > glm::radians(180.0f))
+            targetAngle -= glm::radians(360.0f);
+
+        while (angle < glm::radians(-180.0f))
+            angle += glm::radians(360.0f);
+        while (angle > glm::radians(180.0f))
+            angle -= glm::radians(360.0f);
+
+        float delta = targetAngle - angle;
+        if (delta < glm::radians(-180.0f))
+            delta += glm::radians(360.0f);
+        if (delta > glm::radians(180.0f))
+            delta -= glm::radians(360.0f);
+
         float step = ROTATE_SPEED * time;
         if (step < fabsf(delta))
             angle += (delta < 0.0f ? -step : step);
