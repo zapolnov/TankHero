@@ -2,6 +2,7 @@
 #include "Level.h"
 #include "src/engine/render/Renderer.h"
 #include "src/engine/Engine.h"
+#include <random>
 
 class Enemy::Visual : public Node
 {
@@ -34,6 +35,16 @@ Enemy::Enemy(Engine* engine, Level* level, const Descriptor& desc)
     , mLives(desc.initialLives)
 {
     mVisual->setPosition(desc.visualPosition);
+
+    std::uniform_int_distribution<int> distribution(0, 3);
+    switch (distribution(mLevel->randomGenerator())) {
+        case 0:  mTargetAngle = glm::radians(  0.0f); break;
+        case 1:  mTargetAngle = glm::radians( 90.0f); break;
+        case 2:  mTargetAngle = glm::radians(180.0f); break;
+        default: mTargetAngle = glm::radians(270.0f); break;
+    }
+    setRotation2D(mTargetAngle);
+
     invalidateBoundingBox();
 }
 
@@ -82,13 +93,45 @@ void Enemy::update(float time)
         return;
     }
 
-    mTimeSinceLastShot += time;
+    auto dir = direction();
 
-    if (mTimeSinceLastShot > 5.0f) {
+    mTimeSinceLastShot += time;
+    if (mTimeSinceLastShot > 2.0f) {
         auto position = glm::vec3(worldMatrix() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
         position.z = 1.0f;
-        mLevel->spawnBullet(std::static_pointer_cast<Enemy>(shared_from_this()), position, direction());
+        mLevel->spawnBullet(std::static_pointer_cast<Enemy>(shared_from_this()), position, dir);
         mTimeSinceLastShot = 0.0f;
+    }
+
+    const float ROTATE_SPEED = glm::radians(90.0f);
+    const float MOVE_SPEED = Level::CELL_SIZE * 1.2f;
+
+    auto angle = rotation2D();
+    if (mTargetAngle != angle) {
+        float delta = mTargetAngle - angle;
+        float step = ROTATE_SPEED * time;
+        if (step > fabsf(delta))
+            angle += step;
+        else
+            angle = mTargetAngle;
+        setRotation2D(angle);
+        invalidateBoundingBox();
+    } else {
+        auto pos = position2D();
+
+        float length = time * MOVE_SPEED;
+        if (!mLevel->collideOnMove(*this, dir, length, this)) {
+            pos += dir * length;
+            setPosition2D(pos);
+            invalidateBoundingBox();
+        } else {
+            auto angle = rotation2D();
+            std::uniform_int_distribution<int> distribution(0, 1);
+            switch (distribution(mLevel->randomGenerator())) {
+                case 0:  mTargetAngle = angle + glm::radians(90.0f); break;
+                default: mTargetAngle = angle - glm::radians(90.0f); break;
+            }
+        }
     }
 }
 

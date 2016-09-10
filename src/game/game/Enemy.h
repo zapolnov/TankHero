@@ -27,6 +27,7 @@ private:
 
     Level* mLevel;
     std::shared_ptr<Visual> mVisual;
+    float mTargetAngle = 0.0f;
     float mTimeSinceLastShot = 0.0f;
     float mDeathTime = 0.0f;
     int mLives;

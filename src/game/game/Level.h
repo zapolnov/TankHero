@@ -12,6 +12,7 @@
 #include <utility>
 #include <string>
 #include <memory>
+#include <random>
 
 class Level : public RootNode
 {
@@ -48,6 +49,8 @@ public:
     void updateListenerPosition();
     void updateListenerOrientation();
 
+    std::default_random_engine& randomGenerator() { return mRandomGenerator; }
+
 private:
     struct Cell
     {
@@ -60,6 +63,7 @@ private:
 
     Engine* mEngine;
     int mIndex;
+    std::default_random_engine mRandomGenerator;
     std::shared_ptr<PerspectiveCamera> mCamera;
     std::shared_ptr<Player> mPlayer;
     std::shared_ptr<LoseScene> mLoseScene;
