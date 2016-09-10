@@ -1,6 +1,7 @@
 
 #pragma once
 #include "OpenGL.h"
+#include <string>
 
 class GLES2Texture
 {

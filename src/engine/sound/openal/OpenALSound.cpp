@@ -1,6 +1,7 @@
 #include "OpenALSound.h"
 #include "src/engine/utility/StbVorbis.h"
 #include <cassert>
+#include <cstdlib>
 
 OpenALSound::OpenALSound(ALCcontext* context)
     : mContext(context)
@@ -32,13 +33,13 @@ void OpenALSound::load(const std::string& file)
     assert(nSamples > 0);
     if (nSamples <= 0) {
         if (buffer)
-            free(buffer);
+            std::free(buffer);
         return;
     }
 
     assert(channels == 1 || channels == 2);
     if (channels != 1 && channels != 2) {
-        free(buffer);
+        std::free(buffer);
         return;
     }
 
@@ -48,7 +49,7 @@ void OpenALSound::load(const std::string& file)
     alcMakeContextCurrent(mContext);
     alBufferData(mBuffer, format, buffer, ALsizei(bufferSize), sampleRate);
 
-    free(buffer);
+    std::free(buffer);
 }
 
 void OpenALSound::play(ALuint source, bool looping)

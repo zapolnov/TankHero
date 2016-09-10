@@ -50,8 +50,22 @@ set(engine_sources
     src/engine/Game.h
     )
 
-# FIXME
-if(TRUE)
+if(EMSCRIPTEN)
+    add_definitions(-DPLATFORM_EMSCRIPTEN)
+
+    set(template "${CMAKE_CURRENT_SOURCE_DIR}/src/engine/platform/emscripten/index.html")
+    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --shell-file \"${template}\" --separate-asm")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file \"${CMAKE_CURRENT_SOURCE_DIR}/data/bin@\"")
+    set(flags "-s USE_SDL=2 -s NO_EXIT_RUNTIME=1 -s ALIASING_FUNCTION_POINTERS=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1")
+    set(flags "${flags} -s TOTAL_MEMORY=268435456")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${flags}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flags} -std=c++11")
+
+    list(APPEND platform_sources
+        src/engine/platform/emscripten/main.cpp
+        )
+else()
     add_definitions(-DPLATFORM_QT)
 
     find_package(Qt5Widgets REQUIRED)
@@ -227,7 +241,7 @@ set(asset_src_files)
 set(asset_bin_files)
 
 if(NOT CMAKE_CROSSCOMPILING)
-#    add_subdirectory(tools)
+    add_subdirectory(tools)
 endif()
 
 add_mesh(
@@ -444,4 +458,8 @@ if(WIN32)
     add_custom_command(TARGET Game POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${openal_dll}" "$<TARGET_FILE_DIR:Game>/openal32.dll"
         COMMENT "Copying openal32.dll")
+endif()
+
+if(EMSCRIPTEN)
+    set_target_properties(Game PROPERTIES OUTPUT_NAME "index")
 endif()

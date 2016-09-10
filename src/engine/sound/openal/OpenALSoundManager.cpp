@@ -55,6 +55,9 @@ void OpenALSoundManager::unloadAllSounds()
 
 void OpenALSoundManager::setListenerPosition(const glm::vec3& position)
 {
+  #ifdef PLATFORM_EMSCRIPTEN
+    mListenerPosition = position;
+  #endif
     alListenerfv(AL_POSITION, &position[0]);
 }
 
@@ -78,6 +81,12 @@ void OpenALSoundManager::play(const glm::vec3& position, uint16_t sound, bool lo
 {
     if (!mContext || sound == 0 || sound >= mSounds.size() || !mSounds[sound])
         return;
+
+  #ifdef PLATFORM_EMSCRIPTEN
+    auto distance = glm::length(position - mListenerPosition);
+    if (distance > 20.0f)
+        return;
+  #endif
 
     alcMakeContextCurrent(mContext);
     ALuint source = allocSource();

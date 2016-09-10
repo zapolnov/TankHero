@@ -1,7 +1,9 @@
 
 #pragma once
 
-#ifdef PLATFORM_QT
+#ifdef PLATFORM_EMSCRIPTEN
+ #include <GLES2/gl2.h>
+#elif defined(PLATFORM_QT)
  #include <QOpenGLFunctions>
  extern QOpenGLFunctions* gl;
  #define glActiveTexture (gl->glActiveTexture)

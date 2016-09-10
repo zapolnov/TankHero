@@ -52,7 +52,7 @@ void GLES2ShaderProgram::compileShader(GLuint shader, const std::string& source)
 
     glCompileShader(shader);
 
-  #ifndef NDEBUG
+  #if !defined(NDEBUG) || defined(PLATFORM_EMSCRIPTEN)
     GLint status = GL_FALSE;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
     if (status != GL_TRUE) {
@@ -101,7 +101,7 @@ void GLES2ShaderProgram::linkProgram()
 {
     glLinkProgram(mProgram);
 
-  #ifndef NDEBUG
+  #if !defined(NDEBUG) || defined(PLATFORM_EMSCRIPTEN)
     GLint status = GL_FALSE;
     glGetProgramiv(mProgram, GL_LINK_STATUS, &status);
     if (status != GL_TRUE) {

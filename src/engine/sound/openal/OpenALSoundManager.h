@@ -26,6 +26,9 @@ private:
     ALCcontext* mContext;
     std::vector<ALuint> mAllSources;
     std::vector<std::unique_ptr<OpenALSound>> mSounds;
+  #ifdef PLATFORM_EMSCRIPTEN
+    glm::vec3 mListenerPosition;
+  #endif
 
     ALuint allocSource();
 };
