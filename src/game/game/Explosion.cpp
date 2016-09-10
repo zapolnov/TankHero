@@ -28,7 +28,7 @@ Explosion::Explosion(Camera* camera, uint16_t texture, float size, size_t numFra
 
 void Explosion::update(float time)
 {
-    mTime += time * 24.0f;
+    mTime += time * 48.0f;
     if (mTime >= float(mNumFrames)) {
         mTime = float(mNumFrames);
         removeFromParent();
