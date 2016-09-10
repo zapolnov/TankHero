@@ -1,0 +1,17 @@
+
+You will need the latest version of OS X 10.11 "El Capitan" to run the game.
+
+Uncompress the TankHero-OSX.zip archive and run the Tank Hero application (the one with a nice tank icon).
+
+=================
+ !!!IMPORTANT!!!
+=================
+
+I don't have a code signing certificate, so OS X will not, by default, allow you to run my game
+due to security reasons.
+
+The game itself is virus-free, you can check it using your antivirus software or online, for example on
+https://virustotal.com/
+
+To run the game, please follow instructions from this page:
+http://osxdaily.com/2012/07/27/app-cant-be-opened-because-it-is-from-an-unidentified-developer/

@@ -1,0 +1,15 @@
+
+I have only tested WebGL version on Firefox, Google Chrome and Microsoft Edge.
+Please ensure that you are running the latest version of one of those browsers.
+
+MICROSOFT INTERNET EXPLORER IS NOT SUPPORTED!
+And Microsoft Edge has some glitches, so FireFox and Chrome are preferred.
+
+If you get message "Unable to initialize WebGL" or "Exception thrown, see console", then, probably, 
+your system or browser has some limitations. In this case try running Windows or OS X binaries.
+
+If you use FireFox, then just uncompress TankHero-OSX.zip archive and open the index.html file
+with FireFox.
+
+Google Chrome and Microsoft Edge, on the other hand, do not work with locally downloaded files due to security reasons.
+You will have to play online, please navigate your browser to: https://zapolnov.github.io/TankHero/Web/play.html

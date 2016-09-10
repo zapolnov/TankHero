@@ -1,0 +1,18 @@
+
+Please ensure that you have latest drivers for you video adapter installed.
+
+Unpack the TankHero-Windows.zip archive and run the TankHero.exe file inside (the file with a nice tank icon).
+
+=================
+ !!!IMPORTANT!!!
+=================
+
+I don't have a code signing certificate, so Windows 8 and 10 will not allow you to run the application.
+
+The game itself is virus-free, you can check it using your antivirus software or online, for example on
+https://virustotal.com/
+
+You will have to click the "More info" label and then button "Run Anyway" will appear.
+
+More information and screenshots are available on this page:
+http://www.ghacks.net/2012/02/09/how-to-bypass-smartscreen-filter-windows-protected-your-pc-in-windows-8/
