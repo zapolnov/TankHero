@@ -16,7 +16,7 @@
 #include <string>
 
 const float Level::CELL_SIZE = 5.0f;
-const int Level::TOTAL_COUNT = 2;
+const int Level::TOTAL_COUNT = 3;
 
 Level::Level(Engine* engine, PendingResources& resourceQueue, int index)
     : mEngine(engine)
