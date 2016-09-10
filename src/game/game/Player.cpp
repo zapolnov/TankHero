@@ -58,6 +58,8 @@ Player::Player(Engine* engine, Level* level, PendingResources& resourceQueue)
     , mLevel(level)
     , mLives(INITIAL_LIVES)
 {
+    resourceQueue.sounds.emplace(mMedKitSound = engine->soundManager()->soundNameId("Rise01.ogg"));
+
     mBody = std::make_shared<Body>(engine, resourceQueue);
     mGun = std::make_shared<Gun>(engine, resourceQueue);
     resourceQueue.custom.emplace_back([this]() {
@@ -83,6 +85,12 @@ bool Player::hitWithBullet(float, bool shotByPlayer)
         }
     }
     return false;
+}
+
+void Player::collectMedKit()
+{
+    mLives++;
+    mEngine->soundManager()->play(mMedKitSound);
 }
 
 const glm::mat4& Player::bboxToWorldTransform()
@@ -123,7 +131,7 @@ void Player::update(float time)
         if (mEngine->wasKeyPressed(KeyLeft)) {
             setRotation2D(angle + step);
             invalidateBoundingBox();
-            if (!mLevel->collideOnMove(oldBoundingBox, boundingBox(), nullptr, this)) {
+            if (!mLevel->collideOnMove(*this, oldBoundingBox, boundingBox(), nullptr, this)) {
                 angle = angle + step;
                 orientationChanged = true;
             } else {
@@ -135,7 +143,7 @@ void Player::update(float time)
         if (mEngine->wasKeyPressed(KeyRight)) {
             setRotation2D(angle - step);
             invalidateBoundingBox();
-            if (!mLevel->collideOnMove(oldBoundingBox, boundingBox(), nullptr, this)) {
+            if (!mLevel->collideOnMove(*this, oldBoundingBox, boundingBox(), nullptr, this)) {
                 angle = angle - step;
                 orientationChanged = true;
             } else {

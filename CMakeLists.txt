@@ -261,6 +261,12 @@ add_mesh(
     )
 
 add_mesh(
+    INPUT "data/src/crate_model/crate_medkit.xml"
+    OUTPUT "data/bin/crate_medkit.mesh"
+    DEPENDS "data/src/crate_model/crate_model.obj"
+    )
+
+add_mesh(
     INPUT "data/src/landscape_asset_v2a/obj/grass.xml"
     OUTPUT "data/bin/grass.mesh"
     DEPENDS "data/src/landscape_asset_v2a/obj/grass.obj" "data/src/landscape_asset_v2a/obj/grass.mtl"
@@ -386,6 +392,8 @@ set(source_files
     src/game/game/Obstacle.h
     src/game/game/LoseScene.cpp
     src/game/game/LoseScene.h
+    src/game/game/MedKit.cpp
+    src/game/game/MedKit.h
     src/game/game/PauseScene.cpp
     src/game/game/PauseScene.h
     src/game/game/Player.cpp

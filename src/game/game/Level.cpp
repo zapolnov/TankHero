@@ -35,6 +35,7 @@ Level::Level(Engine* engine, PendingResources& resourceQueue, int index)
 
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("basetexture.jpg"));
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("texture_panzerwagen.jpg"));
+    resourceQueue.textures.emplace(engine->renderer()->textureNameId("crate_medkit.jpg"));
     resourceQueue.textures.emplace(mExplosion1Texture = engine->renderer()->textureNameId("explosion1.png"));
 
     resourceQueue.meshes.emplace(mTreeMesh = engine->renderer()->meshNameId("tree.mesh"));
@@ -50,6 +51,7 @@ Level::Level(Engine* engine, PendingResources& resourceQueue, int index)
     resourceQueue.meshes.emplace(mRiverStraightMesh = engine->renderer()->meshNameId("river-straight-low.mesh"));
     resourceQueue.meshes.emplace(mWaterMesh = engine->renderer()->meshNameId("water.mesh"));
     resourceQueue.meshes.emplace(mBulletMesh = engine->renderer()->meshNameId("tank_bullet.mesh"));
+    resourceQueue.meshes.emplace(mMedKitMesh = engine->renderer()->meshNameId("crate_medkit.mesh"));
 
     resourceQueue.sounds.emplace(mShootSound = engine->soundManager()->soundNameId("8bit_gunloop_explosion.ogg"));
     resourceQueue.sounds.emplace(mExplosionSound = engine->soundManager()->soundNameId("explosion.ogg"));
@@ -145,6 +147,15 @@ void Level::load()
                     updateListenerPosition();
                     updateListenerOrientation();
                     break;
+
+                case '+': {
+                    cell.levelMarker = ' ';
+                    auto medkit = std::make_shared<MedKit>(mEngine, mMedKitMesh);
+                    medkit->setPosition(cell.posX, cell.posY, 1.2f);
+                    cell.medkits.emplace_back(medkit);
+                    appendChild(medkit);
+                    break;
+                }
 
                 case '!': {
                     cell.levelMarker = ' ';
@@ -453,7 +464,7 @@ std::shared_ptr<Collidable> Level::collideOnMove(Collidable& collidable, const g
     targetBox.p[3] += vec;
 
     float depth = 0.0f;
-    auto obstacle = collideOnMove(sourceBox, targetBox, &depth, ignore, isBullet);
+    auto obstacle = collideOnMove(collidable, sourceBox, targetBox, &depth, ignore, isBullet);
     if (obstacle)
         length = std::max(length - depth - 0.1f, 0.0f);
 
@@ -484,6 +495,17 @@ std::shared_ptr<Collidable> Level::collideCircleOnMove(Collidable& collidable, c
                 auto obstacle = obstacleRef.lock();
                 if (obstacle && obstacle->boundingBox().intersectsWithCircle(targetCircleCenter, circleRadius))
                     return obstacle;
+            }
+            for (const auto& medkitRef : mCells[y][x].medkits) {
+                auto medkit = medkitRef.lock();
+                if (medkit) {
+                    glm::vec2 c1 = medkit->boundingSphereWorldCenter();
+                    float r1 = medkit->boundingSphereRadius();
+                    float x = (c1.x - targetCircleCenter.x) * (c1.x - targetCircleCenter.x) +
+                              (c1.y - targetCircleCenter.y) * (c1.y - targetCircleCenter.y);
+                    if (x <= (r1 + circleRadius) * (r1 + circleRadius))
+                        return medkit;
+                }
             }
             for (const auto& obstacle : mCells[y][x].invisibleObstacles) {
                 if (obstacle && obstacle->boundingBox().intersectsWithCircle(targetCircleCenter, circleRadius))
@@ -516,7 +538,7 @@ std::shared_ptr<Collidable> Level::collideCircleOnMove(Collidable& collidable, c
     return nullptr;
 }
 
-std::shared_ptr<Collidable> Level::collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox,
+std::shared_ptr<Collidable> Level::collideOnMove(Collidable& collidable, const OBB2D& sourceBox, const OBB2D& targetBox,
     float* penetrationDepth, const Collidable* ignore, bool isBullet)
 {
     //auto range1 = cellsForBoundingBox(sourceBox);
@@ -536,6 +558,19 @@ std::shared_ptr<Collidable> Level::collideOnMove(const OBB2D& sourceBox, const O
                 auto obstacle = obstacleRef.lock();
                 if (obstacle && obstacle->boundingBox().intersectsWith(targetBox, penetrationDepth))
                     return obstacle;
+            }
+
+            for (const auto& medkitRef : mCells[y][x].medkits) {
+                auto medkit = medkitRef.lock();
+                if (medkit && medkit->boundingBox().intersectsWith(targetBox, penetrationDepth)) {
+                    if (!collidable.isPlayer())
+                        return medkit;
+                    auto& player = static_cast<Player&>(collidable);
+                    if (player.isDead())
+                        return medkit;
+                    player.collectMedKit();
+                    medkit->removeFromParent();
+                }
             }
 
             if (!isBullet) {

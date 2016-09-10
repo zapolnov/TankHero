@@ -1,0 +1,8 @@
+<Mesh>
+    <File>crate_model.obj</File>
+    <IncludeColors>false</IncludeColors>
+    <Material name="DefaultMaterial">
+        <DiffuseMap>crate_medkit.jpg</DiffuseMap>
+        <AmbientColor r="0.4" g="0.4" b="0.4" />
+    </Material>
+</Mesh>

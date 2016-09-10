@@ -4,6 +4,7 @@
 #include "Obstacle.h"
 #include "InvisibleObstacle.h"
 #include "Enemy.h"
+#include "MedKit.h"
 #include "LoseScene.h"
 #include "WinScene.h"
 #include "src/engine/scene/RootNode.h"
@@ -41,7 +42,7 @@ public:
         const Collidable* ignore = nullptr, bool isBullet = false);
     std::shared_ptr<Collidable> collideCircleOnMove(Collidable& collidable, const glm::vec2& dir, float& length,
         const Collidable* ignore = nullptr);
-    std::shared_ptr<Collidable> collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox,
+    std::shared_ptr<Collidable> collideOnMove(Collidable& collidable, const OBB2D& sourceBox, const OBB2D& targetBox,
         float* penetrationDepth = nullptr, const Collidable* ignore = nullptr, bool isBullet = false);
 
     void showWinScreen();
@@ -61,6 +62,7 @@ private:
     {
         std::vector<std::weak_ptr<Obstacle>> obstacles;
         std::vector<std::shared_ptr<InvisibleObstacle>> invisibleObstacles;
+        std::vector<std::weak_ptr<MedKit>> medkits;
         glm::mat4 worldTransform{1.0f};
         float posX;
         float posY;
@@ -94,6 +96,7 @@ private:
     uint16_t mExplosion1Texture;
     uint16_t mShootSound;
     uint16_t mExplosionSound;
+    uint16_t mMedKitMesh;
     Enemy::Descriptor mEnemy1;
     int mWidth;
     int mHeight;

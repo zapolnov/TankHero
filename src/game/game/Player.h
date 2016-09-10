@@ -19,6 +19,8 @@ public:
 
     bool hitWithBullet(float bulletAngle, bool shotByPlayer) override;
 
+    void collectMedKit();
+
     bool isDead() const { return mLives <= 0; }
     bool isPlayer() const override { return true; }
 
@@ -27,6 +29,7 @@ private:
     class Gun;
 
     Level* mLevel;
+    uint16_t mMedKitSound;
     std::shared_ptr<Body> mBody;
     std::shared_ptr<Gun> mGun;
     float mTimeSinceLastShot = 0.0f;
