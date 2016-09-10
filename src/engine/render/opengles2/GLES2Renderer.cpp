@@ -249,6 +249,11 @@ void GLES2Renderer::flushFrame()
     mDrawCalls.clear();
 }
 
+void GLES2Renderer::clearDepthBuffer()
+{
+    glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
+
 void GLES2Renderer::loadTexture(uint16_t texture)
 {
     if (texture >= mTextures.size())

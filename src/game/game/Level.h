@@ -55,6 +55,9 @@ public:
     void updateListenerPosition();
     void updateListenerOrientation();
 
+    int enemyCount() const { return mEnemyCount; }
+    void decreaseEnemyCount() { --mEnemyCount; }
+
     std::default_random_engine& randomGenerator() { return mRandomGenerator; }
 
 private:
@@ -98,6 +101,7 @@ private:
     uint16_t mExplosionSound;
     uint16_t mMedKitMesh;
     Enemy::Descriptor mEnemy1;
+    int mEnemyCount = 0;
     int mWidth;
     int mHeight;
 

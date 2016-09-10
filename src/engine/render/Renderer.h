@@ -20,6 +20,7 @@ public:
     virtual void beginFrame(int width, int height) = 0;
     virtual void endFrame() = 0;
     virtual void flushFrame() = 0;
+    virtual void clearDepthBuffer() = 0;
 
     uint16_t textureNameId(const std::string& name);
     const std::string& textureName(uint16_t id) const;

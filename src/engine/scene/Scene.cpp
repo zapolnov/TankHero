@@ -123,6 +123,7 @@ void Scene::runFrame(Renderer* renderer, float frameTime)
     auto hudNode = mHudNode;
     if (hudNode) {
         renderer->flushFrame();
+        renderer->clearDepthBuffer();
 
         if (mHudSizeChanged) {
             hudNode->resize(mWidth, mHeight);

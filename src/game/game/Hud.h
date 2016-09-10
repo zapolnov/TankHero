@@ -21,6 +21,8 @@ private:
     std::shared_ptr<OrthoCamera> mCamera;
     std::shared_ptr<Button> mPauseButton;
     std::shared_ptr<PauseScene> mPauseScene;
+    uint16_t mEnemiesLeft;
+    uint16_t mDigits[10];
     uint16_t mHeart;
     uint16_t mPauseNormalImage;
     uint16_t mPausePressedImage;

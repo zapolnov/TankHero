@@ -64,6 +64,7 @@ bool Enemy::hitWithBullet(float, bool shotByPlayer)
         --mLives;
         if (mLives <= 0) {
             mLevel->spawnEnemyExplosion(position());
+            mLevel->decreaseEnemyCount();
             mDeathTime = 0.1f;
             return true;
         }

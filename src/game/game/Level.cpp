@@ -163,6 +163,7 @@ void Level::load()
                     enemy->setPosition2D(cell.posX, cell.posY);
                     appendChild(enemy);
                     mEnemies.emplace_back(enemy);
+                    ++mEnemyCount;
                     break;
                 }
 
