@@ -13,6 +13,8 @@ public:
 
     Player(Engine* engine, Level* level, PendingResources& resourceQueue);
 
+    int lives() const { return mLives; }
+
     glm::vec2 direction() const;
 
     bool hitWithBullet(float bulletAngle) override;

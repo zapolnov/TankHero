@@ -12,10 +12,11 @@ GameScene::GameScene(Engine* engine, PendingResources& resourceQueue, int levelN
     uint16_t music = engine->soundManager()->soundNameId("S31-Unexpected Trouble.ogg");
     resourceQueue.sounds.emplace(music);
 
-    auto hud = std::make_shared<Hud>(engine, resourceQueue, levelNo);
+    auto level = std::make_shared<Level>(engine, resourceQueue, levelNo);
+
+    auto hud = std::make_shared<Hud>(level, engine, resourceQueue);
     setHudNode(hud);
 
-    auto level = std::make_shared<Level>(engine, resourceQueue, levelNo);
     resourceQueue.custom.emplace_back([this, level, music] {
         level->load();
         setRootNode(level);

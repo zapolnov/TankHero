@@ -21,10 +21,14 @@ public:
 
     Level(Engine* engine, PendingResources& resourceQueue, int index);
 
+    int index() const { return mIndex; }
+
     int width() const { return mWidth; }
     int height() const { return mHeight; }
 
     void load();
+
+    int playerLives() const { return mPlayer->lives(); }
 
     glm::ivec2 cellForPoint(const glm::vec2& point) const;
     std::pair<glm::ivec2, glm::ivec2> cellsForBoundingBox(const OBB2D& box) const;

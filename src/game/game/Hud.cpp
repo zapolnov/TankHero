@@ -10,12 +10,16 @@
 static const float PAUSE_BUTTON_WIDTH = 64.0f;
 static const float PAUSE_BUTTON_HEIGHT = 64.0f;
 
-Hud::Hud(Engine* engine, PendingResources& resourceQueue, int level)
+static const float HEART_WIDTH = 64.0f;
+static const float HEART_HEIGHT = 64.0f;
+
+Hud::Hud(const std::shared_ptr<Level>& level, Engine* engine, PendingResources& resourceQueue)
     : mEngine(engine)
     , mLevel(level)
 {
     resourceQueue.sounds.emplace(mClickSound = engine->soundManager()->soundNameId("button_click.ogg"));
 
+    resourceQueue.textures.emplace(mHeart = engine->renderer()->textureNameId("heart.png"));
     resourceQueue.textures.emplace(mPauseNormalImage = engine->renderer()->textureNameId("pause_normal.png"));
     resourceQueue.textures.emplace(mPausePressedImage = engine->renderer()->textureNameId("pause_pressed.png"));
 
@@ -27,7 +31,7 @@ Hud::Hud(Engine* engine, PendingResources& resourceQueue, int level)
     mPauseButton = std::make_shared<Button>(mEngine, PAUSE_BUTTON_WIDTH, PAUSE_BUTTON_HEIGHT,
         mClickSound, mPauseNormalImage, mPausePressedImage);
 
-    mPauseScene = std::make_shared<PauseScene>(mEngine, resourceQueue, level);
+    mPauseScene = std::make_shared<PauseScene>(mEngine, resourceQueue, level->index());
 
     resourceQueue.custom.emplace_back([this] {
         mPauseButton->onClick = [this]() {
@@ -48,5 +52,32 @@ void Hud::update(float time)
         mButtonX = buttonX;
         mButtonY = buttonY;
         mPauseButton->setPosition2D(buttonX, buttonY);
+    }
+}
+
+void Hud::draw(Renderer* renderer)
+{
+    RootNode::draw(renderer);
+
+    auto level = mLevel.lock();
+    if (level) {
+        float x = mCamera->left() + 10.0f + HEART_WIDTH * 0.5f;
+        float y = mCamera->top() - HEART_HEIGHT + 10.0f;
+
+        auto canvas = renderer->begin2D();
+        canvas->pushMatrix(glm::mat4(1.0f));
+        canvas->pushColor(glm::vec4(1.0f));
+
+        for (int i = 0; i < level->playerLives(); i++) {
+            canvas->drawSolidRect(
+                glm::vec2(x - HEART_WIDTH * 0.5f, y + HEART_HEIGHT * 0.5f),
+                glm::vec2(x + HEART_WIDTH * 0.5f, y - HEART_HEIGHT * 0.5f),
+                mHeart);
+             x += HEART_WIDTH + 10.0f;
+        }
+
+        canvas->popColor();
+        canvas->popMatrix();
+        renderer->end2D();
     }
 }
