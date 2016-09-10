@@ -450,7 +450,7 @@ if(WIN32)
     source_group("Source Files" FILES data/icon/win32.rc)
 endif()
 
-add_executable(Game WIN32 ${source_files} ${asset_src_files} ${asset_bin_files})
+add_executable(Game WIN32 MACOSX_BUNDLE ${source_files} ${asset_src_files} ${asset_bin_files})
 target_link_libraries(Game engine)
 
 if(WIN32)
@@ -458,6 +458,11 @@ if(WIN32)
     add_custom_command(TARGET Game POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${openal_dll}" "$<TARGET_FILE_DIR:Game>/openal32.dll"
         COMMENT "Copying openal32.dll")
+endif()
+
+if(APPLE)
+    find_library(ApplicationServices ApplicationServices)
+    target_link_libraries(Game ${ApplicationServices})
 endif()
 
 if(EMSCRIPTEN)

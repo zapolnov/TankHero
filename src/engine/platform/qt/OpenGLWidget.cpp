@@ -9,7 +9,9 @@ OpenGLWidget::OpenGLWidget(const std::function<void(Engine*)>& gameInit, QWidget
     : QOpenGLWidget(parent)
     , mGameInit(gameInit)
 {
-    setUpdateBehavior(NoPartialUpdate);
+  #if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
+    setUpdateBehavior(QOpenGLWidget::NoPartialUpdate);
+  #endif
 
     mTimer = new QTimer(this);
     mTimer->setSingleShot(false);

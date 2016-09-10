@@ -9,6 +9,10 @@
  #include <shlwapi.h>
 #endif
 
+#ifdef __APPLE__
+ #include <ApplicationServices/ApplicationServices.h>
+#endif
+
 int main(int argc, char** argv)
 {
     QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
@@ -30,6 +34,21 @@ int main(int argc, char** argv)
     PathRemoveFileSpecW(buf);
     PathAppendW(buf, L"data");
     SetCurrentDirectoryW(buf);
+  #endif
+
+  #if defined(__APPLE__) && defined(NDEBUG)
+    CFBundleRef bundle = CFBundleGetMainBundle();
+    if (bundle) {
+        CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(bundle);
+        CFStringRef last = CFURLCopyLastPathComponent(resourcesURL);
+        if (CFStringCompare(CFSTR("Resources"), last, 0) == kCFCompareEqualTo) {
+            char resourcesPath[MAXPATHLEN];
+            if (CFURLGetFileSystemRepresentation(resourcesURL, true, (UInt8*)resourcesPath, MAXPATHLEN))
+                chdir(resourcesPath);
+        }
+        CFRelease(last);
+        CFRelease(resourcesURL);
+    }
   #endif
 
     OpenGLWidget mainWindow(&gameInit);
