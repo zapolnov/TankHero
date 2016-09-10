@@ -9,14 +9,17 @@
 #include <algorithm>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sstream>
 #include <cstdio>
 #include <vector>
 #include <string>
 
 const float Level::CELL_SIZE = 5.0f;
+const int Level::TOTAL_COUNT = 2;
 
-Level::Level(Engine* engine, PendingResources& resourceQueue)
+Level::Level(Engine* engine, PendingResources& resourceQueue, int index)
     : mEngine(engine)
+    , mIndex(index)
 {
     mCamera = std::make_shared<PerspectiveCamera>();
     mCamera->setFov(glm::radians(45.0f));
@@ -26,7 +29,8 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     setCamera(mCamera);
 
     mPlayer = std::make_shared<Player>(mEngine, this, resourceQueue);
-    mLoseScene = std::make_shared<LoseScene>(mEngine, resourceQueue);
+    mLoseScene = std::make_shared<LoseScene>(mEngine, resourceQueue, index);
+    mWinScene = std::make_shared<WinScene>(mEngine, resourceQueue, index);
 
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("basetexture.jpg"));
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("texture_panzerwagen.jpg"));
@@ -54,8 +58,12 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     resourceQueue.meshes.emplace(mEnemy1.mesh = engine->renderer()->meshNameId("enemy1.mesh"));
 }
 
-void Level::load(const std::string& file)
+void Level::load()
 {
+    std::stringstream ss;
+    ss << "level" << mIndex << ".dat";
+    auto file = ss.str();
+
     struct stat st;
     if (stat(file.c_str(), &st) < 0)
         return;
@@ -341,6 +349,12 @@ std::shared_ptr<Collidable> Level::collideOnMove(const OBB2D& sourceBox, const O
     return nullptr;
 }
 
+void Level::showWinScreen()
+{
+    mEngine->renderer()->setClearColor(LoseScene::BACKGROUND_COLOR);
+    mEngine->setScene(mWinScene);
+}
+
 void Level::showLoseScreen()
 {
     mEngine->renderer()->setClearColor(LoseScene::BACKGROUND_COLOR);
@@ -391,6 +405,20 @@ void Level::update(float time)
     auto length = glm::length(glm::vec2(mCamera->position()) - glm::vec2(mCamera->target()));
     mCamera->setTarget(pos);
     mCamera->setPosition(glm::vec3(pos.x + length * sinf(-angle), pos.y + length * cosf(-angle), mCamera->position().z));
+
+    bool haveEnemies = false;
+    for (auto it = mEnemies.begin(); it != mEnemies.end(); ) {
+        auto enemy = it->lock();
+        if (!enemy)
+            it = mEnemies.erase(it);
+        else {
+            haveEnemies = true;
+            break;
+        }
+    }
+
+    if (!haveEnemies)
+        showWinScreen();
 }
 
 void Level::beforeDraw(Renderer* renderer)

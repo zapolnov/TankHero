@@ -390,6 +390,8 @@ set(source_files
     src/game/game/Player.h
     src/game/game/Tree.cpp
     src/game/game/Tree.h
+    src/game/game/WinScene.cpp
+    src/game/game/WinScene.h
     src/game/menu/GameLoadingScene.cpp
     src/game/menu/GameLoadingScene.h
     src/game/menu/HelpScene.cpp

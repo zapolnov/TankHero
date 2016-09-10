@@ -1,6 +1,7 @@
 #include "PauseScene.h"
 #include "GameScene.h"
 #include "src/game/menu/MenuLoadingScene.h"
+#include "src/game/menu/GameLoadingScene.h"
 #include "src/engine/scene/camera/OrthoCamera.h"
 #include "src/engine/scene/Button.h"
 #include "src/engine/scene/RootNode.h"
@@ -47,8 +48,9 @@ namespace
     };
 }
 
-PauseScene::PauseScene(Engine* engine, PendingResources& resourceQueue)
+PauseScene::PauseScene(Engine* engine, PendingResources& resourceQueue, int level)
     : mEngine(engine)
+    , mLevel(level)
 {
     mEngine->renderer()->setClearColor(PauseScene::BACKGROUND_COLOR);
 
@@ -57,6 +59,8 @@ PauseScene::PauseScene(Engine* engine, PendingResources& resourceQueue)
     resourceQueue.textures.emplace(mTitleImage = engine->renderer()->textureNameId("pause_title.png"));
     resourceQueue.textures.emplace(mPlayNormalImage = engine->renderer()->textureNameId("continue_normal.png"));
     resourceQueue.textures.emplace(mPlayPressedImage = engine->renderer()->textureNameId("continue_pressed.png"));
+    resourceQueue.textures.emplace(mRestartNormalImage = engine->renderer()->textureNameId("restart_normal.png"));
+    resourceQueue.textures.emplace(mRestartPressedImage = engine->renderer()->textureNameId("restart_pressed.png"));
     resourceQueue.textures.emplace(mHelpNormalImage = engine->renderer()->textureNameId("help_normal.png"));
     resourceQueue.textures.emplace(mHelpPressedImage = engine->renderer()->textureNameId("help_pressed.png"));
     resourceQueue.textures.emplace(mExitNormalImage = engine->renderer()->textureNameId("exit_normal.png"));
@@ -79,7 +83,7 @@ PauseScene::PauseScene(Engine* engine, PendingResources& resourceQueue)
             mClickSound, mPlayNormalImage, mPlayPressedImage);
         continueButton->setPosition2D(0.0f, BUTTON_HEIGHT * 1.5f + 5.0f);
         continueButton->onClick = [this]() {
-                if (mExitTimeout < 0.0f) {
+                if (mExitTimeout < 0.0f && mRestartTimeout < 0.0f) {
                     mEngine->renderer()->setClearColor(GameScene::BACKGROUND_COLOR);
                     mEngine->popScene();
                 }
@@ -90,16 +94,25 @@ PauseScene::PauseScene(Engine* engine, PendingResources& resourceQueue)
             mClickSound, mHelpNormalImage, mHelpPressedImage);
         helpButton->setPosition2D(0.0f, 0.0f);
         helpButton->onClick = [this]() {
-                if (mExitTimeout < 0.0f)
+                if (mExitTimeout < 0.0f && mRestartTimeout < 0.0f)
                     mEngine->pushScene(mHelpScene);
             };
         rootNode->appendChild(helpButton);
 
+        auto restartButton = std::make_shared<Button>(mEngine, BUTTON_WIDTH, BUTTON_HEIGHT,
+            mClickSound, mRestartNormalImage, mRestartPressedImage);
+        restartButton->setPosition2D(0.0f, -BUTTON_HEIGHT * 1.5f - 5.0f);
+        restartButton->onClick = [this]() {
+                if (mExitTimeout < 0.0f && mRestartTimeout < 0.0f)
+                    mRestartTimeout = 0.2f;
+            };
+        rootNode->appendChild(restartButton);
+
         auto exitButton = std::make_shared<Button>(mEngine, BUTTON_WIDTH, BUTTON_HEIGHT,
             mClickSound, mExitNormalImage, mExitPressedImage);
-        exitButton->setPosition2D(0.0f, -BUTTON_HEIGHT * 1.5f - 5.0f);
+        exitButton->setPosition2D(0.0f, -BUTTON_HEIGHT * 3.0f - 10.0f);
         exitButton->onClick = [this]() {
-                if (mExitTimeout < 0.0f)
+                if (mExitTimeout < 0.0f && mRestartTimeout < 0.0f)
                     mExitTimeout = 0.2f;
             };
         rootNode->appendChild(exitButton);
@@ -109,9 +122,16 @@ PauseScene::PauseScene(Engine* engine, PendingResources& resourceQueue)
 void PauseScene::runFrame(Renderer* renderer, float time)
 {
     Scene::runFrame(renderer, time);
+
     if (mExitTimeout > 0.0f) {
         mExitTimeout -= time;
         if (mExitTimeout <= 0.0f)
             mEngine->setScene(std::make_shared<MenuLoadingScene>(mEngine));
+    }
+
+    if (mRestartTimeout > 0.0f) {
+        mRestartTimeout -= time;
+        if (mRestartTimeout <= 0.0f)
+            mEngine->setScene(std::make_shared<GameLoadingScene>(mEngine, mLevel));
     }
 }

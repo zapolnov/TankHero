@@ -9,7 +9,7 @@ class GameScene : public Scene
 public:
     static const glm::vec4 BACKGROUND_COLOR;
 
-    GameScene(Engine* engine, PendingResources& resourceQueue);
+    GameScene(Engine* engine, PendingResources& resourceQueue, int levelNo);
 
 private:
     Engine* mEngine;

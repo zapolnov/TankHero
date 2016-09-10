@@ -139,6 +139,6 @@ void MainMenuScene::runFrame(Renderer* renderer, float time)
     if (mStartLevelTimeout > 0.0f) {
         mStartLevelTimeout -= time;
         if (mStartLevelTimeout <= 0.0f)
-            mEngine->setScene(std::make_shared<GameLoadingScene>(mEngine));
+            mEngine->setScene(std::make_shared<GameLoadingScene>(mEngine, 1));
     }
 }

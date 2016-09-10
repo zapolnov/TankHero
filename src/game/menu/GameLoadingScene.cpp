@@ -41,8 +41,9 @@ namespace
     };
 }
 
-GameLoadingScene::GameLoadingScene(Engine* engine)
+GameLoadingScene::GameLoadingScene(Engine* engine, int level)
     : LoadingScene(engine)
+    , mLevel(level)
 {
     mEngine->renderer()->setClearColor(MainMenuScene::BACKGROUND_COLOR);
 
@@ -59,7 +60,7 @@ GameLoadingScene::GameLoadingScene(Engine* engine)
 
 std::shared_ptr<Scene> GameLoadingScene::constructNextScene(Engine* engine, PendingResources& resources)
 {
-    return std::make_shared<GameScene>(engine, resources);
+    return std::make_shared<GameScene>(engine, resources, mLevel);
 }
 
 void GameLoadingScene::advanceToScene(const std::shared_ptr<Scene>& scene)

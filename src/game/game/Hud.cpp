@@ -10,8 +10,9 @@
 static const float PAUSE_BUTTON_WIDTH = 64.0f;
 static const float PAUSE_BUTTON_HEIGHT = 64.0f;
 
-Hud::Hud(Engine* engine, PendingResources& resourceQueue)
+Hud::Hud(Engine* engine, PendingResources& resourceQueue, int level)
     : mEngine(engine)
+    , mLevel(level)
 {
     resourceQueue.sounds.emplace(mClickSound = engine->soundManager()->soundNameId("button_click.ogg"));
 
@@ -26,7 +27,7 @@ Hud::Hud(Engine* engine, PendingResources& resourceQueue)
     mPauseButton = std::make_shared<Button>(mEngine, PAUSE_BUTTON_WIDTH, PAUSE_BUTTON_HEIGHT,
         mClickSound, mPauseNormalImage, mPausePressedImage);
 
-    mPauseScene = std::make_shared<PauseScene>(mEngine, resourceQueue);
+    mPauseScene = std::make_shared<PauseScene>(mEngine, resourceQueue, level);
 
     resourceQueue.custom.emplace_back([this] {
         mPauseButton->onClick = [this]() {

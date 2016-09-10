@@ -4,6 +4,7 @@
 #include "Obstacle.h"
 #include "Enemy.h"
 #include "LoseScene.h"
+#include "WinScene.h"
 #include "src/engine/scene/RootNode.h"
 #include "src/engine/scene/camera/PerspectiveCamera.h"
 #include "src/game/menu/LoadingScene.h"
@@ -16,13 +17,14 @@ class Level : public RootNode
 {
 public:
     static const float CELL_SIZE;
+    static const int TOTAL_COUNT;
 
-    Level(Engine* engine, PendingResources& resourceQueue);
+    Level(Engine* engine, PendingResources& resourceQueue, int index);
 
     int width() const { return mWidth; }
     int height() const { return mHeight; }
 
-    void load(const std::string& file);
+    void load();
 
     glm::ivec2 cellForPoint(const glm::vec2& point) const;
     std::pair<glm::ivec2, glm::ivec2> cellsForBoundingBox(const OBB2D& box) const;
@@ -32,6 +34,7 @@ public:
     std::shared_ptr<Collidable> collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox,
         float* penetrationDepth = nullptr, const Collidable* ignore = nullptr);
 
+    void showWinScreen();
     void showLoseScreen();
 
     void spawnBullet(const std::shared_ptr<Collidable>& emitter, const glm::vec3& position, const glm::vec2& dir);
@@ -52,9 +55,11 @@ private:
     };
 
     Engine* mEngine;
+    int mIndex;
     std::shared_ptr<PerspectiveCamera> mCamera;
     std::shared_ptr<Player> mPlayer;
     std::shared_ptr<LoseScene> mLoseScene;
+    std::shared_ptr<WinScene> mWinScene;
     std::vector<std::weak_ptr<Enemy>> mEnemies;
     std::vector<std::vector<Cell>> mCells;
     glm::vec2 mVisibleMin;

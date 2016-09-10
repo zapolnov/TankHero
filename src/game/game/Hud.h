@@ -12,7 +12,7 @@ class Engine;
 class Hud : public RootNode
 {
 public:
-    Hud(Engine* engine, PendingResources& resourceQueue);
+    Hud(Engine* engine, PendingResources& resourceQueue, int level);
 
 protected:
     void update(float time) override;
@@ -27,4 +27,5 @@ private:
     uint16_t mClickSound;
     float mButtonX = 0.0f;
     float mButtonY = 0.0f;
+    int mLevel;
 };
