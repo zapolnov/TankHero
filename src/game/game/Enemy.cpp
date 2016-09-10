@@ -150,6 +150,7 @@ void Enemy::update(float time)
                 auto playerPos = mLevel->playerPosition();
                 mTargetAngle = atan2f(playerPos.y - pos.y, playerPos.x - pos.x);
 
+                /*
                 static const float angles[] = {
                     glm::radians(-270.0f),
                     glm::radians(-225.0f),
@@ -174,6 +175,7 @@ void Enemy::update(float time)
                     }
                 }
                 assert(i != sizeof(angles) / sizeof(angles[0]));
+                */
 
                 mTargetAngle += glm::radians(90.0f);
                 if (fabsf(mTargetAngle - angle) < 0.001f)
