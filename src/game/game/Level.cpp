@@ -49,6 +49,7 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     resourceQueue.sounds.emplace(mExplosionSound = engine->soundManager()->soundNameId("explosion.ogg"));
 
     mEnemy1.visualPosition = glm::vec3(0.0f, 0.0f, 0.6f);
+    mEnemy1.initialLives = 1;
     resourceQueue.meshes.emplace(mEnemy1.mesh = engine->renderer()->meshNameId("enemy1.mesh"));
 }
 
@@ -140,6 +141,7 @@ void Level::load(const std::string& file)
                     auto enemy = std::make_shared<Enemy>(mEngine, this, mEnemy1);
                     enemy->setPosition2D(cell.posX, cell.posY);
                     appendChild(enemy);
+                    mEnemies.emplace_back(enemy);
                     break;
                 }
 
@@ -277,7 +279,8 @@ std::pair<glm::ivec2, glm::ivec2> Level::cellsForBoundingBox(const OBB2D& box) c
     return std::make_pair(min, max);
 }
 
-std::shared_ptr<Collidable> Level::collideOnMove(Collidable& collidable, const glm::vec2& dir, float& length) const
+std::shared_ptr<Collidable> Level::collideOnMove(Collidable& collidable, const glm::vec2& dir,
+    float& length, const Collidable* ignore)
 {
     const auto& sourceBox = collidable.boundingBox();
 
@@ -289,14 +292,15 @@ std::shared_ptr<Collidable> Level::collideOnMove(Collidable& collidable, const g
     targetBox.p[3] += vec;
 
     float depth = 0.0f;
-    auto obstacle = collideOnMove(sourceBox, targetBox, &depth);
+    auto obstacle = collideOnMove(sourceBox, targetBox, &depth, ignore);
     if (obstacle)
         length = std::max(length - depth - 0.1f, 0.0f);
 
     return obstacle;
 }
 
-std::shared_ptr<Collidable> Level::collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox, float* penetrationDepth) const
+std::shared_ptr<Collidable> Level::collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox,
+    float* penetrationDepth, const Collidable* ignore)
 {
     auto range1 = cellsForBoundingBox(sourceBox);
     auto range2 = cellsForBoundingBox(targetBox);
@@ -319,12 +323,23 @@ std::shared_ptr<Collidable> Level::collideOnMove(const OBB2D& sourceBox, const O
         }
     }
 
+    for (auto it = mEnemies.begin(); it != mEnemies.end(); ) {
+        auto enemy = it->lock();
+        if (!enemy)
+            it = mEnemies.erase(it);
+        else {
+            ++it;
+            if (enemy.get() != ignore && enemy->boundingBox().intersectsWith(targetBox, penetrationDepth))
+                return enemy;
+        }
+    }
+
     return nullptr;
 }
 
-void Level::spawnBullet(const glm::vec3& position, const glm::vec2& dir)
+void Level::spawnBullet(const std::shared_ptr<Collidable>& emitter, const glm::vec3& position, const glm::vec2& dir)
 {
-    auto bullet = std::make_shared<Bullet>(mEngine, this, mBulletMesh, dir);
+    auto bullet = std::make_shared<Bullet>(mEngine, this, emitter, mBulletMesh, dir);
     bullet->setPosition(position);
     appendChild(bullet);
     mEngine->soundManager()->play(position, mShootSound);
@@ -333,6 +348,14 @@ void Level::spawnBullet(const glm::vec3& position, const glm::vec2& dir)
 void Level::spawnBulletExplosion(const glm::vec3& position)
 {
     auto e = std::make_shared<Explosion>(mCamera.get(), mExplosion1Texture, 2.0f, 32);
+    e->setPosition(position);
+    appendChild(e);
+    mEngine->soundManager()->play(position, mExplosionSound);
+}
+
+void Level::spawnEnemyExplosion(const glm::vec3& position)
+{
+    auto e = std::make_shared<Explosion>(mCamera.get(), mExplosion1Texture, 8.0f, 32);
     e->setPosition(position);
     appendChild(e);
     mEngine->soundManager()->play(position, mExplosionSound);

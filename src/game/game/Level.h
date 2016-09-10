@@ -18,16 +18,22 @@ public:
 
     Level(Engine* engine, PendingResources& resourceQueue);
 
+    int width() const { return mWidth; }
+    int height() const { return mHeight; }
+
     void load(const std::string& file);
 
     glm::ivec2 cellForPoint(const glm::vec2& point) const;
     std::pair<glm::ivec2, glm::ivec2> cellsForBoundingBox(const OBB2D& box) const;
 
-    std::shared_ptr<Collidable> collideOnMove(Collidable& collidable, const glm::vec2& dir, float& length) const;
-    std::shared_ptr<Collidable> collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox, float* penetrationDepth = nullptr) const;
+    std::shared_ptr<Collidable> collideOnMove(Collidable& collidable, const glm::vec2& dir, float& length,
+        const Collidable* ignore = nullptr);
+    std::shared_ptr<Collidable> collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox,
+        float* penetrationDepth = nullptr, const Collidable* ignore = nullptr);
 
-    void spawnBullet(const glm::vec3& position, const glm::vec2& dir);
+    void spawnBullet(const std::shared_ptr<Collidable>& emitter, const glm::vec3& position, const glm::vec2& dir);
     void spawnBulletExplosion(const glm::vec3& position);
+    void spawnEnemyExplosion(const glm::vec3& position);
 
     void updateListenerPosition();
     void updateListenerOrientation();
@@ -45,6 +51,7 @@ private:
     Engine* mEngine;
     std::shared_ptr<PerspectiveCamera> mCamera;
     std::shared_ptr<Player> mPlayer;
+    std::vector<std::weak_ptr<Enemy>> mEnemies;
     std::vector<std::vector<Cell>> mCells;
     glm::vec2 mVisibleMin;
     glm::vec2 mVisibleMax;

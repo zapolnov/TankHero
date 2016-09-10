@@ -2,6 +2,7 @@
 #include "Level.h"
 #include "src/engine/render/Renderer.h"
 #include "src/engine/Engine.h"
+#include <algorithm>
 
 class Player::Body : public Node
 {
@@ -80,6 +81,9 @@ std::pair<glm::vec3, glm::vec3> Player::localAABox() const
 
 void Player::update(float time)
 {
+    mTimeSinceLastShot += time;
+    time = std::min(time, 1.0f / 40.0f);
+
     const float ROTATE_SPEED = glm::radians(90.0f);
     const float MOVE_SPEED = Level::CELL_SIZE;
 
@@ -142,13 +146,11 @@ void Player::update(float time)
         mLevel->updateListenerPosition();
     }
 
-    if (!mEngine->wasKeyPressed(KeyShoot))
-        mDidShoot = false;
-    else if (!mDidShoot) {
+    if (mEngine->wasKeyPressed(KeyShoot) && mTimeSinceLastShot > 1.0f) {
         auto position = glm::vec3(worldMatrix() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
         position.z = 1.0f;
-        mLevel->spawnBullet(position, direction());
-        mDidShoot = true;
+        mLevel->spawnBullet(std::static_pointer_cast<Player>(shared_from_this()), position, direction());
+        mTimeSinceLastShot = 0.0f;
     }
 }
 

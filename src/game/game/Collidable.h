@@ -15,8 +15,10 @@ public:
 
     const OBB2D& boundingBox();
 
+    virtual std::shared_ptr<Collidable> emitter() const { return nullptr; }
+
     virtual bool isPlayer() const { return false; }
-    virtual void hitWithBullet(float bulletAngle) {}
+    virtual bool hitWithBullet(float) { return false; }
 
 protected:
     Engine* mEngine;

@@ -22,7 +22,7 @@ private:
     Level* mLevel;
     std::shared_ptr<Body> mBody;
     std::shared_ptr<Gun> mGun;
-    bool mDidShoot = false;
+    float mTimeSinceLastShot = 0.0f;
 
     const glm::mat4& bboxToWorldTransform() override;
     std::pair<glm::vec3, glm::vec3> localAABox() const override;

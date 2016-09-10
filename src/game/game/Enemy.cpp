@@ -9,8 +9,6 @@ public:
     Visual(uint16_t mesh)
         : mMesh(mesh)
     {
-        //setScale(5.0f);
-        //setRotation(glm::vec3(glm::radians(90.0f), glm::radians(-90.0f), 0.0f));
     }
 
     std::pair<glm::vec3, glm::vec3> localAABox(Engine* engine) const
@@ -33,8 +31,29 @@ Enemy::Enemy(Engine* engine, Level* level, const Descriptor& desc)
     : Collidable(engine)
     , mLevel(level)
     , mVisual(std::make_shared<Visual>(desc.mesh))
+    , mLives(desc.initialLives)
 {
     mVisual->setPosition(desc.visualPosition);
+    invalidateBoundingBox();
+}
+
+glm::vec2 Enemy::direction() const
+{
+    float a = rotation2D() + glm::radians(-90.0f);
+    return glm::vec2(cosf(a), sinf(a));
+}
+
+bool Enemy::hitWithBullet(float)
+{
+    if (mLives > 0) {
+        --mLives;
+        if (mLives <= 0) {
+            mLevel->spawnEnemyExplosion(position());
+            mDeathTime = 0.5f;
+            return true;
+        }
+    }
+    return false;
 }
 
 const glm::mat4& Enemy::bboxToWorldTransform()
@@ -53,4 +72,24 @@ void Enemy::update(float time)
         appendChild(mVisual);
         mInitialized = true;
     }
+
+    if (mLives <= 0) {
+        mDeathTime -= time;
+        if (mDeathTime <= 0.0f)
+            removeFromParent();
+        return;
+    }
+
+    mTimeSinceLastShot += time;
+
+    if (mTimeSinceLastShot > 5.0f) {
+        auto position = glm::vec3(worldMatrix() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        position.z = 1.0f;
+        mLevel->spawnBullet(std::static_pointer_cast<Enemy>(shared_from_this()), position, direction());
+        mTimeSinceLastShot = 0.0f;
+    }
+}
+
+void Enemy::draw(Renderer* renderer)
+{
 }

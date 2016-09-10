@@ -2,6 +2,7 @@
 #include "Level.h"
 #include "src/engine/render/Renderer.h"
 #include "src/engine/Engine.h"
+#include <algorithm>
 
 class Bullet::Visual : public Node
 {
@@ -30,14 +31,20 @@ private:
     uint16_t mMesh;
 };
 
-Bullet::Bullet(Engine* engine, Level* level, uint16_t mesh, const glm::vec2& dir)
+Bullet::Bullet(Engine* engine, Level* level, const std::shared_ptr<Collidable>& emitter, uint16_t mesh, const glm::vec2& dir)
     : Collidable(engine)
     , mLevel(level)
+    , mEmitter(emitter)
     , mVisual(std::make_shared<Visual>(mesh))
     , mDirection(glm::normalize(dir))
 {
     float angle = atan2f(dir.y, dir.x);
     setRotation2D(angle);
+}
+
+std::shared_ptr<Collidable> Bullet::emitter() const
+{
+    return mEmitter.lock();
 }
 
 const glm::mat4& Bullet::bboxToWorldTransform()
@@ -59,17 +66,25 @@ void Bullet::update(float time)
 
     const float MOVE_SPEED = Level::CELL_SIZE * 3.0f;
 
+    auto emitter = mEmitter.lock();
     auto pos = position2D();
 
-    float length = time * MOVE_SPEED;
-    auto target = mLevel->collideOnMove(*this, mDirection, length);
+    float length = std::min(time, 1.0f / 40.0f) * MOVE_SPEED;
+    auto target = mLevel->collideOnMove(*this, mDirection, length, emitter.get());
     if (target) {
-        target->hitWithBullet(rotation2D());
+        if (!target->hitWithBullet(rotation2D()))
+            mLevel->spawnBulletExplosion(position() + glm::vec3(mDirection * (length + 2.0f), 4.0f / 5.0f));
         removeFromParent();
-        mLevel->spawnBulletExplosion(position() + glm::vec3(mDirection * (length + 2.0f), 4.0f / 5.0f));
         return;
     }
     pos += mDirection * length;
+
+    if (pos.x < -Level::CELL_SIZE || pos.y < -Level::CELL_SIZE ||
+            pos.x > mLevel->width() * Level::CELL_SIZE || pos.y > mLevel->height() * Level::CELL_SIZE) {
+        removeFromParent();
+        mLevel->spawnBulletExplosion(glm::vec3(pos.x, pos.y, position().z) + glm::vec3(0.0f, 0.0f, 4.0f / 5.0f));
+        return;
+    }
 
     setPosition(glm::vec3(pos.x, pos.y, position().z));
     invalidateBoundingBox();
