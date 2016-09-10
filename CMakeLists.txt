@@ -267,6 +267,18 @@ add_mesh(
     )
 
 add_mesh(
+    INPUT "data/src/concrete-barriers/wall/wall.xml"
+    OUTPUT "data/bin/wall.mesh"
+    DEPENDS "data/src/concrete-barriers/wall/wall.obj"
+    )
+
+add_mesh(
+    INPUT "data/src/concrete-barriers/cube/cube.xml"
+    OUTPUT "data/bin/wall-corner.mesh"
+    DEPENDS "data/src/concrete-barriers/cube/cube.obj"
+    )
+
+add_mesh(
     INPUT "data/src/landscape_asset_v2a/obj/grass.xml"
     OUTPUT "data/bin/grass.mesh"
     DEPENDS "data/src/landscape_asset_v2a/obj/grass.obj" "data/src/landscape_asset_v2a/obj/grass.mtl"

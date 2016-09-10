@@ -36,6 +36,10 @@ Level::Level(Engine* engine, PendingResources& resourceQueue, int index)
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("basetexture.jpg"));
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("texture_panzerwagen.jpg"));
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("crate_medkit.jpg"));
+    resourceQueue.textures.emplace(engine->renderer()->textureNameId("wall-diffuse.jpg"));
+    resourceQueue.textures.emplace(engine->renderer()->textureNameId("wall-normal.png"));
+    resourceQueue.textures.emplace(engine->renderer()->textureNameId("cube-diffuse.jpg"));
+    resourceQueue.textures.emplace(engine->renderer()->textureNameId("cube-normal.png"));
     resourceQueue.textures.emplace(mExplosion1Texture = engine->renderer()->textureNameId("explosion1.png"));
 
     resourceQueue.meshes.emplace(mTreeMesh = engine->renderer()->meshNameId("tree.mesh"));
@@ -52,6 +56,8 @@ Level::Level(Engine* engine, PendingResources& resourceQueue, int index)
     resourceQueue.meshes.emplace(mWaterMesh = engine->renderer()->meshNameId("water.mesh"));
     resourceQueue.meshes.emplace(mBulletMesh = engine->renderer()->meshNameId("tank_bullet.mesh"));
     resourceQueue.meshes.emplace(mMedKitMesh = engine->renderer()->meshNameId("crate_medkit.mesh"));
+    resourceQueue.meshes.emplace(mWallMesh = engine->renderer()->meshNameId("wall.mesh"));
+    resourceQueue.meshes.emplace(mWallCornerMesh = engine->renderer()->meshNameId("wall-corner.mesh"));
 
     resourceQueue.sounds.emplace(mShootSound = engine->soundManager()->soundNameId("8bit_gunloop_explosion.ogg"));
     resourceQueue.sounds.emplace(mExplosionSound = engine->soundManager()->soundNameId("explosion.ogg"));
@@ -164,6 +170,61 @@ void Level::load()
                     appendChild(enemy);
                     mEnemies.emplace_back(enemy);
                     ++mEnemyCount;
+                    break;
+                }
+
+                case '[': { // wall
+                    cell.levelMarker = ' ';
+                    auto wall = std::make_shared<Obstacle>(mEngine, mWallMesh);
+                    wall->setPosition(cell.posX - CELL_SIZE * 0.1f, cell.posY, 1.0f);
+                    wall->setRotation(glm::radians(90.0f), glm::radians(90.0f), 0.0f);
+                    wall->setScale(0.05f, 0.02f, 0.05f);
+                    cell.walls.emplace_back(wall);
+                    cell.obstacles.emplace_back(wall);
+                    break;
+                }
+
+                case ']': { // wall
+                    cell.levelMarker = ' ';
+                    auto wall = std::make_shared<Obstacle>(mEngine, mWallMesh);
+                    wall->setPosition(cell.posX + CELL_SIZE * 0.1f, cell.posY, 1.0f);
+                    wall->setRotation(glm::radians(90.0f), glm::radians(90.0f), 0.0f);
+                    wall->setScale(0.05f, 0.02f, 0.05f);
+                    cell.walls.emplace_back(wall);
+                    cell.obstacles.emplace_back(wall);
+                    break;
+                }
+
+                case '^': { // wall
+                    cell.levelMarker = ' ';
+                    auto wall = std::make_shared<Obstacle>(mEngine, mWallMesh);
+                    wall->setPosition(cell.posX, cell.posY - CELL_SIZE * 0.1f, 1.0f);
+                    wall->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
+                    wall->setScale(0.05f, 0.02f, 0.05f);
+                    cell.walls.emplace_back(wall);
+                    cell.obstacles.emplace_back(wall);
+                    break;
+                }
+
+                case 'v': { // wall
+                    cell.levelMarker = ' ';
+                    auto wall = std::make_shared<Obstacle>(mEngine, mWallMesh);
+                    wall->setPosition(cell.posX, cell.posY + CELL_SIZE * 0.1f, 1.0f);
+                    wall->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
+                    wall->setScale(0.05f, 0.02f, 0.05f);
+                    cell.walls.emplace_back(wall);
+                    cell.obstacles.emplace_back(wall);
+                    break;
+                }
+
+                case '@': { // wall
+                    cell.levelMarker = ' ';
+                    auto wall = std::make_shared<Obstacle>(mEngine, mWallCornerMesh);
+                    wall->setPosition(cell.posX, cell.posY, 1.0f);
+                    wall->setRotation(glm::radians(90.0f), 0.0f, 0.0f);
+                    wall->setScale(0.08f, 0.08f, 0.08f);
+                    cell.walls.emplace_back(wall);
+                    cell.obstacles.emplace_back(wall);
                     break;
                 }
 
@@ -706,6 +767,10 @@ void Level::draw(Renderer* renderer)
     for (int y = startY; y <= endY; y++) {
         for (int x = startX; x <= endX; x++) {
             const Cell& cell = mCells[size_t(y)][size_t(x)];
+
+            for (const auto& wall : cell.walls)
+                wall->recursiveDraw(renderer);
+
             switch (cell.levelMarker) {
                 case ' ':
                 case '.':

@@ -73,7 +73,7 @@ namespace
                         mPendingResources.custom.erase(it);
                     }
 
-                    if (++count >= 3)
+                    if (++count >= 5)
                         break;
 
                     auto current = std::chrono::steady_clock::now();

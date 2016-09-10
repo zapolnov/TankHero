@@ -65,6 +65,7 @@ private:
     {
         std::vector<std::weak_ptr<Obstacle>> obstacles;
         std::vector<std::shared_ptr<InvisibleObstacle>> invisibleObstacles;
+        std::vector<std::shared_ptr<Obstacle>> walls;
         std::vector<std::weak_ptr<MedKit>> medkits;
         glm::mat4 worldTransform{1.0f};
         float posX;
@@ -100,6 +101,8 @@ private:
     uint16_t mShootSound;
     uint16_t mExplosionSound;
     uint16_t mMedKitMesh;
+    uint16_t mWallMesh;
+    uint16_t mWallCornerMesh;
     Enemy::Descriptor mEnemy1;
     int mEnemyCount = 0;
     int mWidth;
