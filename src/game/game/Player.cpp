@@ -51,9 +51,12 @@ private:
     uint16_t mMesh;
 };
 
+const int Player::INITIAL_LIVES = 5;
+
 Player::Player(Engine* engine, Level* level, PendingResources& resourceQueue)
     : Collidable(engine)
     , mLevel(level)
+    , mLives(INITIAL_LIVES)
 {
     mBody = std::make_shared<Body>(engine, resourceQueue);
     mGun = std::make_shared<Gun>(engine, resourceQueue);
@@ -69,6 +72,19 @@ glm::vec2 Player::direction() const
     return glm::vec2(cosf(a), sinf(a));
 }
 
+bool Player::hitWithBullet(float)
+{
+    if (mLives > 0) {
+        --mLives;
+        if (mLives <= 0) {
+            mLevel->spawnEnemyExplosion(position());
+            mDeathTime = 1.0f;
+            return true;
+        }
+    }
+    return false;
+}
+
 const glm::mat4& Player::bboxToWorldTransform()
 {
     return mBody->worldMatrix();
@@ -81,6 +97,15 @@ std::pair<glm::vec3, glm::vec3> Player::localAABox() const
 
 void Player::update(float time)
 {
+    if (mLives <= 0) {
+        if (mDeathTime > 0.0f) {
+            mDeathTime -= time;
+            if (mDeathTime <= 0.0f)
+                mLevel->showLoseScreen();
+        }
+        return;
+    }
+
     mTimeSinceLastShot += time;
     time = std::min(time, 1.0f / 40.0f);
 
@@ -98,7 +123,7 @@ void Player::update(float time)
         if (mEngine->wasKeyPressed(KeyLeft)) {
             setRotation2D(angle + step);
             invalidateBoundingBox();
-            if (!mLevel->collideOnMove(oldBoundingBox, boundingBox())) {
+            if (!mLevel->collideOnMove(oldBoundingBox, boundingBox(), nullptr, this)) {
                 angle = angle + step;
                 orientationChanged = true;
             } else {
@@ -110,7 +135,7 @@ void Player::update(float time)
         if (mEngine->wasKeyPressed(KeyRight)) {
             setRotation2D(angle - step);
             invalidateBoundingBox();
-            if (!mLevel->collideOnMove(oldBoundingBox, boundingBox())) {
+            if (!mLevel->collideOnMove(oldBoundingBox, boundingBox(), nullptr, this)) {
                 angle = angle - step;
                 orientationChanged = true;
             } else {
@@ -131,13 +156,13 @@ void Player::update(float time)
 
         if (mEngine->wasKeyPressed(KeyUp)) {
             float dist = length;
-            mLevel->collideOnMove(*this, dir, dist);
+            mLevel->collideOnMove(*this, dir, dist, this);
             pos += dir * dist;
         }
 
         if (mEngine->wasKeyPressed(KeyDown)) {
             float dist = length;
-            mLevel->collideOnMove(*this, -dir, dist);
+            mLevel->collideOnMove(*this, -dir, dist, this);
             pos -= dir * dist;
         }
 

@@ -26,6 +26,7 @@ Level::Level(Engine* engine, PendingResources& resourceQueue)
     setCamera(mCamera);
 
     mPlayer = std::make_shared<Player>(mEngine, this, resourceQueue);
+    mLoseScene = std::make_shared<LoseScene>(mEngine, resourceQueue);
 
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("basetexture.jpg"));
     resourceQueue.textures.emplace(engine->renderer()->textureNameId("texture_panzerwagen.jpg"));
@@ -323,6 +324,9 @@ std::shared_ptr<Collidable> Level::collideOnMove(const OBB2D& sourceBox, const O
         }
     }
 
+    if (mPlayer.get() != ignore && mPlayer->boundingBox().intersectsWith(targetBox, penetrationDepth))
+        return mPlayer;
+
     for (auto it = mEnemies.begin(); it != mEnemies.end(); ) {
         auto enemy = it->lock();
         if (!enemy)
@@ -335,6 +339,12 @@ std::shared_ptr<Collidable> Level::collideOnMove(const OBB2D& sourceBox, const O
     }
 
     return nullptr;
+}
+
+void Level::showLoseScreen()
+{
+    mEngine->renderer()->setClearColor(LoseScene::BACKGROUND_COLOR);
+    mEngine->setScene(mLoseScene);
 }
 
 void Level::spawnBullet(const std::shared_ptr<Collidable>& emitter, const glm::vec3& position, const glm::vec2& dir)

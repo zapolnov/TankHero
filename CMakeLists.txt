@@ -382,6 +382,8 @@ set(source_files
     src/game/game/Level.h
     src/game/game/Obstacle.cpp
     src/game/game/Obstacle.h
+    src/game/game/LoseScene.cpp
+    src/game/game/LoseScene.h
     src/game/game/PauseScene.cpp
     src/game/game/PauseScene.h
     src/game/game/Player.cpp

@@ -74,9 +74,11 @@ void Enemy::update(float time)
     }
 
     if (mLives <= 0) {
-        mDeathTime -= time;
-        if (mDeathTime <= 0.0f)
-            removeFromParent();
+        if (mDeathTime > 0.0f) {
+            mDeathTime -= time;
+            if (mDeathTime <= 0.0f)
+                removeFromParent();
+        }
         return;
     }
 

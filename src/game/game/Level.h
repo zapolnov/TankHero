@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Obstacle.h"
 #include "Enemy.h"
+#include "LoseScene.h"
 #include "src/engine/scene/RootNode.h"
 #include "src/engine/scene/camera/PerspectiveCamera.h"
 #include "src/game/menu/LoadingScene.h"
@@ -31,6 +32,8 @@ public:
     std::shared_ptr<Collidable> collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox,
         float* penetrationDepth = nullptr, const Collidable* ignore = nullptr);
 
+    void showLoseScreen();
+
     void spawnBullet(const std::shared_ptr<Collidable>& emitter, const glm::vec3& position, const glm::vec2& dir);
     void spawnBulletExplosion(const glm::vec3& position);
     void spawnEnemyExplosion(const glm::vec3& position);
@@ -51,6 +54,7 @@ private:
     Engine* mEngine;
     std::shared_ptr<PerspectiveCamera> mCamera;
     std::shared_ptr<Player> mPlayer;
+    std::shared_ptr<LoseScene> mLoseScene;
     std::vector<std::weak_ptr<Enemy>> mEnemies;
     std::vector<std::vector<Cell>> mCells;
     glm::vec2 mVisibleMin;
