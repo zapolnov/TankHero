@@ -15,6 +15,9 @@ public:
 
     const OBB2D& boundingBox();
 
+    virtual glm::vec2 boundingSphereWorldCenter() const { return glm::vec2(0.0f); }
+    virtual float boundingSphereRadius() const { return 0.0f; }
+
     virtual std::shared_ptr<Collidable> emitter() const { return nullptr; }
 
     virtual bool isPlayer() const { return false; }

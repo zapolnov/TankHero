@@ -45,6 +45,9 @@ Enemy::Enemy(Engine* engine, Level* level, const Descriptor& desc)
     }
     setRotation2D(mTargetAngle);
 
+    std::uniform_int_distribution<int> distribution2(0, 1);
+    mLeftHanded = distribution2(mLevel->randomGenerator()) == 0;
+
     invalidateBoundingBox();
 }
 
@@ -96,42 +99,109 @@ void Enemy::update(float time)
     auto dir = direction();
 
     mTimeSinceLastShot += time;
-    if (mTimeSinceLastShot > 2.0f) {
+    mTimeSinceLastTurn += time;
+
+    if (mTimeSinceLastShot > 1.0f) {
         auto position = glm::vec3(worldMatrix() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
         position.z = 1.0f;
         mLevel->spawnBullet(std::static_pointer_cast<Enemy>(shared_from_this()), position, dir);
         mTimeSinceLastShot = 0.0f;
     }
 
-    const float ROTATE_SPEED = glm::radians(90.0f);
+    const float ROTATE_SPEED = glm::radians(180.0f);
     const float MOVE_SPEED = Level::CELL_SIZE * 1.2f;
 
     auto angle = rotation2D();
-    if (mTargetAngle != angle) {
+    if (mRotating) {
         float delta = mTargetAngle - angle;
         float step = ROTATE_SPEED * time;
-        if (step > fabsf(delta))
-            angle += step;
-        else
+        if (step < fabsf(delta))
+            angle += (delta < 0.0f ? -step : step);
+        else {
             angle = mTargetAngle;
+            mTimeSinceLastTurn = 0.0f;
+            mMovedAfterTurn = false;
+            mRotating = false;
+        }
         setRotation2D(angle);
         invalidateBoundingBox();
     } else {
         auto pos = position2D();
 
         float length = time * MOVE_SPEED;
-        if (!mLevel->collideOnMove(*this, dir, length, this)) {
+        if (!mLevel->collideCircleOnMove(*this, dir, length, this)) {
+            if (mMovedAfterTurn && mTimeSinceLastTurn >= 1.0f) {
+                auto playerPos = mLevel->playerPosition();
+                mTargetAngle = atan2f(playerPos.y - pos.y, playerPos.x - pos.x);
+
+                static const float angles[] = {
+                    glm::radians(-270.0f),
+                    glm::radians(-225.0f),
+                    glm::radians(-180.0f),
+                    glm::radians(-135.0f),
+                    glm::radians( -90.0f),
+                    glm::radians( -45.0f),
+                    glm::radians(   0.0f),
+                    glm::radians(  45.0f),
+                    glm::radians(  90.0f),
+                    glm::radians( 135.0f),
+                    glm::radians( 180.0f),
+                    glm::radians( 225.0f),
+                    glm::radians( 270.0f),
+                };
+
+                size_t i;
+                for (i = 0; i < sizeof(angles) / sizeof(angles[0]); i++) {
+                    if (mTargetAngle <= angles[i]) {
+                        mTargetAngle = angles[i];
+                        break;
+                    }
+                }
+                assert(i != sizeof(angles) / sizeof(angles[0]));
+
+                mTargetAngle += glm::radians(90.0f);
+                if (fabsf(mTargetAngle - angle) < 0.001f)
+                    mTargetAngle = angle;
+                else {
+                    mRotating = true;
+                    return;
+                }
+            }
+
+            mMovedAfterTurn = true;
             pos += dir * length;
             setPosition2D(pos);
             invalidateBoundingBox();
-        } else {
-            auto angle = rotation2D();
-            std::uniform_int_distribution<int> distribution(0, 1);
-            switch (distribution(mLevel->randomGenerator())) {
-                case 0:  mTargetAngle = angle + glm::radians(90.0f); break;
-                default: mTargetAngle = angle - glm::radians(90.0f); break;
-            }
+            return;
         }
+
+        auto angle = rotation2D();
+        while (angle < glm::radians(0.0f))
+            angle += glm::radians(360.0f);
+        while (angle > glm::radians(360.0f))
+            angle -= glm::radians(360.0f);
+
+        if (mLeftHanded) {
+            if (angle <= glm::radians(90.0f))
+                mTargetAngle = glm::radians(180.0f);
+            else if (angle <= glm::radians(180.0f))
+                mTargetAngle = glm::radians(270.0f);
+            else if (angle <= glm::radians(270.0f))
+                mTargetAngle = glm::radians(360.0f);
+            else
+                mTargetAngle = glm::radians(450.0f);
+        } else {
+            if (angle >= glm::radians(270.0f))
+                mTargetAngle = glm::radians(180.0f);
+            else if (angle >= glm::radians(180.0f))
+                mTargetAngle = glm::radians(90.0f);
+            else if (angle >= glm::radians(90.0f))
+                mTargetAngle = glm::radians(0.0f);
+            else
+                mTargetAngle = glm::radians(-90.0f);
+        }
+
+        mRotating = true;
     }
 }
 

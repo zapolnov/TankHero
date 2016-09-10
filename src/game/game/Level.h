@@ -30,11 +30,15 @@ public:
     void load();
 
     int playerLives() const { return mPlayer->lives(); }
+    const glm::vec2& playerPosition() const { return mPlayer->position2D(); }
 
     glm::ivec2 cellForPoint(const glm::vec2& point) const;
     std::pair<glm::ivec2, glm::ivec2> cellsForBoundingBox(const OBB2D& box) const;
+    std::pair<glm::ivec2, glm::ivec2> cellsForBoundingCircle(const glm::vec2& center, float radius) const;
 
     std::shared_ptr<Collidable> collideOnMove(Collidable& collidable, const glm::vec2& dir, float& length,
+        const Collidable* ignore = nullptr);
+    std::shared_ptr<Collidable> collideCircleOnMove(Collidable& collidable, const glm::vec2& dir, float& length,
         const Collidable* ignore = nullptr);
     std::shared_ptr<Collidable> collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox,
         float* penetrationDepth = nullptr, const Collidable* ignore = nullptr);

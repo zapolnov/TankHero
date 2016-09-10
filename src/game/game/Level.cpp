@@ -288,6 +288,13 @@ std::pair<glm::ivec2, glm::ivec2> Level::cellsForBoundingBox(const OBB2D& box) c
     return std::make_pair(min, max);
 }
 
+std::pair<glm::ivec2, glm::ivec2> Level::cellsForBoundingCircle(const glm::vec2& center, float radius) const
+{
+    auto min = cellForPoint(center - radius);
+    auto max = cellForPoint(center + radius);
+    return std::make_pair(min, max);
+}
+
 std::shared_ptr<Collidable> Level::collideOnMove(Collidable& collidable, const glm::vec2& dir,
     float& length, const Collidable* ignore)
 {
@@ -308,14 +315,59 @@ std::shared_ptr<Collidable> Level::collideOnMove(Collidable& collidable, const g
     return obstacle;
 }
 
+std::shared_ptr<Collidable> Level::collideCircleOnMove(Collidable& collidable, const glm::vec2& dir, float& length,
+    const Collidable* ignore)
+{
+    auto circleRadius = collidable.boundingSphereRadius();
+    auto sourceCircleCenter = collidable.boundingSphereWorldCenter();
+    auto targetCircleCenter = sourceCircleCenter + dir * length;
+
+    //auto range1 = cellsForBoundingCircle(sourceCircleCenter, circleRadius);
+    auto range2 = cellsForBoundingCircle(targetCircleCenter, circleRadius);
+
+    auto min = range2.first;//glm::min(range1.first, range2.first);
+    auto max = range2.second; //glm::max(range1.second, range2.second);
+
+    min.x = std::max(min.x, 0);
+    min.y = std::max(min.y, 0);
+    max.x = std::min(max.x, mWidth - 1);
+    max.y = std::min(max.y, mHeight - 1);
+
+    for (int y = min.y; y <= max.y; y++) {
+        for (int x = min.x; x <= max.x; x++) {
+            for (const auto& obstacleRef : mCells[y][x].obstacles) {
+                auto obstacle = obstacleRef.lock();
+                if (obstacle && obstacle->boundingBox().intersectsWithCircle(targetCircleCenter, circleRadius))
+                    return obstacle;
+            }
+        }
+    }
+
+    if (mPlayer.get() != ignore && mPlayer->boundingBox().intersectsWithCircle(targetCircleCenter, circleRadius))
+        return mPlayer;
+
+    for (auto it = mEnemies.begin(); it != mEnemies.end(); ) {
+        auto enemy = it->lock();
+        if (!enemy)
+            it = mEnemies.erase(it);
+        else {
+            ++it;
+            if (enemy.get() != ignore && enemy->boundingBox().intersectsWithCircle(targetCircleCenter, circleRadius))
+                return enemy;
+        }
+    }
+
+    return nullptr;
+}
+
 std::shared_ptr<Collidable> Level::collideOnMove(const OBB2D& sourceBox, const OBB2D& targetBox,
     float* penetrationDepth, const Collidable* ignore)
 {
-    auto range1 = cellsForBoundingBox(sourceBox);
+    //auto range1 = cellsForBoundingBox(sourceBox);
     auto range2 = cellsForBoundingBox(targetBox);
 
-    auto min = glm::min(range1.first, range2.first);
-    auto max = glm::max(range1.second, range2.second);
+    auto min = range2.first;//glm::min(range1.first, range2.first);
+    auto max = range2.second;//glm::max(range1.second, range2.second);
 
     min.x = std::max(min.x, 0);
     min.y = std::max(min.y, 0);

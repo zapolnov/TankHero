@@ -11,4 +11,5 @@ struct OBB2D
     std::pair<float, float> projectOntoLine(const glm::vec2& axis) const;
 
     bool intersectsWith(const OBB2D& other, float* penetrationDepth = nullptr) const;
+    bool intersectsWithCircle(const glm::vec2& center, float radius) const;
 };
