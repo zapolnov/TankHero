@@ -227,7 +227,7 @@ set(asset_src_files)
 set(asset_bin_files)
 
 if(NOT CMAKE_CROSSCOMPILING)
-    add_subdirectory(tools)
+#    add_subdirectory(tools)
 endif()
 
 add_mesh(
@@ -430,10 +430,17 @@ set(source_files
     )
 
 set_source_groups_with_dir("Source Files" "src" ${source_files})
-add_executable(Game ${source_files} ${asset_src_files} ${asset_bin_files})
+
+if(WIN32)
+    list(APPEND source_files data/icon/win32.rc)
+    source_group("Source Files" FILES data/icon/win32.rc)
+endif()
+
+add_executable(Game WIN32 ${source_files} ${asset_src_files} ${asset_bin_files})
 target_link_libraries(Game engine)
 
 if(WIN32)
+    target_link_libraries(Game shlwapi)
     add_custom_command(TARGET Game POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${openal_dll}" "$<TARGET_FILE_DIR:Game>/openal32.dll"
         COMMENT "Copying openal32.dll")

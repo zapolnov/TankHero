@@ -3,6 +3,12 @@
 #include <QSurfaceFormat>
 #include <QApplication>
 
+#ifdef _WIN32
+ #define WIN32_LEAN_AND_MEAN 1
+ #include <windows.h>
+ #include <shlwapi.h>
+#endif
+
 int main(int argc, char** argv)
 {
     QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
@@ -17,6 +23,14 @@ int main(int argc, char** argv)
     QSurfaceFormat::setDefaultFormat(format);
 
     QApplication app(argc, argv);
+
+  #if defined(_WIN32) && defined(NDEBUG)
+    WCHAR buf[MAX_PATH];
+    GetModuleFileNameW(nullptr, buf, MAX_PATH);
+    PathRemoveFileSpecW(buf);
+    PathAppendW(buf, L"data");
+    SetCurrentDirectoryW(buf);
+  #endif
 
     OpenGLWidget mainWindow(&gameInit);
     mainWindow.resize(1024, 768);
