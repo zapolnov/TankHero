@@ -365,7 +365,7 @@ void Level::spawnBulletExplosion(const glm::vec3& position)
 
 void Level::spawnEnemyExplosion(const glm::vec3& position)
 {
-    auto e = std::make_shared<Explosion>(mCamera.get(), mExplosion1Texture, 8.0f, 32);
+    auto e = std::make_shared<Explosion>(mCamera.get(), mExplosion1Texture, 8.0f, 32, false);
     e->setPosition(position);
     appendChild(e);
     mEngine->soundManager()->play(position, mExplosionSound);

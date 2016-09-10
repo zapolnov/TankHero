@@ -196,8 +196,6 @@ void GLES2Mesh::renderElement(size_t index, const GLES2UberShader& shader) const
     if (shader.shininessUniform() >= 0)
         glUniform1f(shader.shininessUniform(), element.material.shininess);
 
-    glEnable(GL_DEPTH_TEST);
-
     if (element.material.flags & MaterialTwoSided)
         glDisable(GL_CULL_FACE);
     else {

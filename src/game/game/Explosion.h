@@ -11,7 +11,7 @@ class Camera;
 class Explosion : public Node
 {
 public:
-    Explosion(Camera* camera, uint16_t texture, float size, size_t numFrames);
+    Explosion(Camera* camera, uint16_t texture, float size, size_t numFrames, bool depthTest = true);
 
 private:
     struct Vertex
@@ -28,6 +28,7 @@ private:
     std::vector<Vertex> mVertices;
     std::vector<uint16_t> mIndices;
     VertexFormat mVertexFormat;
+    bool mDepthTest;
 
     void update(float time) override;
     void draw(Renderer* renderer) override;

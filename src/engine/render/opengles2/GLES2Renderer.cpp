@@ -74,6 +74,8 @@ void GLES2Renderer::flushFrame()
                 glUniformMatrix4fv(shader.viewMatrixUniform(), 1, GL_FALSE, &mViewMatrix[0][0]);
                 glUniformMatrix4fv(shader.modelMatrixUniform(), 1, GL_FALSE, &drawCall.modelMatrix[0][0]);
 
+                glEnable(GL_DEPTH_TEST);
+
                 for (size_t i = 0; i < mesh->elementCount(); i++) {
                     const auto& material = mesh->elementMaterial(i);
                     if (material.flags & MaterialCastsShadow)
@@ -137,95 +139,109 @@ void GLES2Renderer::flushFrame()
         return shader;
     };
 
-    for (const auto& drawCall : mDrawCalls) {
-        GLES2UberShader::Key baseKey = 0;
-
-        switch (drawCall.type) {
-            case DrawIndexedPrimitive: {
-                VertexFormat format(drawCall.u.ip.vertexFormat);
-
-                mStreamVertexBuffer.bind(GL_ARRAY_BUFFER);
-                glBufferData(GL_ARRAY_BUFFER, drawCall.u.ip.vertexCount * format.stride(),
-                    drawCall.u.ip.vertices, GL_STREAM_DRAW);
-
-                mStreamIndexBuffer.bind(GL_ELEMENT_ARRAY_BUFFER);
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, drawCall.u.ip.indexCount * sizeof(uint16_t),
-                    drawCall.u.ip.indices, GL_STREAM_DRAW);
-
-                bindDiffuseMap(baseKey, drawCall.u.ip.texture);
-                auto shader = bindShader(baseKey, drawCall);
-
-                glDisable(GL_DEPTH_TEST);
-                glEnable(GL_CULL_FACE);
-                glCullFace(GL_BACK);
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-                if (shader->ambientColorUniform() >= 0)
-                    glUniform3f(shader->ambientColorUniform(), 0.3f, 0.3f, 0.3f);
-                if (shader->diffuseColorUniform() >= 0)
-                    glUniform3f(shader->diffuseColorUniform(), 1.0f, 1.0, 1.0f);
-                if (shader->specularColorUniform() >= 0)
-                    glUniform3f(shader->specularColorUniform(), 0.0f, 0.0f, 0.0f);
-                if (shader->opacityUniform() >= 0)
-                    glUniform1f(shader->opacityUniform(), 1.0f);
-                if (shader->shininessUniform() >= 0)
-                    glUniform1f(shader->shininessUniform(), 0.0f);
-
-                GLES2Mesh::enableAttributes(*shader, format);
-                glDrawElements(GL_TRIANGLES, GLsizei(drawCall.u.ip.indexCount), GL_UNSIGNED_SHORT, nullptr);
-                GLES2Mesh::disableAttributes(*shader, format);
+    for (int pass = 0; pass < 2; pass++) {
+        for (const auto& drawCall : mDrawCalls) {
+            if (pass != 0 && !drawCall.transparent)
                 continue;
-            }
+            if (pass != 1 &&  drawCall.transparent)
+                continue;
 
-            case DrawMesh: {
-                const auto& mesh = mMeshes[drawCall.u.m.mesh];
+            GLES2UberShader::Key baseKey = 0;
 
-                if (mesh->vertexFormat().hasNormal()
-                    && mesh->vertexFormat().hasTangent()
-                    && mesh->vertexFormat().hasBitangent())
-                    baseKey |= GLES2UberShader::HasLighting;
-                if (mesh->vertexFormat().hasColor())
-                    baseKey |= GLES2UberShader::HasColorAttribute;
+            if (drawCall.depthTest)
+                glEnable(GL_DEPTH_TEST);
+            else
+                glDisable(GL_DEPTH_TEST);
 
-                GLES2UberShader::Key previousKey;
-                const GLES2UberShader* shader;
+            switch (drawCall.type) {
+                case DrawIndexedPrimitive: {
+                    VertexFormat format(drawCall.u.ip.vertexFormat);
 
-                for (size_t i = 0; i < mesh->elementCount(); i++) {
-                    const auto& material = mesh->elementMaterial(i);
+                    mStreamVertexBuffer.bind(GL_ARRAY_BUFFER);
+                    glBufferData(GL_ARRAY_BUFFER, drawCall.u.ip.vertexCount * format.stride(),
+                        drawCall.u.ip.vertices, GL_STREAM_DRAW);
 
-                    GLES2UberShader::Key key = baseKey;
+                    mStreamIndexBuffer.bind(GL_ELEMENT_ARRAY_BUFFER);
+                    glBufferData(GL_ELEMENT_ARRAY_BUFFER, drawCall.u.ip.indexCount * sizeof(uint16_t),
+                        drawCall.u.ip.indices, GL_STREAM_DRAW);
 
-                    if (material.flags & MaterialAcceptsShadow)
-                        key |= GLES2UberShader::AcceptsShadow;
+                    bindDiffuseMap(baseKey, drawCall.u.ip.texture);
+                    auto shader = bindShader(baseKey, drawCall);
 
-                    bindDiffuseMap(key, material.diffuseMap);
+                    glDepthMask(GL_FALSE);
+                    glEnable(GL_CULL_FACE);
+                    glCullFace(GL_BACK);
+                    glEnable(GL_BLEND);
+                    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-                    glActiveTexture(GL_TEXTURE1);
-                    if (!(key & GLES2UberShader::HasLighting) || material.normalMap == 0)
-                        glBindTexture(GL_TEXTURE_2D, 0);
-                    else {
-                        key |= GLES2UberShader::HasNormalMap;
-                        mTextures[material.normalMap]->bind(GL_TEXTURE_2D);
-                    }
+                    if (shader->ambientColorUniform() >= 0)
+                        glUniform3f(shader->ambientColorUniform(), 0.3f, 0.3f, 0.3f);
+                    if (shader->diffuseColorUniform() >= 0)
+                        glUniform3f(shader->diffuseColorUniform(), 1.0f, 1.0, 1.0f);
+                    if (shader->specularColorUniform() >= 0)
+                        glUniform3f(shader->specularColorUniform(), 0.0f, 0.0f, 0.0f);
+                    if (shader->opacityUniform() >= 0)
+                        glUniform1f(shader->opacityUniform(), 1.0f);
+                    if (shader->shininessUniform() >= 0)
+                        glUniform1f(shader->shininessUniform(), 0.0f);
 
-                    glActiveTexture(GL_TEXTURE2);
-                    if (!(key & GLES2UberShader::HasLighting) || material.specularMap == 0)
-                        glBindTexture(GL_TEXTURE_2D, 0);
-                    else {
-                        key |= GLES2UberShader::HasSpecularMap;
-                        mTextures[material.specularMap]->bind(GL_TEXTURE_2D);
-                    }
+                    GLES2Mesh::enableAttributes(*shader, format);
+                    glDrawElements(GL_TRIANGLES, GLsizei(drawCall.u.ip.indexCount), GL_UNSIGNED_SHORT, nullptr);
+                    GLES2Mesh::disableAttributes(*shader, format);
 
-                    if (i == 0 || previousKey != key) {
-                        previousKey = key;
-                        shader = bindShader(key, drawCall);
-                    }
-
-                    mesh->renderElement(i, *shader);
+                    glDepthMask(GL_TRUE);
+                    continue;
                 }
 
-                continue;
+                case DrawMesh: {
+                    const auto& mesh = mMeshes[drawCall.u.m.mesh];
+
+                    if (mesh->vertexFormat().hasNormal()
+                        && mesh->vertexFormat().hasTangent()
+                        && mesh->vertexFormat().hasBitangent())
+                        baseKey |= GLES2UberShader::HasLighting;
+                    if (mesh->vertexFormat().hasColor())
+                        baseKey |= GLES2UberShader::HasColorAttribute;
+
+                    GLES2UberShader::Key previousKey;
+                    const GLES2UberShader* shader;
+
+                    for (size_t i = 0; i < mesh->elementCount(); i++) {
+                        const auto& material = mesh->elementMaterial(i);
+
+                        GLES2UberShader::Key key = baseKey;
+
+                        if (material.flags & MaterialAcceptsShadow)
+                            key |= GLES2UberShader::AcceptsShadow;
+
+                        bindDiffuseMap(key, material.diffuseMap);
+
+                        glActiveTexture(GL_TEXTURE1);
+                        if (!(key & GLES2UberShader::HasLighting) || material.normalMap == 0)
+                            glBindTexture(GL_TEXTURE_2D, 0);
+                        else {
+                            key |= GLES2UberShader::HasNormalMap;
+                            mTextures[material.normalMap]->bind(GL_TEXTURE_2D);
+                        }
+
+                        glActiveTexture(GL_TEXTURE2);
+                        if (!(key & GLES2UberShader::HasLighting) || material.specularMap == 0)
+                            glBindTexture(GL_TEXTURE_2D, 0);
+                        else {
+                            key |= GLES2UberShader::HasSpecularMap;
+                            mTextures[material.specularMap]->bind(GL_TEXTURE_2D);
+                        }
+
+                        if (i == 0 || previousKey != key) {
+                            previousKey = key;
+                            shader = bindShader(key, drawCall);
+                        }
+
+                        mesh->renderElement(i, *shader);
+                    }
+
+                    continue;
+                }
             }
         }
     }

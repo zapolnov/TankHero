@@ -87,7 +87,7 @@ void Renderer::end2D()
 }
 
 void Renderer::drawIndexedPrimitive(const glm::mat4& model, VertexFormat format, const void* vertices, size_t vertexCount,
-    const uint16_t* indices, size_t indexCount, uint16_t texture)
+    const uint16_t* indices, size_t indexCount, uint16_t texture, bool depthTest)
 {
     mDrawCalls.emplace_back();
     auto& drawCall = mDrawCalls.back();
@@ -99,6 +99,8 @@ void Renderer::drawIndexedPrimitive(const glm::mat4& model, VertexFormat format,
     drawCall.lightPosition = mLightPosition;
     drawCall.lightColor = mLightColor;
     drawCall.lightPower = mLightPower;
+    drawCall.transparent = true; // FIXME: HACKHACK
+    drawCall.depthTest = depthTest;
     drawCall.u.ip.vertexFormat = format.components();
     drawCall.u.ip.vertices = vertices;
     drawCall.u.ip.vertexCount = vertexCount;
@@ -107,7 +109,7 @@ void Renderer::drawIndexedPrimitive(const glm::mat4& model, VertexFormat format,
     drawCall.u.ip.texture = texture;
 }
 
-void Renderer::drawMesh(const glm::mat4& model, uint16_t mesh)
+void Renderer::drawMesh(const glm::mat4& model, uint16_t mesh, bool transparent)
 {
     mDrawCalls.emplace_back();
     auto& drawCall = mDrawCalls.back();
@@ -119,5 +121,7 @@ void Renderer::drawMesh(const glm::mat4& model, uint16_t mesh)
     drawCall.lightPosition = mLightPosition;
     drawCall.lightColor = mLightColor;
     drawCall.lightPower = mLightPower;
+    drawCall.transparent = transparent;
+    drawCall.depthTest = true;
     drawCall.u.m.mesh = mesh;
 }

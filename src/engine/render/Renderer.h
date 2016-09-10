@@ -59,9 +59,9 @@ public:
     }
 
     void drawIndexedPrimitive(const glm::mat4& model, VertexFormat format, const void* vertices, size_t vertexCount,
-        const uint16_t* indices, size_t indexCount, uint16_t texture);
+        const uint16_t* indices, size_t indexCount, uint16_t texture, bool depthTest = true);
 
-    void drawMesh(const glm::mat4& model, uint16_t mesh);
+    void drawMesh(const glm::mat4& model, uint16_t mesh, bool transparent = false);
 
 protected:
     enum DrawCallType
@@ -79,6 +79,8 @@ protected:
         glm::vec3 lightPosition;
         glm::vec3 lightColor;
         float lightPower;
+        bool transparent;
+        bool depthTest;
         union {
             struct {
                 uint16_t mesh;

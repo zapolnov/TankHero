@@ -3,13 +3,14 @@
 #include "src/engine/scene/camera/Camera.h"
 #include <cassert>
 
-Explosion::Explosion(Camera* camera, uint16_t texture, float size, size_t numFrames)
+Explosion::Explosion(Camera* camera, uint16_t texture, float size, size_t numFrames, bool depthTest)
     : mCamera(camera)
     , mTexture(texture)
     , mSize(size)
     , mNumFrames(numFrames)
     , mTime(0.0f)
     , mVertexFormat(VertexFormat::Position | VertexFormat::TexCoord0)
+    , mDepthTest(depthTest)
 {
     assert(mVertexFormat.stride() == sizeof(Vertex));
     assert(mVertexFormat.positionOffset() == offsetof(Vertex, position));
@@ -63,5 +64,5 @@ void Explosion::draw(Renderer* renderer)
     mVertices[3].texCoord = glm::vec2(tx * TSTEPX + TW, ty * TSTEPY + TH);
 
     renderer->drawIndexedPrimitive(worldMatrix(), mVertexFormat, mVertices.data(), mVertices.size(),
-        mIndices.data(), mIndices.size(), mTexture);
+        mIndices.data(), mIndices.size(), mTexture, mDepthTest);
 }
