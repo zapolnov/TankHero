@@ -17,7 +17,7 @@ public:
 
     glm::vec2 direction() const;
 
-    bool hitWithBullet(float bulletAngle) override;
+    bool hitWithBullet(float bulletAngle, bool shotByPlayer) override;
 
     bool isDead() const { return mLives <= 0; }
     bool isPlayer() const override { return true; }

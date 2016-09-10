@@ -9,7 +9,7 @@ Tree::Tree(Engine* engine, uint16_t mesh)
     setScale(0.3f);
 }
 
-bool Tree::hitWithBullet(float bulletAngle)
+bool Tree::hitWithBullet(float bulletAngle, bool)
 {
     if (!mFalling) {
         mFalling = true;

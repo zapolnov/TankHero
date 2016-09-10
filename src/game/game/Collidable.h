@@ -18,7 +18,7 @@ public:
     virtual std::shared_ptr<Collidable> emitter() const { return nullptr; }
 
     virtual bool isPlayer() const { return false; }
-    virtual bool hitWithBullet(float) { return false; }
+    virtual bool hitWithBullet(float, bool) { return false; }
 
 protected:
     Engine* mEngine;

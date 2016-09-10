@@ -37,6 +37,7 @@ Bullet::Bullet(Engine* engine, Level* level, const std::shared_ptr<Collidable>& 
     , mEmitter(emitter)
     , mVisual(std::make_shared<Visual>(mesh))
     , mDirection(glm::normalize(dir))
+    , mShotByPlayer(emitter->isPlayer())
 {
     float angle = atan2f(dir.y, dir.x);
     setRotation2D(angle);
@@ -72,7 +73,7 @@ void Bullet::update(float time)
     float length = std::min(time, 1.0f / 40.0f) * MOVE_SPEED;
     auto target = mLevel->collideOnMove(*this, mDirection, length, emitter.get());
     if (target) {
-        if (!target->hitWithBullet(rotation2D()))
+        if (!target->hitWithBullet(rotation2D(), mShotByPlayer))
             mLevel->spawnBulletExplosion(position() + glm::vec3(mDirection * (length + 2.0f), 4.0f / 5.0f));
         removeFromParent();
         return;

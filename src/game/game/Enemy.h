@@ -20,7 +20,7 @@ public:
 
     glm::vec2 direction() const;
 
-    bool hitWithBullet(float bulletAngle) override;
+    bool hitWithBullet(float bulletAngle, bool shotByPlayer) override;
 
 private:
     class Visual;

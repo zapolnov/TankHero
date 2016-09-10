@@ -54,9 +54,9 @@ glm::vec2 Enemy::direction() const
     return glm::vec2(cosf(a), sinf(a));
 }
 
-bool Enemy::hitWithBullet(float)
+bool Enemy::hitWithBullet(float, bool shotByPlayer)
 {
-    if (mLives > 0) {
+    if (shotByPlayer && mLives > 0) {
         --mLives;
         if (mLives <= 0) {
             mLevel->spawnEnemyExplosion(position());

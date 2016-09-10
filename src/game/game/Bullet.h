@@ -20,6 +20,7 @@ private:
     std::shared_ptr<Visual> mVisual;
     std::weak_ptr<Collidable> mEmitter;
     glm::vec2 mDirection;
+    bool mShotByPlayer;
     bool mInitialized = false;
 
     const glm::mat4& bboxToWorldTransform() override;
