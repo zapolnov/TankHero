@@ -4,8 +4,9 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Game</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <style>
-      html,body { background-color: #202020; color: #c0c0c0; }
+      html,body { background-color: #202020; color: #c0c0c0; margin: 0px; padding: 0px; }
       input { background-color: #303030; color: #c0c0c0; margin-top: 5px; padding: 3px; }
       .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
       textarea.emscripten { font-family: monospace; width: 80%; }
@@ -17,6 +18,7 @@
         height: 50px;
         width: 50px;
         margin: 0px auto;
+        margin-top: 250px;
         -webkit-animation: rotation .8s linear infinite;
         -moz-animation: rotation .8s linear infinite;
         -o-animation: rotation .8s linear infinite;
@@ -54,7 +56,9 @@
       <progress value="0" max="100" id="progress" hidden=1></progress>
     </div>
     <div class="emscripten_border">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+      <canvas class="emscripten" id="canvas" tabindex="1"
+        oncontextmenu="$(document).find('#canvas').focus(); event.preventDefault()"
+        onclick="$(document).find('#canvas').focus()"></canvas>
     </div>
     <div class="emscripten">
       <span style="display:none">
@@ -132,7 +136,7 @@
         totalDependencies: 0,
         monitorRunDependencies: function(left) {
           this.totalDependencies = Math.max(this.totalDependencies, left);
-          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'Starting...');
         }
       };
       Module.setStatus('Downloading...');
