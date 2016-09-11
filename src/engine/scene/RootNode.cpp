@@ -117,7 +117,9 @@ void RootNode::beforeDraw(Renderer* renderer)
         renderer->setViewMatrix(glm::mat4(1.0f));
     } else {
         if (mSizeChanged) {
-            mCamera->setSize(mWidth, mHeight);
+            float width = mWidth, height = mHeight;
+            adjustCameraSize(width, height);
+            mCamera->setSize(width, height);
             mSizeChanged = false;
         }
         renderer->setProjectionMatrix(mCamera->projectionMatrix());

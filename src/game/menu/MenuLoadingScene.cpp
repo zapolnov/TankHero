@@ -45,7 +45,7 @@ MenuLoadingScene::MenuLoadingScene(Engine* engine)
 {
     mEngine->renderer()->setClearColor(MainMenuScene::BACKGROUND_COLOR);
 
-    setProgressBarPosition(-LOGO_H * 0.5f - 40.0f);
+    setProgressBarPosition(-LOGO_H * 0.5f - 10.0f);
     setProgressBarColors(
         glm::vec4(104.0f / 255.0f, 175.0f / 255.0f, 98.0f / 255.0f, 1.0f),
         glm::vec4( 35.0f / 255.0f,  64.0f / 255.0f, 33.0f / 255.0f, 1.0f)

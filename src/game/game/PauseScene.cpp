@@ -13,7 +13,7 @@ const glm::vec4 PauseScene::BACKGROUND_COLOR(0.156863f, 0.156863f, 0.156863f, 1.
 
 static const float TITLE_W = 1024.0f;
 static const float TITLE_H = 128.0f;
-static const float TITLE_Y = 200.0f;
+static const float TITLE_Y = 150.0f;
 
 namespace
 {

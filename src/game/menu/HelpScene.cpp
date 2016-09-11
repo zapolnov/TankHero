@@ -12,6 +12,19 @@ static const float IMAGE_H = 1024.0f;
 
 namespace
 {
+    class Root : public RootNode
+    {
+    public:
+        void adjustCameraSize(float& width, float& height) override
+        {
+            if (height < 768.0f) {
+                float aspect = width / height;
+                height = 768.0f;
+                width = height * aspect;
+            }
+        }
+    };
+
     class Image : public Node
     {
     public:
@@ -55,7 +68,7 @@ HelpScene::HelpScene(Engine* engine, PendingResources& resourceQueue)
     resourceQueue.textures.emplace(mGoBackPressedImage = engine->renderer()->textureNameId("gotit_pressed.png"));
 
     resourceQueue.custom.emplace_back([this] {
-        auto rootNode = std::make_shared<RootNode>();
+        auto rootNode = std::make_shared<Root>();
         rootNode->set2D(true);
         rootNode->setCamera(std::make_shared<OrthoCamera>());
         setRootNode(rootNode);

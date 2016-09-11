@@ -32,4 +32,6 @@ private:
     float mHeight = 0.0f;
     bool mSizeChanged = true;
     bool m2D = false;
+
+    virtual void adjustCameraSize(float&, float&) {}
 };

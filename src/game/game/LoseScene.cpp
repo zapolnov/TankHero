@@ -12,7 +12,7 @@ const glm::vec4 LoseScene::BACKGROUND_COLOR(0.156863f, 0.156863f, 0.156863f, 1.0
 
 static const float TITLE_W = 1024.0f;
 static const float TITLE_H = 128.0f;
-static const float TITLE_Y = 200.0f;
+static const float TITLE_Y = 50.0f;
 
 namespace
 {

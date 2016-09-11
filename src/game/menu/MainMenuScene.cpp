@@ -10,11 +10,11 @@ const glm::vec4 MainMenuScene::BACKGROUND_COLOR(0.156863f, 0.156863f, 0.156863f,
 
 static const float LOGO_W = 512.0f;
 static const float LOGO_H = 256.0f;
-static const float LOGO_Y = 100.0f;
+static const float LOGO_Y = 30.0f;
 
 static const float COPYRIGHT_W = 1024.0f;
 static const float COPYRIGHT_H = 64.0f;
-static const float COPYRIGHT_Y = -360.0f;
+static const float COPYRIGHT_Y = -260.0f;
 
 namespace
 {
