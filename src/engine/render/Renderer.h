@@ -48,6 +48,9 @@ public:
     Canvas* begin2D();
     void end2D();
 
+    const glm::vec3& lightPosition() const { return mLightPosition; }
+    void setLightPosition(const glm::vec3& position) { mLightPosition = position; }
+
     void setLight(const glm::vec3& position, const glm::vec3& color, float power)
     {
         mLightPosition = position;

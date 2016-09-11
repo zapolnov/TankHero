@@ -735,7 +735,7 @@ void Level::update(float time)
 
 void Level::beforeDraw(Renderer* renderer)
 {
-    auto lightPosition = glm::vec3(0.0f, 0.0f, -400.0f);
+    auto lightPosition = glm::vec3(0.1f, 0.1f, -400.0f);
     renderer->setLight(lightPosition, glm::vec3(1.0f), 1.0f);
 
     glm::vec2 p[4] = {

@@ -7,7 +7,8 @@
 class Player::Body : public Node
 {
 public:
-    Body(Engine* engine, PendingResources& resourceQueue)
+    Body(Engine* engine, Player* player, PendingResources& resourceQueue)
+        : mPlayer(player)
     {
         resourceQueue.meshes.emplace(mMesh = engine->renderer()->meshNameId("tank_body.mesh"));
         setScale(5.0f);
@@ -24,17 +25,20 @@ public:
 
     void draw(Renderer* renderer) override
     {
+        renderer->setLightPosition(glm::vec3(mPlayer->position2D() - mPlayer->direction() * 300.0f, -100.0f));
         renderer->drawMesh(worldMatrix(), mMesh);
     }
 
 private:
     uint16_t mMesh;
+    Player* mPlayer;
 };
 
 class Player::Gun : public Node
 {
 public:
-    Gun(Engine* engine, PendingResources& resourceQueue)
+    Gun(Engine* engine, Player* player, PendingResources& resourceQueue)
+        : mPlayer(player)
     {
         resourceQueue.meshes.emplace(mMesh = engine->renderer()->meshNameId("tank_gun.mesh"));
         setScale(5.0f);
@@ -44,11 +48,13 @@ public:
 
     void draw(Renderer* renderer) override
     {
+        renderer->setLightPosition(glm::vec3(mPlayer->position2D() - mPlayer->direction() * 250.0f, -100.0f));
         renderer->drawMesh(worldMatrix(), mMesh);
     }
 
 private:
     uint16_t mMesh;
+    Player* mPlayer;
 };
 
 const int Player::INITIAL_LIVES = 5;
@@ -60,8 +66,8 @@ Player::Player(Engine* engine, Level* level, PendingResources& resourceQueue)
 {
     resourceQueue.sounds.emplace(mMedKitSound = engine->soundManager()->soundNameId("Rise01.ogg"));
 
-    mBody = std::make_shared<Body>(engine, resourceQueue);
-    mGun = std::make_shared<Gun>(engine, resourceQueue);
+    mBody = std::make_shared<Body>(engine, this, resourceQueue);
+    mGun = std::make_shared<Gun>(engine, this, resourceQueue);
     resourceQueue.custom.emplace_back([this]() {
         appendChild(mBody);
         appendChild(mGun);
@@ -185,6 +191,16 @@ void Player::update(float time)
         mLevel->spawnBullet(std::static_pointer_cast<Player>(shared_from_this()), position, direction());
         mTimeSinceLastShot = 0.0f;
     }
+}
+
+void Player::beforeDraw(Renderer* renderer)
+{
+    mOldLightPosition = renderer->lightPosition();
+}
+
+void Player::afterDraw(Renderer* renderer)
+{
+    renderer->setLightPosition(mOldLightPosition);
 }
 
 void Player::draw(Renderer*)

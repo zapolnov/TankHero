@@ -3,19 +3,19 @@
     <IncludeColors>false</IncludeColors>
     <SimplifiedBoundingSphere>true</SimplifiedBoundingSphere>
     <Material name="Body_001">
-        <AmbientColor r="0.4" g="0.4" b="0.4" />
+        <AmbientColor r="0.7" g="0.7" b="0.7" />
         <AcceptsShadow>false</AcceptsShadow>
     </Material>
     <Material name="Tracks">
-        <AmbientColor r="0.4" g="0.4" b="0.4" />
+        <AmbientColor r="0.7" g="0.7" b="0.7" />
         <AcceptsShadow>false</AcceptsShadow>
     </Material>
     <Material name="Wheel">
-        <AmbientColor r="0.4" g="0.4" b="0.4" />
+        <AmbientColor r="0.7" g="0.7" b="0.7" />
         <AcceptsShadow>false</AcceptsShadow>
     </Material>
     <Material name="WheelInner">
-        <AmbientColor r="0.4" g="0.4" b="0.4" />
+        <AmbientColor r="0.7" g="0.7" b="0.7" />
         <AcceptsShadow>false</AcceptsShadow>
     </Material>
 </Mesh>

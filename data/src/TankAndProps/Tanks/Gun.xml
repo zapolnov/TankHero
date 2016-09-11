@@ -3,14 +3,14 @@
     <IncludeColors>false</IncludeColors>
     <Material name="Black">
         <AcceptsShadow>false</AcceptsShadow>
-        <AmbientColor r="0.4" g="0.4" b="0.4" />
+        <AmbientColor r="0.7" g="0.7" b="0.7" />
     </Material>
     <Material name="Body">
         <AcceptsShadow>false</AcceptsShadow>
-        <AmbientColor r="0.4" g="0.4" b="0.4" />
+        <AmbientColor r="0.7" g="0.7" b="0.7" />
     </Material>
     <Material name="Material_003">
         <AcceptsShadow>false</AcceptsShadow>
-        <AmbientColor r="0.4" g="0.4" b="0.4" />
+        <AmbientColor r="0.7" g="0.7" b="0.7" />
     </Material>
 </Mesh>

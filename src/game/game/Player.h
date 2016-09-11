@@ -34,11 +34,15 @@ private:
     std::shared_ptr<Gun> mGun;
     float mTimeSinceLastShot = 0.0f;
     float mDeathTime = 0.0f;
+    glm::vec3 mOldLightPosition;
     int mLives;
 
     const glm::mat4& bboxToWorldTransform() override;
     std::pair<glm::vec3, glm::vec3> localAABox() const override;
 
     void update(float time) override;
+
+    void beforeDraw(Renderer* renderer) override;
+    void afterDraw(Renderer* renderer) override;
     void draw(Renderer* renderer) override;
 };
