@@ -14,6 +14,17 @@ static bool gDragging;
 template <typename TYPE> static Key mapKey(TYPE key)
 {
     switch (key) {
+        case SDLK_w: return KeyUp;
+        case SDLK_a: return KeyLeft;
+        case SDLK_s: return KeyDown;
+        case SDLK_d: return KeyRight;
+        case SDLK_KP_8: return KeyUp;
+        case SDLK_KP_4: return KeyLeft;
+        case SDLK_KP_6: return KeyRight;
+        case SDLK_KP_2: return KeyDown;
+        case SDLK_KP_ENTER: return KeyShoot;
+        case SDLK_RETURN: return KeyShoot;
+        case SDLK_RETURN2: return KeyShoot;
         case SDLK_UP: return KeyUp;
         case SDLK_DOWN: return KeyDown;
         case SDLK_LEFT: return KeyLeft;

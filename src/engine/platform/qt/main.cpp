@@ -52,7 +52,7 @@ int main(int argc, char** argv)
   #endif
 
     OpenGLWidget mainWindow(&gameInit);
-    mainWindow.resize(800, 600);
+    mainWindow.resize(1024, 768);
     mainWindow.show();
 
     return app.exec();
