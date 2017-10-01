@@ -57,3 +57,10 @@ int main(int argc, char** argv)
 
     return app.exec();
 }
+
+#ifdef _WIN32
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+{
+    return main(__argc, __argv);
+}
+#endif

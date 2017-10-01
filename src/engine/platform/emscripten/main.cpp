@@ -104,7 +104,7 @@ int main()
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
     gWindow = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+        1024, 768, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (!gWindow) {
         EM_ASM(alert("Unable to initialize WebGL."));
         return 1;

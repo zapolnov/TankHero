@@ -451,7 +451,7 @@ if(WIN32)
 endif()
 
 add_executable(Game WIN32 MACOSX_BUNDLE ${source_files} ${asset_src_files} ${asset_bin_files})
-target_link_libraries(Game engine)
+target_link_libraries(Game renderer sound engine)
 
 if(WIN32)
     target_link_libraries(Game shlwapi)
